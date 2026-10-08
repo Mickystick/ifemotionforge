@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lindero</title>
+
+  <!-- Makes the app installable to a phone's home screen, which is what the
+       WhatsApp share target needs: the OS share sheet only lists installed
+       apps. See public/manifest.webmanifest and docs/receipt-intake.md. -->
+  <link rel="manifest" href="/manifest.webmanifest">
+  <!-- Tints the Android status bar to match the page behind it. Same value as
+       --paper in styles.css, which is the body background. -->
+  <meta name="theme-color" content="#FCF9F5">
+  <!-- The browser-tab icon: the MR mark cropped tight, because the install
+       icons carry wide margins that leave it unreadable at 16px. The .ico is
+       also what browsers request on their own if no link is found. -->
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48">
+  <link rel="icon" type="image/png" href="/icons/favicon-32.png" sizes="32x32">
+  <!-- iOS ignores the manifest's icons. It cannot install a share target
+       either, so this is only so a home-screen bookmark looks right. -->
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <script type="module" crossorigin src="/assets/index-CVgnmUVx.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DqTQ2E5f.css">
+</head>
+
+<body>
+  <!-- React renders the entire application inside this one empty div. -->
+  <div id="root"></div>
+</body>
+
+</html>

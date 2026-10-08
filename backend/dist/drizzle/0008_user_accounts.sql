@@ -1,0 +1,15 @@
+--
+-- Give an account a way to STOP working, so hiring and losing staff is a thing
+-- the app can do rather than a job for whoever has the database file.
+--
+-- Deactivation rather than deletion, and the reason is in the references: a
+-- user's id is written on every payment they recorded (`payments.recorded_by`)
+-- and on every row of `audit_events`. Deleting the row would either break those
+-- foreign keys or, worse, take the answer to "who received this money" with it
+-- — which is the whole reason those columns are there.
+--
+-- A plain ADD COLUMN, so no rebuild and no foreign key handling is needed here.
+-- Existing accounts get NULL, which reads as "active" everywhere: nobody is
+-- locked out by running this.
+--
+ALTER TABLE `users` ADD `deactivated_at` text;
