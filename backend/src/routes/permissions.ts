@@ -55,7 +55,7 @@ export const permissionRoutes: FastifyPluginAsync = async (app) => {
       if (!parsed.success) {
         return reply.code(400).send({
           error: "invalid_body",
-          message: "No se pudo leer la lista de permisos.",
+          message: "Could not load the permissions list.",
         });
       }
 
@@ -65,7 +65,7 @@ export const permissionRoutes: FastifyPluginAsync = async (app) => {
       if (unknown.length > 0) {
         return reply.code(400).send({
           error: "unknown_capability",
-          message: `Permiso desconocido: ${unknown.join(", ")}.`,
+          message: `Unknown permission: ${unknown.join(", ")}.`,
         });
       }
 

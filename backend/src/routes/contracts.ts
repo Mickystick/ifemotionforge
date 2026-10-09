@@ -411,10 +411,10 @@ function present(
 
 const isoDate = z
   .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/, "La fecha debe tener el formato AAAA-MM-DD.")
+  .regex(/^\d{4}-\d{2}-\d{2}$/, "Date must use the YYYY-MM-DD format.")
   // Rejects "2026-02-31", which matches the pattern and is not a day.
   .refine((value) => value === new Date(`${value}T00:00:00Z`).toISOString().slice(0, 10), {
-    message: "Esa fecha no existe en el calendario.",
+    message: "That date does not exist on the calendar.",
   });
 
 const contractBody = z.object({
@@ -555,18 +555,18 @@ function termsProblem(
 
   if (body.saleType === "financed") {
     if (body.termMonths == null || body.monthlyPaymentCents == null || body.dueDay == null) {
-      return "Un contrato a crédito necesita plazo en meses, cuota mensual y día de pago.";
+      return "A financed contract requires a term in months, a monthly payment, and a payment day.";
     }
   } else if (hasSchedule) {
     return body.saleType === "cash"
-      ? "Una venta de contado se salda al firmar: no lleva plazo, cuota ni día de pago."
-      : "Una donación no lleva plazo, cuota ni día de pago.";
+      ? "A cash sale is paid in full at signing; it has no term, monthly payment, or payment day."
+      : "A donation has no term, monthly payment, or payment day.";
   }
 
   if (body.saleType === "donation" && (body.salePriceCents > 0 || body.downPaymentCents > 0)) {
     // Recorded at zero rather than left out of the table: the lot's history has
     // to say what became of it, and "no aparece" is not an answer.
-    return "Una donación se registra con precio y prima en cero.";
+    return "A donation must be recorded with a price and down payment of zero.";
   }
 
   if (body.saleType === "cash" && body.downPaymentCents > 0) {
@@ -575,29 +575,29 @@ function termsProblem(
     // `expectedByCents` already assumes — so a prima on one is a number that
     // changes no arithmetic and still gets counted as a prima pendiente on the
     // Panel General until somebody notices.
-    return "Una venta de contado se salda al firmar: no lleva prima.";
+    return "A cash sale is paid in full at signing and does not have a down payment.";
   }
 
   if (body.downPaymentCents > body.salePriceCents) {
-    return "La prima no puede ser mayor que el precio de venta.";
+    return "The down payment cannot exceed the sale price.";
   }
 
   if (body.saleType === "financed" && body.downPaymentCents === body.salePriceCents) {
-    return "Si la prima cubre todo el precio, la venta es de contado, no a crédito.";
+    return "If the down payment covers the full price, the sale is cash, not financed.";
   }
 
   if (body.kind === "reservation" && !body.expiresOn) {
     // A hold with no end date keeps a lot off the market forever and nobody
     // ever notices. That is the difference between a reservation and a sale.
-    return "Una reserva necesita una fecha de vencimiento.";
+    return "A reservation requires an expiration date.";
   }
 
   if (body.firstDueOn && body.firstDueOn < body.signedOn) {
-    return "La primera cuota no puede vencer antes de firmar el contrato.";
+    return "The first payment cannot be due before the contract is signed.";
   }
 
   if (body.expiresOn && body.expiresOn < body.signedOn) {
-    return "El vencimiento de la reserva no puede ser anterior a la firma.";
+    return "A reservation cannot expire before it is signed.";
   }
 
   return null;
@@ -699,7 +699,7 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
       if (!Number.isInteger(amountCents) || amountCents <= 0) {
         return reply.code(400).send({
           error: "invalid_amount",
-          message: "Indica el monto a repartir, en centavos.",
+          message: "Enter the amount to distribute, in cents.",
         });
       }
 
@@ -713,7 +713,7 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
       if (members.length === 0) {
         return reply.code(404).send({
           error: "not_found",
-          message: "Esa compra no tiene contratos vigentes.",
+          message: "This purchase has no active contracts.",
         });
       }
 
@@ -763,7 +763,7 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
       if (!parsed.success) {
         return reply.code(400).send({
           error: "invalid_body",
-          message: "Revisa los datos del contrato.",
+          message: "Check the contract details.",
           issues: parsed.error.issues.map((issue) => issue.message),
         });
       }
@@ -779,7 +779,7 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
       if (!lot || lot.archivedAt !== null) {
         return reply.code(400).send({
           error: "unknown_lot",
-          message: "Ese lote no existe o está archivado.",
+          message: "That lot does not exist or has been archived.",
         });
       }
 
@@ -792,7 +792,7 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
       if (!customer) {
         return reply
           .code(400)
-          .send({ error: "unknown_customer", message: "Ese cliente no existe." });
+          .send({ error: "unknown_customer", message: "That customer does not exist." });
       }
 
       // A lot can only be held once. This is what stops the same lot being sold
@@ -810,7 +810,7 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
       if (holder) {
         return reply.code(409).send({
           error: "lot_taken",
-          message: `El lote ${lot.code} ya tiene el contrato ${holder.code} vigente.`,
+          message: `Lot ${lot.code} already has active contract ${holder.code}.`,
         });
       }
 
@@ -835,14 +835,14 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
         if (!sibling || sibling.status !== "active") {
           return reply.code(400).send({
             error: "unknown_group",
-            message: "El contrato al que quieres unir esta compra no existe o no está vigente.",
+            message: "The contract you want to add this purchase to does not exist or is not active.",
           });
         }
 
         if (sibling.customerId !== customer.id) {
           return reply.code(400).send({
             error: "group_customer_mismatch",
-            message: "Una compra agrupa lotes de un solo cliente.",
+            message: "A purchase can only group lots for one customer.",
           });
         }
 
@@ -915,7 +915,7 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
       if (!parsed.success) {
         return reply.code(400).send({
           error: "invalid_body",
-          message: "Revisa los datos del contrato.",
+          message: "Check the contract details.",
           issues: parsed.error.issues.map((issue) => issue.message),
         });
       }
@@ -934,7 +934,7 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
         .get();
 
       if (!existing) {
-        return reply.code(404).send({ error: "not_found", message: "Contrato no encontrado." });
+        return reply.code(404).send({ error: "not_found", message: "Contract not found." });
       }
 
       if (existing.status !== "active" && existing.status !== "paid_off") {
@@ -946,7 +946,7 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
         // without anybody having to remember this line.
         return reply.code(409).send({
           error: "not_active",
-          message: "Este contrato está cerrado y ya no admite cambios.",
+          message: "This contract is closed and can no longer be changed.",
         });
       }
 
@@ -968,8 +968,8 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
         return reply.code(400).send({
           error: "reason_required",
           message:
-            `Explica por qué se modifican los términos del contrato ${existing.code} ` +
-            "(mínimo 10 caracteres).",
+            `Explain why the terms of contract ${existing.code} are changing ` +
+            "(at least 10 characters).",
         });
       }
 
@@ -984,7 +984,7 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
       if (isRepricing && !roleCan(app.db, actor.role, "contract:reprice")) {
         return reply.code(403).send({
           error: "forbidden",
-          message: "Tu usuario puede editar contratos, pero no cambiar el precio de venta.",
+          message: "Your account can edit contracts but cannot change the sale price.",
         });
       }
 
@@ -993,7 +993,7 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
         // would be owed a refund nothing in the app can express yet.
         return reply.code(400).send({
           error: "price_below_paid",
-          message: "El precio no puede quedar por debajo de lo ya pagado en este contrato.",
+          message: "The price cannot be lower than the amount already paid on this contract.",
         });
       }
 
@@ -1081,7 +1081,7 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
       if (!parsed.success) {
         return reply.code(400).send({
           error: "invalid_body",
-          message: "Elige el lote correcto y explica el motivo (mínimo 10 caracteres).",
+          message: "Choose the correct lot and explain the reason (at least 10 characters).",
         });
       }
 
@@ -1093,21 +1093,21 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
         .get();
 
       if (!existing) {
-        return reply.code(404).send({ error: "not_found", message: "Contrato no encontrado." });
+        return reply.code(404).send({ error: "not_found", message: "Contract not found." });
       }
 
       if (existing.status !== "active" && existing.status !== "paid_off") {
         // A closed contract is history, same rule as the terms edit above.
         return reply.code(409).send({
           error: "not_active",
-          message: "Este contrato está cerrado y ya no admite cambios.",
+          message: "This contract is closed and can no longer be changed.",
         });
       }
 
       if (parsed.data.lotId === existing.lotId) {
         return reply.code(400).send({
           error: "same_lot",
-          message: "Ese ya es el lote de este contrato.",
+          message: "That is already this contract's lot.",
         });
       }
 
@@ -1116,7 +1116,7 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
       if (!lot || lot.archivedAt !== null) {
         return reply.code(400).send({
           error: "unknown_lot",
-          message: "Ese lote no existe o está archivado.",
+          message: "That lot does not exist or has been archived.",
         });
       }
 
@@ -1133,7 +1133,7 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
       if (holder) {
         return reply.code(409).send({
           error: "lot_taken",
-          message: `El lote ${lot.code} ya tiene el contrato ${holder.code} vigente.`,
+          message: `Lot ${lot.code} already has active contract ${holder.code}.`,
         });
       }
 
@@ -1197,7 +1197,7 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
       if (!parsed.success) {
         return reply.code(400).send({
           error: "invalid_body",
-          message: "Revisa los datos de la adenda. El motivo necesita al menos 10 caracteres.",
+          message: "Check the amendment details. The reason must be at least 10 characters.",
           issues: parsed.error.issues.map((issue) => issue.message),
         });
       }
@@ -1209,7 +1209,7 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
       if (new Set(contractIds).size !== contractIds.length) {
         return reply.code(400).send({
           error: "duplicate_contract",
-          message: "Un mismo contrato aparece dos veces en la adenda.",
+          message: "The same contract appears twice in the amendment.",
         });
       }
 
@@ -1219,7 +1219,7 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
       if (body.effectiveOn > today()) {
         return reply.code(400).send({
           error: "future_date",
-          message: "La fecha de la adenda no puede ser futura: es el día en que se acordó.",
+          message: "The amendment date cannot be in the future; it is the date the change was agreed.",
         });
       }
 
@@ -1239,7 +1239,7 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
         if (!row) {
           return reply
             .code(404)
-            .send({ error: "not_found", message: "Uno de los contratos de la adenda no existe." });
+            .send({ error: "not_found", message: "One of the contracts in the amendment does not exist." });
         }
 
         const { contract, lotCode } = row;
@@ -1248,7 +1248,7 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
         if (customerId !== null && contract.customerId !== customerId) {
           return reply.code(400).send({
             error: "customer_mismatch",
-            message: "Una adenda cubre contratos de un solo cliente.",
+            message: "An amendment can only cover contracts for one customer.",
           });
         }
         customerId = contract.customerId;
@@ -1256,7 +1256,7 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
         if (contract.status !== "active") {
           return reply.code(409).send({
             error: "not_active",
-            message: `${contract.code} no está vigente: solo un contrato vigente admite una adenda.`,
+            message: `${contract.code} is not active; only active contracts can be amended.`,
           });
         }
 
@@ -1266,7 +1266,7 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
           return reply.code(400).send({
             error: "not_a_contract",
             message:
-              `${contract.code} es una reserva. Conviértela en contrato con «Editar términos» ` +
+              `${contract.code} is a reservation. Convert it to a contract using “Edit terms” ` +
               "antes de hacerle una adenda.",
           });
         }
@@ -1276,7 +1276,7 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
         if (body.effectiveOn < signedOn) {
           return reply.code(400).send({
             error: "before_signing",
-            message: `La adenda no puede ser anterior a la firma de ${contract.code} (${signedOn}).`,
+            message: `The amendment cannot be dated before ${contract.code} was signed (${signedOn}).`,
           });
         }
 
@@ -1297,7 +1297,7 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
         if (problem) {
           return reply
             .code(400)
-            .send({ error: "invalid_terms", message: `Lote ${lotCode}: ${problem}` });
+            .send({ error: "invalid_terms", message: `Lot ${lotCode}: ${problem}` });
         }
       }
 
@@ -1331,11 +1331,11 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
         return reply.code(409).send({
           error: "payment_after_amendment",
           message:
-            `${code} tiene un pago del ${lateItem.paidOn} ` +
-            `(L ${(lateItem.amountCents / 100).toLocaleString("es-HN")}), posterior a la fecha ` +
-            "de la adenda. Si ese dinero es del nuevo acuerdo, anula ese pago y regístralo en " +
-            "el contrato nuevo después de la adenda; si era del contrato anterior, pon la " +
-            "adenda en esa fecha o después.",
+            `${code} has a payment from ${lateItem.paidOn} ` +
+            `(L ${(lateItem.amountCents / 100).toLocaleString("en-HN")}), after the date ` +
+            "of the amendment. If that money belongs to the new agreement, void the payment and " +
+            "record it on the new contract after the amendment; if it belongs to the previous " +
+            "contract, date the amendment on or after that payment.",
         });
       }
 
@@ -1457,7 +1457,7 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
         if (error instanceof AmendmentConflict) {
           return reply.code(409).send({
             error: "not_active",
-            message: `${error.message} cambió mientras se registraba la adenda. Ábrela de nuevo.`,
+            message: `${error.message} changed while the amendment was being saved. Please open it again.`,
           });
         }
         throw error;
@@ -1493,7 +1493,7 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
     if (!parsed.success) {
       return reply.code(400).send({
         error: "invalid_body",
-        message: "Explica el motivo con al menos 10 caracteres.",
+        message: "Please explain the reason in at least 10 characters.",
       });
     }
 
@@ -1505,7 +1505,7 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
       .get();
 
     if (!existing) {
-      return reply.code(404).send({ error: "not_found", message: "Contrato no encontrado." });
+      return reply.code(404).send({ error: "not_found", message: "Contract not found." });
     }
 
     // `active` or `paid_off` — both are contracts that still hold a lot and can
@@ -1513,7 +1513,7 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
     if (existing.status !== "active" && existing.status !== "paid_off") {
       return reply.code(409).send({
         error: "not_active",
-        message: "Ese contrato ya está cerrado.",
+        message: "That contract is already closed.",
       });
     }
 
@@ -1540,8 +1540,8 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
         return reply.code(400).send({
           error: "settlement_required",
           message:
-            `${existing.code} tiene L ${(paidToDateCents / 100).toLocaleString("es-HN")} ` +
-            "pagados. Indica qué pasa con ese dinero: reembolso, retención temporal o " +
+            `${existing.code} has L ${(paidToDateCents / 100).toLocaleString("en-HN")} ` +
+            "in payments. Specify what happens to that money: refund, temporary hold, or " +
             "que quede como ingreso.",
         });
       }
@@ -1554,8 +1554,8 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
         return reply.code(403).send({
           error: "forbidden",
           message:
-            `Tu usuario puede ${kind.verb} contratos, pero no revertir pagos. ` +
-            "Elige otra opción o pide a un supervisor que registre el reembolso.",
+            `Your account can ${kind.verb} contracts but cannot reverse payments. ` +
+            "Choose another option or ask a supervisor to record the refund.",
         });
       }
     }
@@ -1577,8 +1577,8 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
         .run();
 
       if (settlement === "refunded" && contractPayments.length > 0) {
-        const note = `Contrato ${existing.code} ${
-          kind.newStatus === "defaulted" ? "incumplido" : "cancelado"
+        const note = `Contract ${existing.code} ${
+          kind.newStatus === "defaulted" ? "defaulted" : "cancelled"
         } con reembolso`;
 
         // The payments keep their amount, date and rate — they just stop
@@ -1648,7 +1648,7 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
   app.post<{ Params: { id: string } }>(
     "/contracts/:id/cancel",
     { onRequest: app.requireCapability("contract:cancel") },
-    (request, reply) => close(request, reply, { newStatus: "cancelled", action: "cancel", verb: "cancelar" }),
+    (request, reply) => close(request, reply, { newStatus: "cancelled", action: "cancel", verb: "cancel" }),
   );
 
   /**
@@ -1665,7 +1665,7 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
     "/contracts/:id/default",
     { onRequest: app.requireCapability("contract:default") },
     (request, reply) =>
-      close(request, reply, { newStatus: "defaulted", action: "default", verb: "declarar incumplidos" }),
+      close(request, reply, { newStatus: "defaulted", action: "default", verb: "declare in default" }),
   );
 
   /* ---------------------------------------------------------------------- */
@@ -1706,7 +1706,7 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
         .get();
 
       if (!contract) {
-        return reply.code(404).send({ error: "not_found", message: "Ese contrato no existe." });
+        return reply.code(404).send({ error: "not_found", message: "That contract does not exist." });
       }
 
       return { documents: documentsFor(app.db, contract.id).map(presentDocument) };
@@ -1735,7 +1735,7 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
         .get();
 
       if (!contract) {
-        return reply.code(404).send({ error: "not_found", message: "Ese contrato no existe." });
+        return reply.code(404).send({ error: "not_found", message: "That contract does not exist." });
       }
 
       const existing = app.db
@@ -1747,7 +1747,7 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
       if ((existing?.value ?? 0) >= MAX_DOCUMENTS_PER_CONTRACT) {
         return reply.code(409).send({
           error: "too_many_documents",
-          message: `Un contrato admite hasta ${MAX_DOCUMENTS_PER_CONTRACT} documentos.`,
+          message: `A contract can have up to ${MAX_DOCUMENTS_PER_CONTRACT} documents.`,
         });
       }
 
@@ -1759,19 +1759,19 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
         // Thrown by @fastify/multipart when the body is not multipart at all.
         return reply
           .code(400)
-          .send({ error: "invalid_upload", message: "No se recibió ningún archivo." });
+          .send({ error: "invalid_upload", message: "No file was received." });
       }
 
       if (!part) {
         return reply
           .code(400)
-          .send({ error: "invalid_upload", message: "No se recibió ningún archivo." });
+          .send({ error: "invalid_upload", message: "No file was received." });
       }
 
       if (!isAllowedContentType(part.mimetype)) {
         return reply.code(415).send({
           error: "unsupported_type",
-          message: "Solo se aceptan PDF o imágenes (JPG, PNG, WEBP, HEIC) del contrato escaneado.",
+          message: "Only scanned contract PDFs or images (JPG, PNG, WEBP, HEIC) are accepted.",
         });
       }
 
@@ -1784,12 +1784,12 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
       if (part.file.truncated) {
         return reply.code(413).send({
           error: "file_too_large",
-          message: `El archivo supera el máximo de ${Math.round(MAX_DOCUMENT_BYTES / 1024 / 1024)} MB.`,
+          message: `The file exceeds the ${Math.round(MAX_DOCUMENT_BYTES / 1024 / 1024)} MB limit.`,
         });
       }
 
       if (buffer.byteLength === 0) {
-        return reply.code(400).send({ error: "empty_file", message: "El archivo está vacío." });
+        return reply.code(400).send({ error: "empty_file", message: "The file is empty." });
       }
 
       const storageKey = storageKeyFor(part.mimetype);
@@ -1862,7 +1862,7 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
         .get();
 
       if (!row) {
-        return reply.code(404).send({ error: "not_found", message: "Ese archivo no existe." });
+        return reply.code(404).send({ error: "not_found", message: "That file does not exist." });
       }
 
       return sendStoredFile(reply, row, options.uploadsPath);
@@ -1896,7 +1896,7 @@ export const contractRoutes: FastifyPluginAsync<ContractRoutesOptions> = async (
         .get();
 
       if (!row) {
-        return reply.code(404).send({ error: "not_found", message: "Ese archivo no existe." });
+        return reply.code(404).send({ error: "not_found", message: "That file does not exist." });
       }
 
       app.db.transaction((tx) => {

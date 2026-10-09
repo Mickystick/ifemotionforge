@@ -36,7 +36,7 @@ const MINIMUM_PASSWORD_LENGTH = 10;
 
 const password = z
   .string()
-  .min(MINIMUM_PASSWORD_LENGTH, `La contraseña debe tener al menos ${MINIMUM_PASSWORD_LENGTH} caracteres.`)
+  .min(MINIMUM_PASSWORD_LENGTH, `Password must be at least ${MINIMUM_PASSWORD_LENGTH} characters long.`)
   // Matches the ceiling on the login route. scrypt is deliberately slow, so an
   // unbounded password is an invitation to make the server do arbitrary work.
   .max(200);
@@ -82,7 +82,7 @@ function emailClash(
     return null;
   }
 
-  return `El correo ${email} ya lo usa la cuenta de ${clash.name}.`;
+  return `The email ${email} is already used by ${clash.name}'s account.`;
 }
 
 /**
@@ -147,7 +147,7 @@ export const userRoutes: FastifyPluginAsync = async (app) => {
     if (!parsed.success) {
       return reply.code(400).send({
         error: "invalid_body",
-        message: "Revisa los datos de la cuenta.",
+        message: "Check the account details.",
         issues: parsed.error.issues.map((issue) => issue.message),
       });
     }
@@ -214,7 +214,7 @@ export const userRoutes: FastifyPluginAsync = async (app) => {
       if (!parsed.success) {
         return reply.code(400).send({
           error: "invalid_body",
-          message: "Revisa los datos de la cuenta.",
+          message: "Check the account details.",
           issues: parsed.error.issues.map((issue) => issue.message),
         });
       }
@@ -222,7 +222,7 @@ export const userRoutes: FastifyPluginAsync = async (app) => {
       const existing = app.db.select().from(users).where(eq(users.id, request.params.id)).get();
 
       if (!existing) {
-        return reply.code(404).send({ error: "not_found", message: "Cuenta no encontrada." });
+        return reply.code(404).send({ error: "not_found", message: "Account not found." });
       }
 
       const actor = request.user!;
@@ -240,8 +240,8 @@ export const userRoutes: FastifyPluginAsync = async (app) => {
         return reply.code(409).send({
           error: "cannot_change_own_role",
           message:
-            "No puedes cambiar tu propio rol. Pide a otro supervisor que lo haga, para que " +
-            "nadie se quede fuera de su propia aplicación.",
+            "You cannot change your own role. Ask another supervisor to do it so you do not " +
+            "lose access to your own account.",
         });
       }
 
@@ -256,8 +256,8 @@ export const userRoutes: FastifyPluginAsync = async (app) => {
         return reply.code(409).send({
           error: "last_owner",
           message:
-            `${existing.name} es el único supervisor activo. Nombra a otro supervisor antes ` +
-            "de cambiarle el rol.",
+            `${existing.name} is the only active supervisor. Make another user a supervisor before ` +
+            "changing this user's role.",
         });
       }
 
@@ -321,14 +321,14 @@ export const userRoutes: FastifyPluginAsync = async (app) => {
       if (!parsed.success) {
         return reply.code(400).send({
           error: "invalid_body",
-          message: parsed.error.issues[0]?.message ?? "Revisa la contraseña.",
+          message: parsed.error.issues[0]?.message ?? "Check the password.",
         });
       }
 
       const existing = app.db.select().from(users).where(eq(users.id, request.params.id)).get();
 
       if (!existing) {
-        return reply.code(404).send({ error: "not_found", message: "Cuenta no encontrada." });
+        return reply.code(404).send({ error: "not_found", message: "Account not found." });
       }
 
       const passwordHash = await hashPassword(parsed.data.password);
@@ -375,7 +375,7 @@ export const userRoutes: FastifyPluginAsync = async (app) => {
       const existing = app.db.select().from(users).where(eq(users.id, request.params.id)).get();
 
       if (!existing) {
-        return reply.code(404).send({ error: "not_found", message: "Cuenta no encontrada." });
+        return reply.code(404).send({ error: "not_found", message: "Account not found." });
       }
 
       const actor = request.user!;
@@ -384,15 +384,15 @@ export const userRoutes: FastifyPluginAsync = async (app) => {
         return reply.code(409).send({
           error: "cannot_deactivate_self",
           message:
-            "No puedes desactivar tu propia cuenta. Quedarías fuera de la aplicación en tu " +
-            "siguiente clic, sin forma de volver a entrar.",
+            "You cannot deactivate your own account. You would lose access to the app on your " +
+            "next click, with no way to sign back in.",
         });
       }
 
       if (existing.deactivatedAt !== null) {
         return reply.code(409).send({
           error: "already_deactivated",
-          message: `La cuenta de ${existing.name} ya está desactivada.`,
+          message: `${existing.name}'s account is already deactivated.`,
         });
       }
 
@@ -400,8 +400,8 @@ export const userRoutes: FastifyPluginAsync = async (app) => {
         return reply.code(409).send({
           error: "last_owner",
           message:
-            `${existing.name} es el único supervisor activo. Nombra a otro supervisor antes ` +
-            "de desactivar esta cuenta.",
+            `${existing.name} is the only active supervisor. Make another user a supervisor before ` +
+            "deactivating this account.",
         });
       }
 
@@ -436,13 +436,13 @@ export const userRoutes: FastifyPluginAsync = async (app) => {
       const existing = app.db.select().from(users).where(eq(users.id, request.params.id)).get();
 
       if (!existing) {
-        return reply.code(404).send({ error: "not_found", message: "Cuenta no encontrada." });
+        return reply.code(404).send({ error: "not_found", message: "Account not found." });
       }
 
       if (existing.deactivatedAt === null) {
         return reply.code(409).send({
           error: "already_active",
-          message: `La cuenta de ${existing.name} ya está activa.`,
+          message: `${existing.name}'s account is already active.`,
         });
       }
 

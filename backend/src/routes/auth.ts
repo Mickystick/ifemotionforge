@@ -50,7 +50,7 @@ export const authRoutes: FastifyPluginAsync<AuthRoutesOptions> = async (app, opt
       const parsed = loginBody.safeParse(request.body);
 
       if (!parsed.success) {
-        return reply.code(400).send({ error: "invalid_body", message: "Datos incompletos." });
+        return reply.code(400).send({ error: "invalid_body", message: "Incomplete information." });
       }
 
       const email = parsed.data.email.toLowerCase();
@@ -66,7 +66,7 @@ export const authRoutes: FastifyPluginAsync<AuthRoutesOptions> = async (app, opt
         request.log.warn({ email }, "Failed login");
         return reply
           .code(401)
-          .send({ error: "invalid_credentials", message: "Correo o contraseña incorrectos." });
+          .send({ error: "invalid_credentials", message: "Incorrect email or password." });
       }
 
       /*
@@ -84,7 +84,7 @@ export const authRoutes: FastifyPluginAsync<AuthRoutesOptions> = async (app, opt
         request.log.warn({ email }, "Login by a deactivated account");
         return reply.code(403).send({
           error: "account_deactivated",
-          message: "Esta cuenta está desactivada. Pide al supervisor que la reactive.",
+          message: "This account is deactivated. Ask a supervisor to reactivate it.",
         });
       }
 
@@ -139,7 +139,7 @@ export const authRoutes: FastifyPluginAsync<AuthRoutesOptions> = async (app, opt
   /** Who am I? The frontend calls this on load to restore an existing session. */
   app.get("/auth/me", async (request, reply) => {
     if (!request.user) {
-      return reply.code(401).send({ error: "unauthenticated", message: "Inicia sesión." });
+      return reply.code(401).send({ error: "unauthenticated", message: "Please sign in." });
     }
 
     return reply.send({

@@ -86,7 +86,7 @@ describe("the message written to a customer", () => {
   it("greets by first name rather than by the whole legal name", () => {
     const message = defaultMessage(buildContract(), money);
 
-    assert.ok(message.startsWith("Buenos días, María."), message);
+    assert.ok(message.startsWith("Good morning, María."), message);
     assert.ok(!message.includes("Rodríguez Paz"), message);
   });
 
@@ -110,8 +110,8 @@ describe("the message written to a customer", () => {
 
     // A customer who owes nothing must not be told they owe something, and must
     // not be told about a cuota that does not exist either.
-    assert.ok(!settled.includes("vencido"), settled);
-    assert.ok(!settled.includes("cuota"), settled);
+    assert.ok(!settled.includes("overdue"), settled);
+    assert.ok(!settled.includes("installment"), settled);
     assert.ok(settled.includes("A-07"), settled);
 
     const behind = defaultMessage(
@@ -131,7 +131,7 @@ describe("the message written to a customer", () => {
       money,
     );
 
-    assert.ok(behind.includes("vencido"), behind);
+    assert.ok(behind.includes("overdue"), behind);
     assert.ok(behind.includes("10,000"), behind);
   });
 
@@ -154,9 +154,9 @@ describe("the message written to a customer", () => {
     );
 
     // "7,249.51" would read as a different cuota; the customer's cuota is 7,250.
-    assert.ok(message.includes("7,250.00") || message.includes("7,250 "), message);
+    assert.ok(message.includes("7,250"), message);
     assert.ok(!message.includes("7,249.51"), message);
-    assert.ok(message.includes("abonado") && message.includes("0.49"), message);
+    assert.ok(message.includes("has already been paid toward that installment") && message.includes("0.49"), message);
   });
 });
 

@@ -50,17 +50,17 @@ function describeSignIn(value: string): string {
   const days = calendarDaysBetween(new Date(then), new Date());
 
   if (days <= 0) {
-    return "Hoy";
+    return "Today";
   }
   if (days === 1) {
-    return "Ayer";
+    return "Yesterday";
   }
   if (days < 30) {
-    return `Hace ${days} días`;
+    return `${days} days ago`;
   }
 
   // The office's clock, for the same reason as the Historial screen.
-  return new Date(then).toLocaleDateString("es-HN", {
+  return new Date(then).toLocaleDateString("en-US", {
     timeZone: businessTimeZone(),
     day: "2-digit",
     month: "short",
@@ -106,7 +106,7 @@ export function UsersPage({
       await onReactivate(account);
     } catch (caught) {
       setError(
-        caught instanceof Error ? caught.message : `No se pudo reactivar a ${account.name}.`,
+        caught instanceof Error ? caught.message : `Unable to reactivate ${account.name}.`,
       );
     } finally {
       setBusyId(null);
@@ -116,15 +116,15 @@ export function UsersPage({
   return (
     <section className="panel active">
       <div className="card users-intro">
-        <h3>Quién puede entrar</h3>
+        <h3>Who can sign in</h3>
         <p>
-          Cada persona que usa Lindero necesita su propia cuenta. Compartir una sola cuenta
-          hace que el historial deje de servir: todo lo que hagan aparecerá con un mismo
-          nombre, y la pregunta «¿quién registró este pago?» se queda sin respuesta.
+          Everyone who uses Lindero needs their own account. Sharing one account makes the
+          history unreliable: all activity appears under the same name, leaving the question
+          “who recorded this payment?” unanswered.
         </p>
         <p className="field-hint">
-          Lo que un asociado <strong>puede hacer</strong> no se decide aquí, sino en la
-          pantalla de Permisos, y aplica a todas las cuentas de asociado por igual.
+          What a staff member <strong>can do</strong> is set on the Permissions screen, not here,
+          and applies equally to all staff accounts.
         </p>
       </div>
 
@@ -134,14 +134,14 @@ export function UsersPage({
           className={showDeactivated ? "chip" : "chip active"}
           onClick={() => setShowDeactivated(false)}
         >
-          Activas ({active.length})
+          Active ({active.length})
         </button>
         <button
           type="button"
           className={showDeactivated ? "chip active" : "chip"}
           onClick={() => setShowDeactivated(true)}
         >
-          Desactivadas ({deactivated.length})
+          Deactivated ({deactivated.length})
         </button>
       </div>
 
@@ -156,11 +156,11 @@ export function UsersPage({
           <table>
             <thead>
               <tr>
-                <th>Persona</th>
-                <th>Correo</th>
+                <th>Person</th>
+                <th>Email</th>
                 <th>Rol</th>
-                <th>Último acceso</th>
-                <th className="col-actions">Acciones</th>
+                <th>Last sign-in</th>
+                <th className="col-actions">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -176,7 +176,7 @@ export function UsersPage({
                         <span className="holder-text">
                           <span className="holder-name">{account.name}</span>
                           <span className="holder-contract">
-                            {account.isSelf ? "Tu cuenta" : ROLE_LABELS[account.role]}
+                            {account.isSelf ? "Your account" : ROLE_LABELS[account.role]}
                           </span>
                         </span>
                       </span>
@@ -192,14 +192,14 @@ export function UsersPage({
                               : "stamp success"
                         }
                       >
-                        {isDeactivated ? "Desactivada" : ROLE_LABELS[account.role]}
+                        {isDeactivated ? "Deactivated" : ROLE_LABELS[account.role]}
                       </span>
                     </td>
                     <td>
                       {account.lastSignInAt === null ? (
                         // Not blank: an empty cell reads as data that failed to
                         // load rather than an account nobody has used yet.
-                        <span className="holder-empty">Nunca ha entrado</span>
+                        <span className="holder-empty">Never signed in</span>
                       ) : (
                         describeSignIn(account.lastSignInAt)
                       )}
@@ -212,8 +212,8 @@ export function UsersPage({
                             className="row-action"
                             disabled={isBusy}
                             onClick={() => void handleReactivate(account)}
-                            title={`Reactivar la cuenta de ${account.name}`}
-                            aria-label={`Reactivar la cuenta de ${account.name}`}
+                            title={`Reactivate ${account.name}'s account`}
+                            aria-label={`Reactivate ${account.name}'s account`}
                           >
                             <IconRestore />
                           </button>
@@ -223,8 +223,8 @@ export function UsersPage({
                               type="button"
                               className="row-action"
                               onClick={() => onEdit(account)}
-                              title={`Editar la cuenta de ${account.name}`}
-                              aria-label={`Editar la cuenta de ${account.name}`}
+                              title={`Edit ${account.name}'s account`}
+                              aria-label={`Edit ${account.name}'s account`}
                             >
                               <IconEdit />
                             </button>
@@ -232,8 +232,8 @@ export function UsersPage({
                               type="button"
                               className="row-action"
                               onClick={() => onResetPassword(account)}
-                              title={`Cambiar la contraseña de ${account.name}`}
-                              aria-label={`Cambiar la contraseña de ${account.name}`}
+                              title={`Change ${account.name}'s password`}
+                              aria-label={`Change ${account.name}'s password`}
                             >
                               <IconPermissions />
                             </button>
@@ -246,8 +246,8 @@ export function UsersPage({
                                 type="button"
                                 className="row-action danger"
                                 onClick={() => onDeactivate(account)}
-                                title={`Desactivar la cuenta de ${account.name}`}
-                                aria-label={`Desactivar la cuenta de ${account.name}`}
+                                title={`Deactivate ${account.name}'s account`}
+                                aria-label={`Deactivate ${account.name}'s account`}
                               >
                                 <IconArchive />
                               </button>
@@ -264,12 +264,12 @@ export function UsersPage({
                 <tr>
                   <td colSpan={5} className="table-empty">
                     {showDeactivated ? (
-                      "No hay cuentas desactivadas."
+                      "No deactivated accounts."
                     ) : (
                       <>
-                        <p>Todavía no hay ninguna cuenta activa además de la tuya.</p>
+                        <p>There are no active accounts besides yours yet.</p>
                         <button type="button" className="link-btn" onClick={onCreate}>
-                          Crear la primera cuenta
+                          Create the first account
                         </button>
                       </>
                     )}

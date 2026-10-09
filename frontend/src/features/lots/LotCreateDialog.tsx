@@ -124,29 +124,29 @@ export function LotCreateDialog({
     const price = parseMoneyInput(basePrice);
 
     if (!code.trim()) {
-      setError("El número de lote es obligatorio.");
+      setError("Lot number is required.");
       return;
     }
     if (!projectName.trim()) {
-      setError("Elige el proyecto al que pertenece el lote.");
+      setError("Choose the project this lot belongs to.");
       return;
     }
     if (duplicate) {
-      setError(`El lote ${code} ya existe en ${projectName}.`);
+      setError(`Lot ${code} already exists in ${projectName}.`);
       return;
     }
     if (!areaIsUsable) {
-      setError("El área debe ser un número mayor que cero.");
+      setError("Area must be a number greater than zero.");
       return;
     }
     // An unreadable amount and a negative one are different mistakes, and a
     // blank field told "no puede ser negativo" reads like a bug.
     if (!Number.isFinite(price)) {
-      setError("Escribe el precio base en lempiras.");
+      setError("Enter the base price in lempiras.");
       return;
     }
     if (price < 0) {
-      setError("El precio base no puede ser negativo.");
+      setError("Base price can't be negative.");
       return;
     }
 
@@ -167,7 +167,7 @@ export function LotCreateDialog({
     } catch (caught) {
       // The server checks the same rules independently — a duplicate code or a
       // permission refusal surfaces here.
-      setError(caught instanceof Error ? caught.message : "No se pudo crear el lote.");
+      setError(caught instanceof Error ? caught.message : "Unable to create the lot.");
     } finally {
       setSaving(false);
     }
@@ -175,7 +175,7 @@ export function LotCreateDialog({
 
   return (
     <Dialog
-      ariaLabel="Nuevo lote"
+      ariaLabel="New lot"
       /* The X and Cancelar stay; the backdrop and Escape stop closing once
          there is something to lose. See `dismissible` in Dialog.tsx. */
       dismissible={!hasEnteredAnything && !isSaving}
@@ -184,14 +184,14 @@ export function LotCreateDialog({
       <form onSubmit={handleSubmit}>
         <div className="modal-header">
           <div>
-            <p className="modal-eyebrow">Nuevo lote</p>
-            <h2>{code || "Sin número"}</h2>
+            <p className="modal-eyebrow">New lot</p>
+            <h2>{code || "No number"}</h2>
             <p className="modal-description">
-              El lote nace disponible. El cliente y el estado se definen solos cuando se le
-              registra un contrato.
+              New lots start as available. The customer and status are set automatically when a
+              contract is recorded.
             </p>
           </div>
-          <button type="button" className="modal-close" onClick={onCancel} aria-label="Cerrar">
+          <button type="button" className="modal-close" onClick={onCancel} aria-label="Close">
             <IconClose />
           </button>
         </div>
@@ -216,7 +216,7 @@ export function LotCreateDialog({
           )}
 
           <div className="form-field full-width">
-            <label htmlFor="new-lot-project">Proyecto</label>
+            <label htmlFor="new-lot-project">Project</label>
             <select
               id="new-lot-project"
               value={projectName}
@@ -235,20 +235,20 @@ export function LotCreateDialog({
               ))}
             </select>
             <span className="field-hint">
-              El número de lote se sugiere a partir del último de este proyecto.
+              The lot number is suggested based on the last number in this project.
             </span>
           </div>
 
           {!isManual && (
             <div className="form-field full-width">
-              <label htmlFor="new-lot-prefix">Lote</label>
+              <label htmlFor="new-lot-prefix">Lot</label>
               <div className="code-composer">
                 <input
                   id="new-lot-prefix"
                   className="code-prefix-input"
                   value={prefix}
                   maxLength={4}
-                  aria-label="Letra del lote"
+                  aria-label="Lot prefix"
                   onChange={(event) => choosePrefix(event.target.value.toUpperCase())}
                 />
                 <span className="code-separator" aria-hidden="true">
@@ -259,7 +259,7 @@ export function LotCreateDialog({
                   className="code-number-input"
                   value={number}
                   inputMode="numeric"
-                  aria-label="Número del lote"
+                  aria-label="Lot number"
                   onChange={(event) => setNumberOverride(event.target.value)}
                 />
                 <span className="code-preview" aria-live="polite">
@@ -269,7 +269,7 @@ export function LotCreateDialog({
 
               {knownPrefixes.length > 0 && (
                 <div className="code-prefix-chips">
-                  <span className="field-hint">En este proyecto:</span>
+                  <span className="field-hint">In this project:</span>
                   {knownPrefixes.map((option) => (
                     <button
                       key={option}
@@ -284,13 +284,13 @@ export function LotCreateDialog({
               )}
 
               <span className="field-hint">
-                Puedes cambiar la letra y el número libremente.{" "}
+                You can change the prefix and number freely.{" "}
                 <button
                   type="button"
                   className="link-btn"
                   onClick={() => setManualCode(code)}
                 >
-                  Escribir el ID manualmente
+                  Enter the ID manually
                 </button>
               </span>
             </div>
@@ -298,20 +298,20 @@ export function LotCreateDialog({
 
           {isManual && (
             <div className="form-field full-width">
-              <label htmlFor="new-lot-code">Lote</label>
+              <label htmlFor="new-lot-code">Lot</label>
               <input
                 id="new-lot-code"
                 value={manualCode}
                 onChange={(event) => setManualCode(event.target.value)}
               />
               <span className="field-hint">
-                ID libre, sin sugerencias.{" "}
+                Free-form ID, no suggestions.{" "}
                 <button
                   type="button"
                   className="link-btn"
                   onClick={() => setManualCode(null)}
                 >
-                  Volver a letra y número
+                  Back to suggested prefix and number
                 </button>
               </span>
             </div>
@@ -319,12 +319,12 @@ export function LotCreateDialog({
 
           {duplicate && code.trim() && (
             <p className="form-error full-width">
-              El lote {code} ya existe en {projectName}.
+              Lot {code} already exists in {projectName}.
             </p>
           )}
 
           <div className="form-field">
-            <label htmlFor="new-lot-area">Área</label>
+            <label htmlFor="new-lot-area">Area</label>
             <div className="input-with-suffix">
               <input
                 id="new-lot-area"
@@ -338,13 +338,13 @@ export function LotCreateDialog({
               <span className="unit-suffix">{unitInfo.symbol}</span>
             </div>
             <span className="field-hint">
-              {unitInfo.label}, la unidad de {projectName}.
+              {unitInfo.label}, the unit used by {projectName}.
               {areaIsUsable && unit !== "m2" && (
                 <>
                   {" "}
-                  Se guardan{" "}
+                  Stored as{" "}
                   <strong>
-                    {new Intl.NumberFormat("es-HN", { maximumFractionDigits: 2 }).format(
+                    {new Intl.NumberFormat("en-HN", { maximumFractionDigits: 2 }).format(
                       toSquareMetres(areaValue, unit),
                     )}{" "}
                     m²
@@ -356,14 +356,14 @@ export function LotCreateDialog({
           </div>
 
           <div className="form-field">
-            <label htmlFor="new-lot-price">Precio base</label>
+            <label htmlFor="new-lot-price">Base price</label>
             <MoneyInput
               id="new-lot-price"
               value={basePrice}
               onChange={setBasePrice}
               placeholder="0.00"
             />
-            <span className="field-hint">Siempre en lempiras.</span>
+            <span className="field-hint">Always in lempiras.</span>
           </div>
 
           {error && <p className="form-error full-width">{error}</p>}
@@ -371,14 +371,14 @@ export function LotCreateDialog({
 
         <div className="modal-actions">
           <button type="button" className="btn-secondary" onClick={onCancel} disabled={isSaving}>
-            Cancelar
+            Cancel
           </button>
           <button
             type="submit"
             className="btn-primary modal-submit"
             disabled={isSaving || duplicate}
           >
-            <span>{isSaving ? "Creando…" : "Crear lote"}</span>
+            <span>{isSaving ? "Creating…" : "Create lot"}</span>
           </button>
         </div>
       </form>

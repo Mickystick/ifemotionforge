@@ -88,14 +88,14 @@ describe("describeUndeliveredShare", () => {
       received,
     );
 
-    assert.match(notice, /^Lo compartido llegó a Lindero sin la imagen\./);
-    assert.match(notice, /recibido: text: 0 caracteres; title: 0 caracteres/);
+    assert.match(notice, /^The shared item reached Lindero without an image\./);
+    assert.match(notice, /received: text: 0 caracteres; title: 0 caracteres/);
   });
 
   it("tells a missing record apart from an empty one", () => {
     assert.match(
       describeUndeliveredShare({ status: "missing" }, received),
-      /ya no estaba guardado/,
+      /no longer saved/,
     );
   });
 
@@ -105,21 +105,21 @@ describe("describeUndeliveredShare", () => {
       received,
     );
 
-    assert.match(notice, /no dejó leerlo/);
+    assert.match(notice, /could not read it/);
     assert.match(notice, /error: UnknownError: blob read failed/);
   });
 
   it("keeps the worker's own failure message", () => {
     assert.match(
       describeUndeliveredShare({ status: "failed" }, "TypeError: bad multipart"),
-      /^No se pudo leer lo que compartiste\..*TypeError: bad multipart/,
+      /^Could not read the item you shared\..*TypeError: bad multipart/,
     );
   });
 
   it("stays a plain sentence when there is no detail to add", () => {
     assert.equal(
       describeUndeliveredShare({ status: "missing" }, null),
-      "Lo compartido llegó, pero ya no estaba guardado al abrir Lindero. Adjunta el comprobante aquí abajo.",
+      "The shared item arrived, but it was no longer saved when Lindero opened. Attach the proof file below.",
     );
   });
 });

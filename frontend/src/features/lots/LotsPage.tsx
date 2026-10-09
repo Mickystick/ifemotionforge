@@ -28,11 +28,11 @@ import type { LotSort } from "./lotSort";
  * still the company's without reading a single word.
  */
 const statusPresentation: Record<LotStatus, { label: string; stampClass: string }> = {
-  available: { label: "Disponible", stampClass: "stamp success" },
-  reserved: { label: "Reservado", stampClass: "stamp warning" },
-  financed: { label: "Financiado", stampClass: "stamp clay" },
-  sold: { label: "Vendido", stampClass: "stamp neutral" },
-  donated: { label: "Donado", stampClass: "stamp neutral" },
+  available: { label: "Available", stampClass: "stamp success" },
+  reserved: { label: "Reserved", stampClass: "stamp warning" },
+  financed: { label: "Financed", stampClass: "stamp clay" },
+  sold: { label: "Sold", stampClass: "stamp neutral" },
+  donated: { label: "Donated", stampClass: "stamp neutral" },
 };
 
 interface LotsPageProps {
@@ -115,14 +115,14 @@ export function LotsPage({
             className={showArchived ? "chip" : "chip active"}
             onClick={() => setShowArchived(false)}
           >
-            Activos ({activeLots.length})
+            Active ({activeLots.length})
           </button>
           <button
             type="button"
             className={showArchived ? "chip active" : "chip"}
             onClick={() => setShowArchived(true)}
           >
-            Archivados ({archivedLots.length})
+            Archived ({archivedLots.length})
           </button>
         </div>
       )}
@@ -133,10 +133,10 @@ export function LotsPage({
             <table>
               <thead>
                 <tr>
-                  <th>Lote</th>
-                  <th>Proyecto</th>
-                  <th>Motivo</th>
-                  <th className="col-actions">Acciones</th>
+                  <th>Lot</th>
+                  <th>Project</th>
+                  <th>Reason</th>
+                  <th className="col-actions">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -152,7 +152,7 @@ export function LotsPage({
                       </span>
                     </td>
                     <td>
-                      <span className="holder-empty">Archivado</span>
+                      <span className="holder-empty">Archived</span>
                     </td>
                     <td>
                       <span className="row-actions">
@@ -160,8 +160,8 @@ export function LotsPage({
                           type="button"
                           className="row-action"
                           onClick={() => onRestoreLot(lot)}
-                          title={`Restaurar lote ${lot.code}`}
-                          aria-label={`Restaurar lote ${lot.code}`}
+                          title={`Restore lot ${lot.code}`}
+                          aria-label={`Restore lot ${lot.code}`}
                         >
                           <IconRestore />
                         </button>
@@ -192,13 +192,13 @@ export function LotsPage({
               <table>
                 <thead>
                   <tr>
-                    <th>Lote</th>
-                    <th>Proyecto</th>
-                    <th>Área</th>
-                    <th className="col-money">Precio base</th>
-                    <th>Cliente</th>
-                    <th>Estado</th>
-                    <th className="col-actions">{showActions ? "Acciones" : ""}</th>
+                    <th>Lot</th>
+                    <th>Project</th>
+                    <th>Area</th>
+                    <th className="col-money">Base price</th>
+                    <th>Customer</th>
+                    <th>Status</th>
+                    <th className="col-actions">{showActions ? "Actions" : ""}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -245,7 +245,7 @@ export function LotsPage({
                               type="button"
                               className="holder-btn"
                               onClick={() => onOpenCustomer(holder.id, lot)}
-                              title={`Ver información de ${holder.fullName}`}
+                              title={`View ${holder.fullName}'s information`}
                             >
                               <span className="holder-avatar">{getInitials(holder.fullName)}</span>
                               <span className="holder-text">
@@ -254,7 +254,7 @@ export function LotsPage({
                               </span>
                             </button>
                           ) : (
-                            <span className="holder-empty">Sin contrato</span>
+                            <span className="holder-empty">No contract</span>
                           )}
                         </td>
                         <td>
@@ -268,8 +268,8 @@ export function LotsPage({
                                   type="button"
                                   className="row-action"
                                   onClick={() => onEditLot(lot)}
-                                  title={`Editar lote ${lot.code}`}
-                                  aria-label={`Editar lote ${lot.code}`}
+                                  title={`Edit lot ${lot.code}`}
+                                  aria-label={`Edit lot ${lot.code}`}
                                 >
                                   <IconEdit />
                                 </button>
@@ -279,8 +279,8 @@ export function LotsPage({
                                   type="button"
                                   className="row-action danger"
                                   onClick={() => onArchiveLot(lot)}
-                                  title={`Archivar lote ${lot.code}`}
-                                  aria-label={`Archivar lote ${lot.code}`}
+                                  title={`Archive lot ${lot.code}`}
+                                  aria-label={`Archive lot ${lot.code}`}
                                 >
                                   <IconArchive />
                                 </button>
@@ -289,7 +289,7 @@ export function LotsPage({
                           ) : (
                             <span
                               className="row-actions-locked"
-                              title="Requiere permisos de supervisor"
+                              title="Requires owner permission"
                             >
                               —
                             </span>
@@ -303,10 +303,10 @@ export function LotsPage({
                     <tr>
                       <td colSpan={7} className="table-empty">
                         {activeLots.length === 0 ? (
-                          "Todavía no hay lotes registrados."
+                          "No lots have been added yet."
                         ) : (
                           <>
-                            <p>Ningún lote coincide con lo que estás buscando.</p>
+                            <p>No lots match your search.</p>
                             {/* An empty table is where a forgotten filter
                                 finally shows itself, so the way out is offered
                                 right here instead of leaving the user hunting
@@ -317,7 +317,7 @@ export function LotsPage({
                                 className="link-btn"
                                 onClick={() => setFilters(NO_FILTERS)}
                               >
-                                Limpiar filtros
+                                Clear filters
                               </button>
                             )}
                           </>

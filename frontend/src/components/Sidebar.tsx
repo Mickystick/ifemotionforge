@@ -38,17 +38,20 @@ interface NavItem {
 function buildNavGroups(user: User): Array<{ label: string; items: NavItem[] }> {
   const groups: Array<{ label: string; items: NavItem[] }> = [
     {
-      label: "Panel",
-      items: [{ id: "dashboard" as const, label: "Panel general", icon: IconDashboard }],
+      label: "Home",
+      items: [
+        { id: "home" as const, label: "Home", icon: IconDashboard },
+        { id: "dashboard" as const, label: "Dashboard", icon: IconDashboard },
+      ],
     },
     {
-      label: "Operación",
+      label: "Operations",
       items: [
-        { id: "projects" as const, label: "Proyectos", icon: IconProjects },
-        { id: "lots" as const, label: "Lotes", icon: IconLots },
-        { id: "contracts" as const, label: "Contratos", icon: IconContracts },
-        { id: "customers" as const, label: "Clientes", icon: IconCustomers },
-        { id: "receipts" as const, label: "Recibos", icon: IconReceipts },
+        { id: "projects" as const, label: "Projects", icon: IconProjects },
+        { id: "lots" as const, label: "Lots", icon: IconLots },
+        { id: "contracts" as const, label: "Contracts", icon: IconContracts },
+        { id: "customers" as const, label: "Customers", icon: IconCustomers },
+        { id: "receipts" as const, label: "Receipts", icon: IconReceipts },
       ],
     },
   ];
@@ -56,18 +59,18 @@ function buildNavGroups(user: User): Array<{ label: string; items: NavItem[] }> 
   const control: NavItem[] = [];
 
   if (can(user, "audit:view")) {
-    control.push({ id: "audit" as const, label: "Historial", icon: IconHistory });
+    control.push({ id: "audit" as const, label: "History", icon: IconHistory });
   }
 
   if (can(user, "permission:manage")) {
-    control.push({ id: "permissions" as const, label: "Permisos", icon: IconPermissions });
+    control.push({ id: "permissions" as const, label: "Permissions", icon: IconPermissions });
   }
 
   // Who exists, as opposed to what the associate role may do. Both are locked
   // to the supervisor and cannot be granted away — see LOCKED_CAPABILITIES in
   // backend/src/lib/permissions.ts.
   if (can(user, "user:manage")) {
-    control.push({ id: "users" as const, label: "Usuarios", icon: IconUsers });
+    control.push({ id: "users" as const, label: "Users", icon: IconUsers });
   }
 
   if (control.length > 0) {
@@ -112,10 +115,10 @@ export function Sidebar({
         </div>
         <div>
           <div className="brand-name">Lindero</div>
-          <div className="brand-sub">Gestión de lotes</div>
+          <div className="brand-sub">Lot management</div>
         </div>
 
-        <button type="button" className="sidebar-close" onClick={onClose} aria-label="Ocultar menú">
+        <button type="button" className="sidebar-close" onClick={onClose} aria-label="Hide menu">
           <IconCollapse />
         </button>
       </div>
@@ -151,7 +154,7 @@ export function Sidebar({
           {user.name}
           <span>{ROLE_LABELS[user.role]}</span>
         </div>
-        <button type="button" className="sign-out" onClick={onSignOut} aria-label="Cerrar sesión" title="Cerrar sesión">
+        <button type="button" className="sign-out" onClick={onSignOut} aria-label="Sign out" title="Sign out">
           <IconSignOut />
         </button>
       </div>

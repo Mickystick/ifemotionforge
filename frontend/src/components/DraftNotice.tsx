@@ -26,16 +26,16 @@ export function DraftNotice({ savedAt, missing, onRestore, onDiscard }: DraftNot
   return (
     <div className="draft-notice full-width">
       <div className="draft-notice-text">
-        <p className="draft-notice-title">Quedó algo a medio escribir {draftAge(savedAt)}.</p>
+        <p className="draft-notice-title">You left a draft unfinished {draftAge(savedAt)}.</p>
         {missing && <p className="draft-notice-missing">{missing}</p>}
       </div>
 
       <div className="draft-notice-actions">
         <button type="button" className="btn-secondary" onClick={onRestore}>
-          Continuar
+          Continue
         </button>
         <button type="button" className="link-btn" onClick={onDiscard}>
-          Empezar de nuevo
+          Start over
         </button>
       </div>
     </div>

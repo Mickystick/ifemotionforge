@@ -25,11 +25,11 @@ interface UserFormDialogProps {
 
 const ROLE_HINTS: Record<Role, string> = {
   owner:
-    "Puede todo, incluyendo crear cuentas y editar permisos. Conviene tener al menos dos, " +
-    "para que nadie se quede fuera si uno pierde su contraseña.",
+    "Can do everything, including create accounts and edit permissions. Keep at least two " +
+    "owners so no one is locked out if one forgets their password.",
   staff:
-    "Hace el trabajo del día a día. Lo que puede hacer exactamente se decide en la pantalla " +
-    "de Permisos y aplica a todos los asociados por igual.",
+    "Handles day-to-day work. Their exact permissions are set on the Permissions screen and " +
+    "apply equally to all staff members.",
 };
 
 /**
@@ -81,15 +81,15 @@ export function UserFormDialog({
     setError(null);
 
     if (!name.trim()) {
-      setError("El nombre es obligatorio: es el que aparecerá en el historial.");
+      setError("Name is required; it will appear in the history.");
       return;
     }
     if (typedEmail === "" || !typedEmail.includes("@")) {
-      setError("Escribe un correo válido. Es con lo que esta persona iniciará sesión.");
+      setError("Enter a valid email address. This person will use it to sign in.");
       return;
     }
     if (duplicate) {
-      setError(`El correo ${typedEmail} ya lo usa la cuenta de ${duplicate.name}.`);
+      setError(`The email ${typedEmail} is already used by ${duplicate.name}'s account.`);
       return;
     }
     if (passwordProblem) {
@@ -107,7 +107,7 @@ export function UserFormDialog({
         ...(isEditing ? {} : { password }),
       });
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "No se pudo guardar la cuenta.");
+      setError(caught instanceof Error ? caught.message : "Unable to save the account.");
     } finally {
       setSaving(false);
     }
@@ -115,63 +115,63 @@ export function UserFormDialog({
 
   return (
     <Dialog
-      ariaLabel={isEditing ? `Editar la cuenta de ${account.name}` : "Nueva cuenta"}
+      ariaLabel={isEditing ? `Edit ${account.name}'s account` : "New account"}
       dismissible={!isDirty && !isSaving}
       onClose={onCancel}
     >
       <form onSubmit={handleSubmit}>
         <div className="modal-header">
           <div>
-            <p className="modal-eyebrow">{isEditing ? "Editar cuenta" : "Nueva cuenta"}</p>
-            <h2>{name.trim() || "Sin nombre"}</h2>
+            <p className="modal-eyebrow">{isEditing ? "Edit account" : "New account"}</p>
+            <h2>{name.trim() || "No name"}</h2>
             <p className="modal-description">
               {isEditing
-                ? "La contraseña no se edita aquí. Cambiarla es una acción aparte, porque " +
-                  "cierra la sesión de esta persona en todos sus dispositivos."
-                : "Entrega la contraseña en persona o por un medio que confíes. El sistema " +
-                  "no la envía por correo ni la vuelve a mostrar después de crear la cuenta."}
+                ? "You can't edit the password here. Changing it is a separate action because " +
+                  "it signs this person out on all their devices."
+                : "Give the password to the person in person or through a trusted channel. The " +
+                  "system won't email it or show it again after the account is created."}
             </p>
           </div>
-          <button type="button" className="modal-close" onClick={onCancel} aria-label="Cerrar">
+          <button type="button" className="modal-close" onClick={onCancel} aria-label="Close">
             <IconClose />
           </button>
         </div>
 
         <div className="modal-form-grid">
           <div className="form-field">
-            <label htmlFor="user-name">Nombre completo</label>
+            <label htmlFor="user-name">Full name</label>
             <input
               id="user-name"
               value={name}
-              placeholder="Ej. Ana Lucía Paz"
+              placeholder="e.g. Ana Lucia Paz"
               autoComplete="off"
               onChange={(event) => setName(event.target.value)}
             />
             <span className="field-hint">
-              Así aparecerá en el historial, junto a cada cosa que haga.
+              This is how their name will appear in the history alongside their activity.
             </span>
           </div>
 
           <div className="form-field">
-            <label htmlFor="user-email">Correo</label>
+            <label htmlFor="user-email">Email</label>
             <input
               id="user-email"
               type="email"
               value={email}
-              placeholder="ana@ejemplo.hn"
+              placeholder="ana@example.com"
               autoComplete="off"
               aria-invalid={duplicate !== undefined}
               onChange={(event) => setEmail(event.target.value)}
             />
             {duplicate ? (
-              <span className="field-error">Ya lo usa la cuenta de {duplicate.name}.</span>
+              <span className="field-error">Already used by {duplicate.name}'s account.</span>
             ) : (
-              <span className="field-hint">Con esto inicia sesión. No se le envía nada.</span>
+              <span className="field-hint">They'll use this to sign in. Nothing will be sent to them.</span>
             )}
           </div>
 
           <div className="form-field full-width">
-            <label htmlFor="user-role">Rol</label>
+            <label htmlFor="user-role">Role</label>
             <select
               id="user-role"
               value={role}
@@ -186,8 +186,8 @@ export function UserFormDialog({
             </select>
             <span className="field-hint">
               {isEditing && isSelf
-                ? "No puedes cambiar tu propio rol. Pide a otro supervisor que lo haga, para " +
-                  "que nadie se quede fuera de su propia aplicación."
+                ? "You can't change your own role. Ask another owner to do it so you don't lose " +
+                  "access to your account."
                 : ROLE_HINTS[role]}
             </span>
           </div>
@@ -200,8 +200,8 @@ export function UserFormDialog({
               onPasswordChange={setPassword}
               onConfirmationChange={setConfirmation}
               hint={
-                `Al menos ${MINIMUM_PASSWORD_LENGTH} caracteres. Una frase corta que solo esta ` +
-                "persona sepa es mejor que algo corto y complicado."
+                `At least ${MINIMUM_PASSWORD_LENGTH} characters. A short phrase only this ` +
+                "person knows is better than a short, complicated password."
               }
             />
           )}
@@ -211,14 +211,14 @@ export function UserFormDialog({
 
         <div className="modal-actions">
           <button type="button" className="btn-secondary" onClick={onCancel} disabled={isSaving}>
-            Cancelar
+            Cancel
           </button>
           <button
             type="submit"
             className="btn-primary modal-submit"
             disabled={isSaving || duplicate !== undefined}
           >
-            <span>{isSaving ? "Guardando…" : isEditing ? "Guardar cambios" : "Crear cuenta"}</span>
+            <span>{isSaving ? "Saving…" : isEditing ? "Save changes" : "Create account"}</span>
           </button>
         </div>
       </form>

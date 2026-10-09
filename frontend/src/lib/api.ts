@@ -50,7 +50,7 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
     });
   } catch {
     // fetch() only rejects when the request never got an answer at all.
-    throw new ApiError(0, "No se pudo conectar con el servidor. ¿Está encendido?");
+    throw new ApiError(0, "Could not connect to the server. Is it running?");
   }
 
   if (response.status === 204) {

@@ -98,33 +98,33 @@ export function LotEditDialog({
     const price = parseMoneyInput(basePrice);
 
     if (!code.trim()) {
-      setError("El número de lote es obligatorio.");
+      setError("Lot number is required.");
       return;
     }
     if (!projectName.trim()) {
-      setError("El proyecto es obligatorio.");
+      setError("The project is required.");
       return;
     }
     if (duplicate) {
-      setError(`El lote ${code.trim()} ya existe en ${projectName.trim()}. Usa otro número.`);
+      setError(`Lot ${code.trim()} already exists in ${projectName.trim()}. Use a different number.`);
       return;
     }
     if (area.trim() === "" || !Number.isFinite(areaValue) || areaValue <= 0) {
-      setError("El área debe ser un número mayor que cero.");
+      setError("Area must be a number greater than zero.");
       return;
     }
     // An unreadable amount and a negative one are different mistakes, and a
     // blank field told "no puede ser negativo" reads like a bug.
     if (!Number.isFinite(price)) {
-      setError("Escribe el precio base en lempiras.");
+      setError("Enter the base price in lempiras.");
       return;
     }
     if (price < 0) {
-      setError("El precio base no puede ser negativo.");
+      setError("Base price can't be negative.");
       return;
     }
     if (needsJustification && reason.trim().length < 10) {
-      setError("Explica el motivo del cambio de precio (mínimo 10 caracteres).");
+      setError("Please explain the price change (at least 10 characters).");
       return;
     }
 
@@ -142,7 +142,7 @@ export function LotEditDialog({
       // The server enforces the same rules independently, so this is where a
       // permission refusal — or a number held by a lot this screen cannot see,
       // an archived one — surfaces.
-      setError(caught instanceof Error ? caught.message : "No se pudo guardar el lote.");
+      setError(caught instanceof Error ? caught.message : "Unable to save the lot.");
     } finally {
       setSaving(false);
     }
@@ -150,27 +150,27 @@ export function LotEditDialog({
 
   return (
     <Dialog
-      ariaLabel={`Editar lote ${lot.code}`}
+      ariaLabel={`Edit lot ${lot.code}`}
       dismissible={!isDirty && !isSaving}
       onClose={onCancel}
     >
       <form onSubmit={handleSubmit}>
         <div className="modal-header">
           <div>
-            <p className="modal-eyebrow">Editar lote</p>
+            <p className="modal-eyebrow">Edit lot</p>
             <h2>{lot.code}</h2>
             <p className="modal-description">
-              Los cambios quedan registrados en el historial con tu nombre y la fecha.
+              Changes are recorded in the history with your name and the date.
             </p>
           </div>
-          <button type="button" className="modal-close" onClick={onCancel} aria-label="Cerrar">
+          <button type="button" className="modal-close" onClick={onCancel} aria-label="Close">
             <IconClose />
           </button>
         </div>
 
         <div className="modal-form-grid">
           <div className="form-field">
-            <label htmlFor="lot-code">Lote</label>
+            <label htmlFor="lot-code">Lot</label>
             <input
               id="lot-code"
               value={code}
@@ -179,13 +179,13 @@ export function LotEditDialog({
             />
             {duplicate && (
               <span className="field-error">
-                Ya hay un lote {code.trim()} en {projectName.trim()}.
+                Lot {code.trim()} already exists in {projectName.trim()}.
               </span>
             )}
           </div>
 
           <div className="form-field">
-            <label htmlFor="lot-area">Área</label>
+            <label htmlFor="lot-area">Area</label>
             <div className="input-with-suffix">
               <input
                 id="lot-area"
@@ -198,11 +198,11 @@ export function LotEditDialog({
               />
               <span className="unit-suffix">{unitInfo.symbol}</span>
             </div>
-            <span className="field-hint">{unitInfo.label}, la unidad de {lot.projectName}.</span>
+            <span className="field-hint">{unitInfo.label}, the unit used by {lot.projectName}.</span>
           </div>
 
           <div className="form-field full-width">
-            <label htmlFor="lot-project">Proyecto</label>
+            <label htmlFor="lot-project">Project</label>
             <input
               id="lot-project"
               value={projectName}
@@ -211,7 +211,7 @@ export function LotEditDialog({
           </div>
 
           <div className="form-field full-width">
-            <label htmlFor="lot-price">Precio base</label>
+            <label htmlFor="lot-price">Base price</label>
             <MoneyInput
               id="lot-price"
               value={basePrice}
@@ -220,29 +220,29 @@ export function LotEditDialog({
             />
             <span className="field-hint">
               {priceLocked
-                ? `Este lote tiene el contrato ${lot.holding?.contractCode} vigente y tu usuario ` +
-                  "no puede cambiar el precio de un lote con contrato. El resto sí se edita."
-                : "Siempre en lempiras. Cambiar el precio base no altera lo que ya deben los " +
-                  "clientes: cada contrato conserva su propio precio de venta."}
+                ? `This lot has active contract ${lot.holding?.contractCode}, and your account ` +
+                "can't change the price of a lot with a contract. You can still edit the other fields."
+                : "Always in lempiras. Changing the base price won't change what customers already owe: " +
+                "each contract keeps its own sale price."}
             </span>
           </div>
 
           {needsJustification && (
             <div className="form-field full-width">
               <p className="form-blocked">
-                Este lote tiene el contrato <strong>{lot.holding?.contractCode}</strong> vigente.
-                El cambio de precio quedará registrado en el Historial con tu nombre, la fecha y
-                el motivo.
+                This lot has active contract <strong>{lot.holding?.contractCode}</strong>. The
+                price change will be recorded in the history with your name, the date, and the
+                reason.
               </p>
               <label htmlFor="lot-price-reason">
-                Motivo del cambio de precio
+                Reason for price change
                 <span className="required-mark" aria-hidden="true"> *</span>
               </label>
               <textarea
                 id="lot-price-reason"
                 rows={3}
                 value={reason}
-                placeholder="Ej. Precio renegociado con el cliente el 12 de agosto."
+                placeholder="e.g. Price renegotiated with the customer on August 12."
                 onChange={(event) => setReason(event.target.value)}
               />
             </div>
@@ -253,14 +253,14 @@ export function LotEditDialog({
 
         <div className="modal-actions">
           <button type="button" className="btn-secondary" onClick={onCancel} disabled={isSaving}>
-            Cancelar
+            Cancel
           </button>
           <button
             type="submit"
             className="btn-primary modal-submit"
             disabled={isSaving || duplicate}
           >
-            <span>{isSaving ? "Guardando…" : "Guardar cambios"}</span>
+            <span>{isSaving ? "Saving…" : "Save changes"}</span>
           </button>
         </div>
       </form>

@@ -35,15 +35,15 @@ export const NO_TRANSACTION_FILTERS: TransactionFilters = {
 };
 
 export const METHOD_LABELS: Array<{ value: MethodFilter; label: string }> = [
-  { value: "cash", label: "Efectivo" },
-  { value: "transfer", label: "Transferencia" },
-  { value: "card", label: "Tarjeta" },
+  { value: "cash", label: "Cash" },
+  { value: "transfer", label: "Bank transfer" },
+  { value: "card", label: "Card" },
 ];
 
 export const STATUS_LABELS: Array<{ value: StatusFilter; label: string }> = [
-  { value: "receipted", label: "Con recibo" },
-  { value: "unreceipted", label: "Sin recibo" },
-  { value: "reversed", label: "Anuladas" },
+  { value: "receipted", label: "Receipt issued" },
+  { value: "unreceipted", label: "No receipt" },
+  { value: "reversed", label: "Voided" },
 ];
 
 /** How many restrictions are active — the number on the Filtros button. */

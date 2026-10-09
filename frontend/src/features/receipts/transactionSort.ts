@@ -36,14 +36,14 @@ export const SORT_OPTIONS: Array<{
 }> = [
   {
     field: "date",
-    label: "Fecha del pago",
-    ascLabel: "Más antiguos primero",
-    descLabel: "Más recientes primero",
+    label: "Payment date",
+    ascLabel: "Oldest first",
+    descLabel: "Newest first",
   },
-  { field: "customer", label: "Cliente", ascLabel: "A → Z", descLabel: "Z → A" },
-  { field: "amount", label: "Monto", ascLabel: "Menor a mayor", descLabel: "Mayor a menor" },
-  { field: "lot", label: "Lote", ascLabel: "A → Z", descLabel: "Z → A" },
-  { field: "project", label: "Proyecto", ascLabel: "A → Z", descLabel: "Z → A" },
+  { field: "customer", label: "Customer", ascLabel: "A → Z", descLabel: "Z → A" },
+  { field: "amount", label: "Amount", ascLabel: "Lowest first", descLabel: "Highest first" },
+  { field: "lot", label: "Lot", ascLabel: "A → Z", descLabel: "Z → A" },
+  { field: "project", label: "Project", ascLabel: "A → Z", descLabel: "Z → A" },
 ];
 
 /**

@@ -23,10 +23,10 @@ export type PaymentType = "down_payment" | "installment" | "full_payment" | "adj
  * payment corrected to "Prima" have to be the same thing, and two lists drift.
  */
 export const PAYMENT_TYPE_OPTIONS: Array<{ value: PaymentType; label: string }> = [
-  { value: "down_payment", label: "Prima" },
-  { value: "installment", label: "Cuota" },
-  { value: "full_payment", label: "Pago total" },
-  { value: "adjustment", label: "Ajuste" },
+  { value: "down_payment", label: "Down payment" },
+  { value: "installment", label: "Installment" },
+  { value: "full_payment", label: "Full payment" },
+  { value: "adjustment", label: "Adjustment" },
 ];
 
 /**

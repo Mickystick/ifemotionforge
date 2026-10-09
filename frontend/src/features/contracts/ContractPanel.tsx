@@ -67,7 +67,7 @@ function termsSummary(contract: Contract, money: MoneyView): string {
   }
 
   return (
-    `${price} · prima ${formatMoney(contract.terms.downPayment, money)} · ` +
+    `${price} · down payment ${formatMoney(contract.terms.downPayment, money)} · ` +
     `${contract.terms.termMonths} × ${formatMoney(contract.terms.monthlyPayment, money)}`
   );
 }
@@ -111,7 +111,7 @@ function AmendmentSide({
             type="button"
             className="link-btn"
             onClick={() => onOpen(other)}
-            title={`Ver el contrato ${link.code}`}
+            title={`View contract ${link.code}`}
           >
             {link.code}
           </button>
@@ -121,26 +121,26 @@ function AmendmentSide({
       </div>
       {other && (
         <div className="cp-row">
-          <span>{other.status === "replaced" ? "Decía" : "Dice"}</span>
+          <span>{other.status === "replaced" ? "Previous terms" : "Current terms"}</span>
           <span>{termsSummary(other, money)}</span>
         </div>
       )}
       {paidNote && (
         <div className="cp-row">
-          <span>Pagado con ese contrato</span>
+          <span>Paid under that contract</span>
           <span>{paidNote}</span>
         </div>
       )}
       <div className="cp-row">
-        <span>Fecha del acuerdo</span>
+        <span>Agreement date</span>
         <span>{formatDate(link.amendment.effectiveOn)}</span>
       </div>
       <div className="cp-row">
-        <span>Autorizó</span>
+        <span>Authorized by</span>
         <span>{link.amendment.authorizedBy ?? "—"}</span>
       </div>
       <div className="cp-row">
-        <span>Registró</span>
+        <span>Recorded by</span>
         <span>
           {link.amendment.recordedBy} · {formatRecordedOn(link.amendment.recordedAt)}
         </span>
@@ -185,7 +185,7 @@ export function ContractPanel({
     contract.status === "active" && contract.kind === "contract" && can(user, "contract:amend");
 
   return (
-    <Dialog ariaLabel={`Contrato ${contract.code}`} onClose={onClose}>
+    <Dialog ariaLabel={`Contract ${contract.code}`} onClose={onClose}>
       <div className="modal-header">
         <div className="cp-identity">
           <div className="cust-avatar cp-avatar">{getInitials(contract.customer.fullName)}</div>
@@ -195,13 +195,13 @@ export function ContractPanel({
             </p>
             <h2>{contract.code}</h2>
             <p className="modal-description">
-              {contract.customer.fullName} · Lote {contract.lot.code} ·{" "}
+              {contract.customer.fullName} · Lot {contract.lot.code} ·{" "}
               {contract.lot.projectName}
             </p>
           </div>
         </div>
 
-        <button type="button" className="modal-close" onClick={onClose} aria-label="Cerrar">
+        <button type="button" className="modal-close" onClick={onClose} aria-label="Close">
           <IconClose />
         </button>
       </div>
@@ -216,7 +216,7 @@ export function ContractPanel({
                   left is where it stood when it closed, and it must not read
                   as a debt still being chased. */}
               <p className="contract-progress-label">
-                {isOpen ? "Saldo pendiente" : "Saldo al cerrarse"}
+                {isOpen ? "Outstanding balance" : "Balance at closing"}
               </p>
               <p className="contract-progress-balance">{formatMoney(contract.balance, money)}</p>
             </div>
@@ -226,14 +226,14 @@ export function ContractPanel({
           <div
             className="contract-progress"
             role="img"
-            aria-label={`${percent}% pagado`}
-            title={`${percent}% pagado`}
+            aria-label={`${percent}% paid`}
+            title={`${percent}% paid`}
           >
             <span className="contract-progress-fill" style={{ width: `${percent}%` }} />
           </div>
 
           <p className="contract-progress-foot">
-            {formatMoney(contract.paidToDate, money)} pagados de{" "}
+            {formatMoney(contract.paidToDate, money)} paid of{" "}
             {formatMoney(contract.terms.salePrice, money)} · {percent}%
           </p>
 
@@ -241,17 +241,17 @@ export function ContractPanel({
           {isOpen && <p className="cp-note">{HEALTH_PRESENTATION[contract.health.status].hint}</p>}
           {contract.status === "replaced" && contract.replacedBy && (
             <p className="cp-note">
-              Ya no se cobra: lo reemplazó {contract.replacedBy.code} el{" "}
-              {formatDate(contract.replacedBy.amendment.effectiveOn)}. Lo pagado quedó como ingreso.
+              No further payments are due: contract {contract.replacedBy.code} replaced it on{" "}
+              {formatDate(contract.replacedBy.amendment.effectiveOn)}. Amounts paid were kept as income.
             </p>
           )}
         </section>
 
         <section className="cp-section">
-          <h3 className="cp-section-title">Lo acordado</h3>
+          <h3 className="cp-section-title">Agreed terms</h3>
 
           <div className="cp-row">
-            <span>Precio de venta</span>
+            <span>Sale price</span>
             <span className="cell-money">{formatMoney(contract.terms.salePrice, money)}</span>
           </div>
           {/* Only on a credit sale. On a contado these three would read a
@@ -262,7 +262,7 @@ export function ContractPanel({
           {isFinanced && (
             <>
               <div className="cp-row">
-                <span>Prima acordada</span>
+                <span>Agreed down payment</span>
                 <span className="cell-money">
                   {formatMoney(contract.terms.downPayment, money)}
                 </span>
@@ -271,16 +271,16 @@ export function ContractPanel({
                 {/* Asked separately on purpose: a prima that was agreed and a
                     prima that arrived are different facts, and only one of them
                     is money in the account. */}
-                <span>Prima cobrada</span>
+                <span>Down payment received</span>
                 <span className="cell-money">
                   {formatMoney(contract.downPaymentPaid, money)}
                   {contract.downPaymentPaid < contract.terms.downPayment && (
-                    <span className="cell-sub warn">pendiente</span>
+                    <span className="cell-sub warn">pending</span>
                   )}
                 </span>
               </div>
               <div className="cp-row">
-                <span>Financiado</span>
+                <span>Financed</span>
                 <span className="cell-money">{formatMoney(contract.terms.financed, money)}</span>
               </div>
             </>
@@ -289,49 +289,49 @@ export function ContractPanel({
           {contract.terms.monthlyPayment !== null && (
             <>
               <div className="cp-row">
-                <span>Plazo</span>
+                <span>Term</span>
                 <span>
-                  {contract.terms.termMonths} meses ·{" "}
-                  {formatMoney(contract.terms.monthlyPayment, money)} al mes
+                  {contract.terms.termMonths} months ·{" "}
+                  {formatMoney(contract.terms.monthlyPayment, money)} per month
                 </span>
               </div>
               <div className="cp-row">
-                <span>Día de pago</span>
-                <span>Cada día {contract.terms.dueDay} del mes</span>
+                <span>Due day</span>
+                <span>Day {contract.terms.dueDay} of each month</span>
               </div>
             </>
           )}
 
           <div className="cp-row">
-            <span>Firma</span>
+            <span>Signed</span>
             <span>{formatDate(contract.terms.signedOn)}</span>
           </div>
 
           {contract.terms.firstDueOn && (
             <div className="cp-row">
-              <span>Primera cuota</span>
+              <span>First installment</span>
               <span>{formatDate(contract.terms.firstDueOn)}</span>
             </div>
           )}
 
           {contract.kind === "reservation" && (
             <div className="cp-row">
-              <span>Vence la reserva</span>
+              <span>Reservation expires</span>
               <span>{formatDate(contract.terms.expiresOn)}</span>
             </div>
           )}
         </section>
 
         <section className="cp-section">
-          <h3 className="cp-section-title">Cómo va</h3>
+          <h3 className="cp-section-title">Payment status</h3>
 
           <div className="cp-row">
-            <span>Pagado hasta hoy</span>
+            <span>Paid to date</span>
             <span className="cell-money">{formatMoney(contract.paidToDate, money)}</span>
           </div>
           {isOpen && contract.health.arrears > 0 && (
             <div className="cp-row">
-              <span>Vencido sin pagar</span>
+              <span>Overdue</span>
               <span className="cell-money warn">
                 {formatMoney(contract.health.arrears, money)}
               </span>
@@ -341,29 +341,29 @@ export function ContractPanel({
               whatever its schedule would still say. */}
           {isOpen && (
             <div className="cp-row">
-              <span>Próxima cuota</span>
+              <span>Next installment</span>
               <span>
                 {contract.health.nextDueOn === null
-                  ? "No queda nada por pagar"
+                  ? "Nothing left to pay"
                   : `${formatDate(contract.health.nextDueOn)} · ${formatMoney(
                       contract.health.nextInstallment,
                       money,
                     )}${
                       contract.health.nextDueCredit > 0
-                        ? ` (adelanto ${formatMoney(contract.health.nextDueCredit, money)})`
+                        ? ` (${formatMoney(contract.health.nextDueCredit, money)} paid in advance)`
                         : ""
                     }`}
               </span>
             </div>
           )}
           <div className="cp-row cp-row-total">
-            <span>Saldo</span>
+            <span>Balance</span>
             <span className="cell-money">{formatMoney(contract.balance, money)}</span>
           </div>
 
           <p className="cp-note">
-            El saldo, el atraso y la próxima cuota se calculan con los pagos registrados cada vez
-            que se abre esta pantalla. No son valores editables.
+            The balance, overdue amount, and next installment are calculated from recorded
+            payments each time this screen opens. They can't be edited.
           </p>
         </section>
 
@@ -371,16 +371,16 @@ export function ContractPanel({
             and what later replaced it. */}
         {(contract.replaces || contract.replacedBy) && (
           <section className="cp-section">
-            <h3 className="cp-section-title">Adenda</h3>
+            <h3 className="cp-section-title">Amendment</h3>
             {contract.replaces && (
               <AmendmentSide
-                heading="Reemplaza a"
+                heading="Replaces"
                 link={contract.replaces}
                 other={predecessor}
                 money={money}
                 paidNote={
                   predecessor
-                    ? `${formatMoney(predecessor.paidToDate, money)} · quedó como ingreso, no se abona a este precio`
+                    ? `${formatMoney(predecessor.paidToDate, money)} · kept as income, not applied to this price`
                     : null
                 }
                 onOpen={onOpenContract}
@@ -389,7 +389,7 @@ export function ContractPanel({
             {contract.replaces && contract.replacedBy && <hr className="cp-divider" />}
             {contract.replacedBy && (
               <AmendmentSide
-                heading="Reemplazado por"
+                heading="Replaced by"
                 link={contract.replacedBy}
                 other={successor}
                 money={money}
@@ -402,7 +402,7 @@ export function ContractPanel({
 
         {siblings.length > 0 && (
           <section className="cp-section">
-            <h3 className="cp-section-title">Los otros lotes de esta compra</h3>
+            <h3 className="cp-section-title">Other lots in this purchase</h3>
             {/* One signature, one payment, one receipt — but a balance each,
                 because the lots are released and titled one at a time. */}
             {siblings.map((sibling) => (
@@ -414,20 +414,20 @@ export function ContractPanel({
               </div>
             ))}
             <p className="cp-note">
-              Un solo recibo cubre los {siblings.length + 1} lotes; el monto se reparte entre ellos
-              y cada uno guarda su propio saldo.
+              One receipt covers all {siblings.length + 1} lots; the amount is split between them,
+              and each lot keeps its own balance.
             </p>
           </section>
         )}
 
         <section className="cp-section">
-          <h3 className="cp-section-title">Cliente</h3>
+          <h3 className="cp-section-title">Customer</h3>
           <div className="cp-row">
-            <span>Nombre</span>
+            <span>Name</span>
             <span>{contract.customer.fullName}</span>
           </div>
           <div className="cp-row">
-            <span>Teléfono</span>
+            <span>Phone</span>
             {/* Stored with its country code; read back the local way. `null`
                 when it was never given — a paid-off lot may never have needed
                 one. */}
@@ -436,20 +436,20 @@ export function ContractPanel({
             </span>
           </div>
           <div className="cp-row">
-            <span>Situación</span>
+            <span>Status</span>
             <span className={STATUS_PRESENTATION[contract.status].stampClass}>
               {STATUS_PRESENTATION[contract.status].label}
             </span>
           </div>
           {contract.closedAt && (
             <div className="cp-row">
-              <span>Motivo del cierre</span>
+              <span>Closing reason</span>
               <span>{contract.closedReason ?? "—"}</span>
             </div>
           )}
           {contract.closedSettlement && (
             <div className="cp-row">
-              <span>Lo ya pagado</span>
+              <span>Amount paid</span>
               <span>{SETTLEMENT_LABELS[contract.closedSettlement]}</span>
             </div>
           )}
@@ -472,7 +472,7 @@ export function ContractPanel({
 
         {contract.notes && (
           <section className="cp-section">
-            <h3 className="cp-section-title">Notas</h3>
+            <h3 className="cp-section-title">Notes</h3>
             <p className="cp-note-body">{contract.notes}</p>
           </section>
         )}
@@ -480,7 +480,7 @@ export function ContractPanel({
 
       <div className="modal-actions cp-actions">
         <button type="button" className="btn-secondary" onClick={onClose}>
-          Cerrar
+          Close
         </button>
         {/* Shown only while there is something to act on. The server re-checks
             every capability either way — hiding a button is convenience, not
@@ -494,7 +494,7 @@ export function ContractPanel({
             className="btn-secondary"
             onClick={() => onEditContract(contract)}
           >
-            <span>Editar términos</span>
+            <span>Edit terms</span>
           </button>
         )}
         {canAmend && (
@@ -502,9 +502,9 @@ export function ContractPanel({
             type="button"
             className="btn-secondary"
             onClick={() => onAmendContract(contract)}
-            title="Nuevo precio o plazo acordado: cierra este contrato y abre uno nuevo, sin tocar sus pagos ni sus recibos."
+            title="New agreed price or term: closes this contract and opens a new one without changing its payments or receipts."
           >
-            <span>Adenda</span>
+            <span>Amend contract</span>
           </button>
         )}
         {isOpen && canReassignLot && (
@@ -512,9 +512,9 @@ export function ContractPanel({
             type="button"
             className="btn-secondary"
             onClick={() => onReassignLot(contract)}
-            title="Solo para un lote mal capturado por error, no para vender otro lote."
+            title="Only for a lot entered incorrectly, not for selling a different lot."
           >
-            <span>Corregir lote</span>
+            <span>Correct lot</span>
           </button>
         )}
         {isOpen && canDefault && (
@@ -522,9 +522,9 @@ export function ContractPanel({
             type="button"
             className="btn-secondary"
             onClick={() => onDefaultContract(contract)}
-            title="El cliente ya no puede pagar: se libera el lote y se registra el incumplimiento."
+            title="The customer can no longer pay: frees the lot and records the default."
           >
-            <span>Marcar como incumplido</span>
+            <span>Mark as defaulted</span>
           </button>
         )}
         {isOpen && canCancel && (
@@ -533,7 +533,7 @@ export function ContractPanel({
             className="btn-danger"
             onClick={() => onCancelContract(contract)}
           >
-            <span>Cancelar contrato</span>
+            <span>Cancel contract</span>
           </button>
         )}
       </div>

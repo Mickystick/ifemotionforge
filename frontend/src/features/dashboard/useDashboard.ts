@@ -47,7 +47,7 @@ export function useDashboard(enabled: boolean) {
       }
 
       const message =
-        caught instanceof Error ? caught.message : "No se pudo cargar el panel general.";
+        caught instanceof Error ? caught.message : "Could not load the dashboard.";
 
       /*
        * A failed REFRESH leaves what is on screen alone, exactly as the other

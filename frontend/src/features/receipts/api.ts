@@ -223,7 +223,7 @@ export async function uploadAttachment(
 
   if (!response.ok) {
     const error = payload as { message?: string } | null;
-    throw new ApiError(response.status, error?.message ?? "No se pudo subir el comprobante.");
+    throw new ApiError(response.status, error?.message ?? "Could not upload the proof file.");
   }
 
   return (payload as { attachment: ReceiptAttachment }).attachment;

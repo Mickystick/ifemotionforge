@@ -44,7 +44,7 @@ export function UserPasswordDialog({ account, onCancel, onConfirm }: UserPasswor
       await onConfirm(password);
     } catch (caught) {
       setError(
-        caught instanceof Error ? caught.message : "No se pudo cambiar la contraseña.",
+        caught instanceof Error ? caught.message : "Unable to change the password.",
       );
     } finally {
       setSaving(false);
@@ -52,29 +52,30 @@ export function UserPasswordDialog({ account, onCancel, onConfirm }: UserPasswor
   };
 
   return (
-    <Dialog ariaLabel={`Cambiar la contraseña de ${account.name}`} onClose={onCancel}>
+    <Dialog ariaLabel={`Change ${account.name}'s password`} onClose={onCancel}>
       <form onSubmit={handleSubmit}>
         <div className="modal-header">
           <div>
-            <p className="modal-eyebrow">Cambiar contraseña</p>
+            <p className="modal-eyebrow">Change password</p>
             <h2>{account.name}</h2>
             <p className="modal-description">
               {account.isSelf
-                ? "Vas a cambiar la contraseña de tu propia cuenta. Se cerrará tu sesión en " +
-                  "los demás dispositivos donde la tengas abierta."
-                : `La contraseña anterior deja de funcionar de inmediato y ${account.name} ` +
-                  "sale de la aplicación en todos sus dispositivos."}
+                ? "You're changing your own account password. You'll be signed out on your " +
+                  "other devices."
+                : `The old password will stop working immediately, and ${account.name} ` +
+                  "will be signed out on all devices."}
             </p>
           </div>
-          <button type="button" className="modal-close" onClick={onCancel} aria-label="Cerrar">
+          <button type="button" className="modal-close" onClick={onCancel} aria-label="Close">
             <IconClose />
           </button>
         </div>
 
         <div className="modal-form-grid">
           <p className="form-warning full-width">
-            Nadie puede consultar la contraseña actual: el sistema solo guarda una huella de
-            ella. Esto no la recupera, la reemplaza — anótala y entrégala en persona.
+            No one can retrieve the current password: the system only stores a fingerprint of
+            it. This replaces the password rather than recovering it—write it down and deliver
+            it in person.
           </p>
 
           <PasswordFields
@@ -83,7 +84,7 @@ export function UserPasswordDialog({ account, onCancel, onConfirm }: UserPasswor
             confirmation={confirmation}
             onPasswordChange={setPassword}
             onConfirmationChange={setConfirmation}
-            hint={`Al menos ${MINIMUM_PASSWORD_LENGTH} caracteres.`}
+            hint={`At least ${MINIMUM_PASSWORD_LENGTH} characters.`}
           />
 
           {error && <p className="form-error full-width">{error}</p>}
@@ -91,10 +92,10 @@ export function UserPasswordDialog({ account, onCancel, onConfirm }: UserPasswor
 
         <div className="modal-actions">
           <button type="button" className="btn-secondary" onClick={onCancel} disabled={isSaving}>
-            Cancelar
+            Cancel
           </button>
           <button type="submit" className="btn-primary modal-submit" disabled={isSaving}>
-            <span>{isSaving ? "Guardando…" : "Cambiar contraseña"}</span>
+            <span>{isSaving ? "Saving…" : "Change password"}</span>
           </button>
         </div>
       </form>

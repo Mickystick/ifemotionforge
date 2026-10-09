@@ -426,7 +426,7 @@ function presentReceipts(db: Db, rows: readonly ReceiptRow[], includeLines: bool
 const receiptBody = z.object({
   customerId: z.string().min(1),
   /** The day the money moved. Back-dating is allowed and is the point. */
-  paidOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Usa una fecha AAAA-MM-DD."),
+  paidOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use a date in YYYY-MM-DD format."),
   method: z.enum(PAYMENT_METHODS),
   /** The bank's confirmation number, for a transfer. */
   reference: z.string().trim().max(120).nullish(),
@@ -443,7 +443,7 @@ const receiptBody = z.object({
   originalCurrency: z.enum(["HNL", "USD"]).default("HNL"),
   exchangeRate: z
     .string()
-    .regex(/^\d+(\.\d+)?$/, "El tipo de cambio debe ser un número.")
+    .regex(/^\d+(\.\d+)?$/, "Exchange rate must be a number.")
     .default("1"),
   /**
    * The client's own key for this submission. A second arrival of the same key
@@ -466,7 +466,7 @@ const receiptBody = z.object({
         notes: z.string().trim().max(300).nullish(),
       }),
     )
-    .min(1, "Un recibo necesita al menos una transacción."),
+    .min(1, "A receipt must have at least one transaction."),
 });
 
 const voidBody = z.object({
@@ -514,7 +514,7 @@ const redistributeBody = z.object({
         type: z.enum(PAYMENT_TYPES).optional(),
       }),
     )
-    .min(1, "Indica al menos un contrato."),
+    .min(1, "Select at least one contract."),
 });
 
 /**
@@ -592,7 +592,7 @@ export const receiptRoutes: FastifyPluginAsync<ReceiptRoutesOptions> = async (ap
       if (stored === null) {
         return reply.code(400).send({
           error: "invalid_lookup_code",
-          message: "Ese código no tiene la forma de un código de recibo.",
+          message: "That code is not in the correct receipt-code format.",
         });
       }
 
@@ -601,7 +601,7 @@ export const receiptRoutes: FastifyPluginAsync<ReceiptRoutesOptions> = async (ap
       if (!row) {
         return reply
           .code(404)
-          .send({ error: "not_found", message: "No existe un recibo con ese código." });
+          .send({ error: "not_found", message: "No receipt exists with that code." });
       }
 
       return { receipt: presentReceipts(app.db, [row], true)[0] };
@@ -792,7 +792,7 @@ export const receiptRoutes: FastifyPluginAsync<ReceiptRoutesOptions> = async (ap
       const row = receiptsListQuery(app.db).where(eq(receipts.id, request.params.id)).get();
 
       if (!row) {
-        return reply.code(404).send({ error: "not_found", message: "Ese recibo no existe." });
+        return reply.code(404).send({ error: "not_found", message: "That receipt does not exist." });
       }
 
       return { receipt: presentReceipts(app.db, [row], true)[0] };
@@ -812,7 +812,7 @@ export const receiptRoutes: FastifyPluginAsync<ReceiptRoutesOptions> = async (ap
       if (!parsed.success) {
         return reply.code(400).send({
           error: "invalid_receipt",
-          message: parsed.error.issues[0]?.message ?? "Revisa los datos del recibo.",
+          message: parsed.error.issues[0]?.message ?? "Check the receipt details.",
         });
       }
 
@@ -843,7 +843,7 @@ export const receiptRoutes: FastifyPluginAsync<ReceiptRoutesOptions> = async (ap
       if (!customer) {
         return reply
           .code(404)
-          .send({ error: "customer_not_found", message: "Ese cliente no existe." });
+          .send({ error: "customer_not_found", message: "That customer does not exist." });
       }
 
       const rate = Number(body.exchangeRate);
@@ -851,14 +851,14 @@ export const receiptRoutes: FastifyPluginAsync<ReceiptRoutesOptions> = async (ap
       if (!Number.isFinite(rate) || rate <= 0) {
         return reply.code(400).send({
           error: "invalid_rate",
-          message: "El tipo de cambio debe ser mayor que cero.",
+          message: "The exchange rate must be greater than zero.",
         });
       }
 
       if (body.originalCurrency === "HNL" && rate !== 1) {
         return reply.code(400).send({
           error: "invalid_rate",
-          message: "Un pago en lempiras no lleva tipo de cambio.",
+          message: "A payment in lempiras does not use an exchange rate.",
         });
       }
 
@@ -870,7 +870,7 @@ export const receiptRoutes: FastifyPluginAsync<ReceiptRoutesOptions> = async (ap
         if (seen.has(line.contractId)) {
           return reply.code(400).send({
             error: "duplicate_contract",
-            message: "Un contrato solo puede aparecer una vez en el mismo recibo.",
+            message: "A contract can only appear once on the same receipt.",
           });
         }
         seen.add(line.contractId);
@@ -896,7 +896,7 @@ export const receiptRoutes: FastifyPluginAsync<ReceiptRoutesOptions> = async (ap
         if (!contract) {
           return reply
             .code(404)
-            .send({ error: "contract_not_found", message: "Uno de los contratos no existe." });
+            .send({ error: "contract_not_found", message: "One of the contracts does not exist." });
         }
 
         // The receipt names one customer, so every line has to be that person's
@@ -905,7 +905,7 @@ export const receiptRoutes: FastifyPluginAsync<ReceiptRoutesOptions> = async (ap
         if (contract.customerId !== body.customerId) {
           return reply.code(400).send({
             error: "contract_not_customers",
-            message: `El contrato ${contract.code} no pertenece a ${customer.fullName}.`,
+            message: `Contract ${contract.code} does not belong to ${customer.fullName}.`,
           });
         }
 
@@ -915,7 +915,7 @@ export const receiptRoutes: FastifyPluginAsync<ReceiptRoutesOptions> = async (ap
         if (contract.status !== "active" && contract.status !== "paid_off") {
           return reply.code(409).send({
             error: "contract_closed",
-            message: `El contrato ${contract.code} está cerrado y no admite pagos.`,
+            message: `Contract ${contract.code} is closed and cannot accept payments.`,
           });
         }
 
@@ -926,8 +926,8 @@ export const receiptRoutes: FastifyPluginAsync<ReceiptRoutesOptions> = async (ap
             return reply.code(409).send({
               error: "overpayment",
               message:
-                `El contrato ${contract.code} solo debe L ${(balance / 100).toLocaleString("es-HN")}. ` +
-                "Confirma el sobrepago si el cliente realmente entregó de más.",
+                `Contract ${contract.code} only has L ${(balance / 100).toLocaleString("en-HN")} remaining. ` +
+                "Confirm the overpayment if the customer actually paid extra.",
               balanceCents: balance,
               contractId: contract.id,
             });
@@ -1074,7 +1074,7 @@ export const receiptRoutes: FastifyPluginAsync<ReceiptRoutesOptions> = async (ap
       if (!parsed.success) {
         return reply.code(400).send({
           error: "invalid_body",
-          message: "La nota no puede pasar de 500 caracteres.",
+          message: "The note cannot exceed 500 characters.",
         });
       }
 
@@ -1085,7 +1085,7 @@ export const receiptRoutes: FastifyPluginAsync<ReceiptRoutesOptions> = async (ap
         .get();
 
       if (!existing) {
-        return reply.code(404).send({ error: "not_found", message: "Ese recibo no existe." });
+        return reply.code(404).send({ error: "not_found", message: "That receipt does not exist." });
       }
 
       const next = parsed.data.note === null || parsed.data.note === "" ? null : parsed.data.note;
@@ -1119,7 +1119,7 @@ export const receiptRoutes: FastifyPluginAsync<ReceiptRoutesOptions> = async (ap
       if (!parsed.success) {
         return reply.code(400).send({
           error: "reason_required",
-          message: "Explica por qué se anula el recibo (al menos 10 caracteres).",
+          message: "Explain why the receipt is being voided (at least 10 characters).",
         });
       }
 
@@ -1130,13 +1130,13 @@ export const receiptRoutes: FastifyPluginAsync<ReceiptRoutesOptions> = async (ap
         .get();
 
       if (!existing) {
-        return reply.code(404).send({ error: "not_found", message: "Ese recibo no existe." });
+        return reply.code(404).send({ error: "not_found", message: "That receipt does not exist." });
       }
 
       if (existing.voidedAt) {
         return reply
           .code(409)
-          .send({ error: "already_voided", message: "Ese recibo ya está anulado." });
+          .send({ error: "already_voided", message: "That receipt has already been voided." });
       }
 
       const actor = request.user!;
@@ -1294,7 +1294,7 @@ export const receiptRoutes: FastifyPluginAsync<ReceiptRoutesOptions> = async (ap
           error: "invalid_redistribution",
           message:
             parsed.error.issues[0]?.message ??
-            "Explica por qué se reparte el recibo (al menos 10 caracteres).",
+            "Explain why the receipt is being distributed (at least 10 characters).",
         });
       }
 
@@ -1308,7 +1308,7 @@ export const receiptRoutes: FastifyPluginAsync<ReceiptRoutesOptions> = async (ap
         .get();
 
       if (!receipt) {
-        return reply.code(404).send({ error: "not_found", message: "Ese recibo no existe." });
+        return reply.code(404).send({ error: "not_found", message: "That receipt does not exist." });
       }
 
       // A voided receipt's money is already out of the accounts. Repartitioning
@@ -1317,7 +1317,7 @@ export const receiptRoutes: FastifyPluginAsync<ReceiptRoutesOptions> = async (ap
       if (receipt.voidedAt) {
         return reply.code(409).send({
           error: "already_voided",
-          message: "Ese recibo está anulado y su dinero ya no cuenta en los saldos.",
+          message: "That receipt has been voided, so its amount is no longer included in balances.",
         });
       }
 
@@ -1343,7 +1343,7 @@ export const receiptRoutes: FastifyPluginAsync<ReceiptRoutesOptions> = async (ap
       if (liveRows.length === 0) {
         return reply.code(409).send({
           error: "nothing_to_redistribute",
-          message: "Ese recibo no tiene transacciones activas que repartir.",
+          message: "That receipt has no active transactions to distribute.",
         });
       }
 
@@ -1363,7 +1363,7 @@ export const receiptRoutes: FastifyPluginAsync<ReceiptRoutesOptions> = async (ap
       ) {
         return reply.code(409).send({
           error: "mixed_currency",
-          message: "Ese recibo mezcla monedas o tipos de cambio y no se puede repartir aquí.",
+          message: "That receipt combines currencies or exchange rates and cannot be distributed here.",
         });
       }
 
@@ -1376,9 +1376,9 @@ export const receiptRoutes: FastifyPluginAsync<ReceiptRoutesOptions> = async (ap
         return reply.code(409).send({
           error: "total_changed",
           message:
-            `El reparto suma L ${(requestedCents / 100).toLocaleString("es-HN")} y el recibo ` +
-            `es por L ${(faceCents / 100).toLocaleString("es-HN")}. ` +
-            "Repartir mueve el dinero entre lotes; no cambia el total del recibo.",
+            `The distribution totals L ${(requestedCents / 100).toLocaleString("en-HN")}, while the receipt ` +
+            `totals L ${(faceCents / 100).toLocaleString("en-HN")}. ` +
+            "Distribution moves money between lots; it does not change the receipt total.",
           receiptTotalCents: faceCents,
           requestedTotalCents: requestedCents,
         });
@@ -1390,7 +1390,7 @@ export const receiptRoutes: FastifyPluginAsync<ReceiptRoutesOptions> = async (ap
         if (seen.has(line.contractId)) {
           return reply.code(400).send({
             error: "duplicate_contract",
-            message: "Un contrato solo puede aparecer una vez en el mismo recibo.",
+            message: "A contract can only appear once on the same receipt.",
           });
         }
         seen.add(line.contractId);
@@ -1418,7 +1418,7 @@ export const receiptRoutes: FastifyPluginAsync<ReceiptRoutesOptions> = async (ap
         if (!contract) {
           return reply
             .code(404)
-            .send({ error: "contract_not_found", message: "Uno de los contratos no existe." });
+            .send({ error: "contract_not_found", message: "One of the contracts does not exist." });
         }
 
         // The receipt names one customer. Redistribution moves money between
@@ -1427,7 +1427,7 @@ export const receiptRoutes: FastifyPluginAsync<ReceiptRoutesOptions> = async (ap
         if (contract.customerId !== receipt.customerId) {
           return reply.code(400).send({
             error: "contract_not_customers",
-            message: `El contrato ${contract.code} no es del cliente de este recibo.`,
+            message: `Contract ${contract.code} does not belong to this receipt's customer.`,
           });
         }
 
@@ -1437,7 +1437,7 @@ export const receiptRoutes: FastifyPluginAsync<ReceiptRoutesOptions> = async (ap
         if (contract.status !== "active" && contract.status !== "paid_off") {
           return reply.code(409).send({
             error: "contract_closed",
-            message: `El contrato ${contract.code} está cerrado y no admite pagos.`,
+            message: `Contract ${contract.code} is closed and cannot accept payments.`,
           });
         }
 
@@ -1471,9 +1471,8 @@ export const receiptRoutes: FastifyPluginAsync<ReceiptRoutesOptions> = async (ap
             return reply.code(409).send({
               error: "overpayment",
               message:
-                `El contrato ${contract.code} solo debe ` +
-                `L ${(room / 100).toLocaleString("es-HN")}. ` +
-                "Confirma el sobrepago si de verdad le toca esa parte.",
+                `Contract ${contract.code} only has L ${(room / 100).toLocaleString("en-HN")} remaining. ` +
+                "Confirm the overpayment if that is the correct amount.",
               balanceCents: room,
               contractId: contract.id,
             });
@@ -1518,8 +1517,8 @@ export const receiptRoutes: FastifyPluginAsync<ReceiptRoutesOptions> = async (ap
           return reply.code(409).send({
             error: "proof_attached",
             message:
-              `La transacción del contrato ${code} tiene un comprobante adjunto. ` +
-              "Quita el comprobante de esa línea antes de mover todo su monto a otro lote.",
+              `The transaction for contract ${code} has an attachment. ` +
+              "Remove the attachment from that line before moving its full amount to another lot.",
           });
         }
       }
@@ -1715,7 +1714,7 @@ export const receiptRoutes: FastifyPluginAsync<ReceiptRoutesOptions> = async (ap
         .get();
 
       if (!receipt) {
-        return reply.code(404).send({ error: "not_found", message: "Ese recibo no existe." });
+        return reply.code(404).send({ error: "not_found", message: "That receipt does not exist." });
       }
 
       const existing = app.db
@@ -1727,7 +1726,7 @@ export const receiptRoutes: FastifyPluginAsync<ReceiptRoutesOptions> = async (ap
       if ((existing?.value ?? 0) >= MAX_ATTACHMENTS_PER_RECEIPT) {
         return reply.code(409).send({
           error: "too_many_attachments",
-          message: `Un recibo admite hasta ${MAX_ATTACHMENTS_PER_RECEIPT} comprobantes.`,
+          message: `A receipt can have up to ${MAX_ATTACHMENTS_PER_RECEIPT} attachments.`,
         });
       }
 
@@ -1739,19 +1738,19 @@ export const receiptRoutes: FastifyPluginAsync<ReceiptRoutesOptions> = async (ap
         // Thrown by @fastify/multipart when the body is not multipart at all.
         return reply
           .code(400)
-          .send({ error: "invalid_upload", message: "No se recibió ningún archivo." });
+          .send({ error: "invalid_upload", message: "No file was received." });
       }
 
       if (!part) {
         return reply
           .code(400)
-          .send({ error: "invalid_upload", message: "No se recibió ningún archivo." });
+          .send({ error: "invalid_upload", message: "No file was received." });
       }
 
       if (!isAllowedContentType(part.mimetype)) {
         return reply.code(415).send({
           error: "unsupported_type",
-          message: "Solo se aceptan imágenes (JPG, PNG, WEBP, HEIC) o un PDF.",
+          message: "Only images (JPG, PNG, WEBP, HEIC) or a PDF are accepted.",
         });
       }
 
@@ -1764,14 +1763,14 @@ export const receiptRoutes: FastifyPluginAsync<ReceiptRoutesOptions> = async (ap
       if (part.file.truncated) {
         return reply.code(413).send({
           error: "file_too_large",
-          message: `El archivo supera el máximo de ${Math.round(MAX_ATTACHMENT_BYTES / 1024 / 1024)} MB.`,
+          message: `The file exceeds the ${Math.round(MAX_ATTACHMENT_BYTES / 1024 / 1024)} MB limit.`,
         });
       }
 
       if (buffer.byteLength === 0) {
         return reply
           .code(400)
-          .send({ error: "empty_file", message: "El archivo está vacío." });
+          .send({ error: "empty_file", message: "The file is empty." });
       }
 
       /*
@@ -1807,7 +1806,7 @@ export const receiptRoutes: FastifyPluginAsync<ReceiptRoutesOptions> = async (ap
         if (!line) {
           return reply.code(400).send({
             error: "unknown_payment",
-            message: "Ese lote no está en este recibo.",
+            message: "That lot is not on this receipt.",
           });
         }
       }
@@ -1892,7 +1891,7 @@ export const receiptRoutes: FastifyPluginAsync<ReceiptRoutesOptions> = async (ap
         .get();
 
       if (!row) {
-        return reply.code(404).send({ error: "not_found", message: "Ese archivo no existe." });
+        return reply.code(404).send({ error: "not_found", message: "That file does not exist." });
       }
 
       return sendStoredFile(reply, row, options.uploadsPath);
@@ -1917,7 +1916,7 @@ export const receiptRoutes: FastifyPluginAsync<ReceiptRoutesOptions> = async (ap
         .get();
 
       if (!row) {
-        return reply.code(404).send({ error: "not_found", message: "Ese archivo no existe." });
+        return reply.code(404).send({ error: "not_found", message: "That file does not exist." });
       }
 
       const receipt = app.db

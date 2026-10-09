@@ -182,14 +182,14 @@ export function ReceiptRedistributeDialog({
       );
       onRedistributed();
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "No se pudo repartir el recibo.");
+      setError(caught instanceof Error ? caught.message : "Could not redistribute the receipt.");
       setSaving(false);
     }
   };
 
   return (
     <Dialog
-      ariaLabel={`Repartir el recibo ${receipt.code} entre lotes`}
+      ariaLabel={`Redistribute receipt ${receipt.code} across lots`}
       size="wide"
       /* Rewriting where posted money sits, with a written reason attached. A
          click beside the panel must not throw that away — see `dismissible` in
@@ -199,23 +199,23 @@ export function ReceiptRedistributeDialog({
     >
       <div className="modal-header">
         <div>
-          <p className="modal-eyebrow">Repartir entre lotes</p>
+          <p className="modal-eyebrow">Redistribute between lots</p>
           <h2>{receipt.code}</h2>
           <p className="modal-description">
             {receipt.customer.fullName} · {formatMoney(receipt.totalPaid, money)}
           </p>
         </div>
-        <button type="button" className="modal-close" onClick={onClose} aria-label="Cerrar">
+        <button type="button" className="modal-close" onClick={onClose} aria-label="Close">
           <IconClose />
         </button>
       </div>
 
       <div className="modal-form-grid">
         <p className="form-note full-width">
-          Esto mueve el dinero de este recibo entre los lotes del cliente. El total no cambia y no
-          se emite un recibo nuevo: el cliente sigue teniendo el mismo papel por{" "}
-          {formatMoney(receipt.totalPaid, money)}, y lo que se corrige es a cuál lote le tocó cada
-          parte. Los saldos de cada contrato se recalculan solos.
+          This moves the money from this receipt between the customer's lots. The total does not
+          change and no new receipt is issued: the customer keeps the same receipt for{" "}
+          {formatMoney(receipt.totalPaid, money)}; only the amount assigned to each lot changes.
+          Contract balances are recalculated.
         </p>
 
         <div className="redistribute-lines full-width">
@@ -231,7 +231,7 @@ export function ReceiptRedistributeDialog({
                     {target.contractCode !== "" && ` · ${target.contractCode}`}
                   </span>
                   {!target.isOnReceipt && (
-                    <span className="redistribute-lot-new">No está en este recibo</span>
+                    <span className="redistribute-lot-new">Not on this receipt</span>
                   )}
                 </div>
 
@@ -244,12 +244,12 @@ export function ReceiptRedistributeDialog({
                     inputMode="decimal"
                     value={value}
                     placeholder="0.00"
-                    aria-label={`Monto para el lote ${target.lotCode}`}
+                    aria-label={`Amount for lot ${target.lotCode}`}
                     onChange={(event) => setAmount(target.contractId, event.target.value)}
                   />
                   {target.isOnReceipt && (
                     <span className="redistribute-current">
-                      Ahora: {formatMoney(cents(target.currentCents), money)}
+                      Current: {formatMoney(cents(target.currentCents), money)}
                     </span>
                   )}
                 </div>
@@ -260,14 +260,14 @@ export function ReceiptRedistributeDialog({
 
         <div className={`redistribute-total full-width${balances ? " is-balanced" : ""}`}>
           <span>
-            Repartido {formatMoney(cents(assignedCents), money)} de{" "}
+            Assigned {formatMoney(cents(assignedCents), money)} of{" "}
             {formatMoney(receipt.totalPaid, money)}
           </span>
           {/* The gap, named and signed. "No cuadra" on its own sends somebody
               back to add up four inputs by hand. */}
           {!balances && (
             <strong className="redistribute-gap">
-              {differenceCents > 0 ? "Sobran " : "Faltan "}
+              {differenceCents > 0 ? "Over by " : "Short by "}
               {formatMoney(cents(Math.abs(differenceCents)), money)}
             </strong>
           )}
@@ -277,27 +277,27 @@ export function ReceiptRedistributeDialog({
             onClick={splitEvenly}
             disabled={isSaving}
           >
-            Repartir en partes iguales
+            Split evenly
           </button>
         </div>
 
         <div className="form-field full-width">
           <label htmlFor="redistribute-reason">
-            Motivo <span className="required-mark">*</span>
+            Reason <span className="required-mark">*</span>
           </label>
           <textarea
             id="redistribute-reason"
             rows={3}
             value={reason}
             onChange={(event) => setReason(event.target.value)}
-            placeholder="Ej. La prima cubría dos lotes; el segundo se registró después."
+            placeholder="e.g. The down payment covered two lots; the second was recorded later."
           />
           <span className="field-hint">
-            Queda en el historial de cada transacción movida. Es lo que explica, meses después, por
-            qué este recibo se reparte distinto de como se emitió.
+            Kept in the history of each transaction moved. This explains later why the receipt is
+            allocated differently from when it was issued.
           </span>
           {trimmedReason.length > 0 && trimmedReason.length < MINIMUM_REASON && (
-            <span className="field-error">Escribe al menos {MINIMUM_REASON} caracteres.</span>
+            <span className="field-error">Enter at least {MINIMUM_REASON} characters.</span>
           )}
         </div>
 
@@ -306,7 +306,7 @@ export function ReceiptRedistributeDialog({
 
       <div className="modal-actions">
         <button type="button" className="btn-secondary" onClick={onClose}>
-          Cancelar
+          Cancel
         </button>
         <button
           type="button"
@@ -314,7 +314,7 @@ export function ReceiptRedistributeDialog({
           disabled={!canSubmit}
           onClick={() => void submit()}
         >
-          {isSaving ? "Repartiendo…" : "Repartir"}
+          {isSaving ? "Redistributing…" : "Redistribute"}
         </button>
       </div>
     </Dialog>

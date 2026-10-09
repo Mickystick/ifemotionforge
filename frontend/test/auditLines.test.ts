@@ -25,7 +25,7 @@ describe("formatAuditLine", () => {
         { lotCode: "A-07", contractCode: "CT-2026-004", type: "installment", amountCents: 500_000 },
         money,
       ),
-      `A-07 · CT-2026-004 · Cuota · ${l(500_000)}`,
+      `A-07 · CT-2026-004 · Installment · ${l(500_000)}`,
     );
   });
 
@@ -35,14 +35,14 @@ describe("formatAuditLine", () => {
         { paymentId: "p1", contractId: "k1", contractCode: "CT-2026-004", type: "down_payment", amountCents: 1_000_000 },
         money,
       ),
-      `CT-2026-004 · Prima · ${l(1_000_000)}`,
+      `CT-2026-004 · Down payment · ${l(1_000_000)}`,
     );
   });
 
   it("keeps a lot that has lost its contract code rather than dropping the line", () => {
     assert.equal(
       formatAuditLine({ lotCode: "A-07", contractCode: null, type: "installment", amountCents: 500_000 }, money),
-      `A-07 · Cuota · ${l(500_000)}`,
+      `A-07 · Installment · ${l(500_000)}`,
     );
   });
 
@@ -64,7 +64,7 @@ describe("formatAuditList", () => {
         ],
         money,
       ),
-      `A-07 · CT-1 · Prima · ${l(1_000_000)}; B-02 · CT-2 · Cuota · ${l(250_000)}`,
+      `A-07 · CT-1 · Down payment · ${l(1_000_000)}; B-02 · CT-2 · Installment · ${l(250_000)}`,
     );
   });
 

@@ -266,10 +266,10 @@ export function draftAge(savedAt: string): string {
   const minutes = Math.max(1, Math.round((Date.now() - new Date(savedAt).getTime()) / 60000));
 
   if (minutes < 60) {
-    return `hace ${minutes} minuto${minutes === 1 ? "" : "s"}`;
+    return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
   }
 
   const hours = Math.round(minutes / 60);
 
-  return `hace ${hours} hora${hours === 1 ? "" : "s"}`;
+  return `${hours} hour${hours === 1 ? "" : "s"} ago`;
 }

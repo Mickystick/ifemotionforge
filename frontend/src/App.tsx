@@ -8,6 +8,7 @@ import { Topbar } from "./components/Topbar";
 import { AuditPage } from "./features/audit/AuditPage";
 import { DashboardPage } from "./features/dashboard/DashboardPage";
 import { useDashboard } from "./features/dashboard/useDashboard";
+import { HomePage } from "./features/home/HomePage";
 import { CustomerDeleteDialog } from "./features/customers/CustomerDeleteDialog";
 import { CustomerFormDialog } from "./features/customers/CustomerFormDialog";
 import { CustomerPanel } from "./features/customers/CustomerPanel";
@@ -39,7 +40,7 @@ import type {
   ContractTermsDraft,
 } from "./features/contracts/api";
 import { useContracts } from "./features/contracts/useContracts";
-import { LoginPage } from "./features/auth/LoginPage";
+import { LoginDialog } from "./features/auth/LoginDialog";
 import { authApi } from "./features/auth/api";
 import { LotArchiveDialog } from "./features/lots/LotArchiveDialog";
 import { LotCreateDialog } from "./features/lots/LotCreateDialog";
@@ -96,27 +97,29 @@ import type { AreaUnit } from "./lib/area";
 import type { Contract, CustomerRecord, Lot, Project, Receipt, TabId, Transaction } from "./types";
 
 const pageTitles: Record<TabId, string> = {
-  dashboard: "Panel general",
-  lots: "Lotes",
-  projects: "Proyectos",
-  contracts: "Contratos",
-  customers: "Clientes",
-  receipts: "Recibos",
-  audit: "Historial",
-  permissions: "Permisos",
-  users: "Usuarios",
+  home: "Home",
+  dashboard: "Dashboard",
+  lots: "Lots",
+  projects: "Projects",
+  contracts: "Contracts",
+  customers: "Customers",
+  receipts: "Receipts",
+  audit: "History",
+  permissions: "Permissions",
+  users: "Users",
 };
 
 const primaryActionLabels: Record<TabId, string> = {
-  dashboard: "Nuevo contrato",
-  lots: "Nuevo lote",
-  projects: "Nuevo proyecto",
-  contracts: "Nuevo contrato",
-  customers: "Nuevo cliente",
-  receipts: "Nueva transacción",
-  audit: "Nuevo lote",
-  permissions: "Nuevo lote",
-  users: "Nueva cuenta",
+  home: "New contract",
+  dashboard: "New contract",
+  lots: "New lot",
+  projects: "New project",
+  contracts: "New contract",
+  customers: "New customer",
+  receipts: "New transaction",
+  audit: "New lot",
+  permissions: "New lot",
+  users: "New account",
 };
 
 /**
@@ -141,6 +144,8 @@ export default function App() {
   // On load, ask the server whether this browser already has a valid session
   // cookie. This is what keeps you signed in after a refresh.
   const [session, setSession] = useState<Session>({ status: "checking" });
+  const [isLoginOpen, setLoginOpen] = useState(false);
+  const [tabAfterLogin, setTabAfterLogin] = useState<TabId | null>(null);
 
   /* Captured on the first render and never re-read: by the time the effect
      below runs, clearShareFromUrl has taken the marker back out of the URL. */
@@ -154,14 +159,10 @@ export default function App() {
   }, []);
 
   /*
-   * The Panel General is home.
-   *
-   * Lotes was the landing screen while it was the only one built. The question
-   * somebody opens this app to answer is "how are we doing" — which is the one
-   * screen that cannot be reached by looking at a single row, and is therefore
-   * the one worth showing before anybody has clicked anything.
+   * The home page is the landing screen, with the dashboard kept as a more
+   * detailed operational view behind it.
    */
-  const [activeTab, setActiveTab] = useState<TabId>("dashboard");
+  const [activeTab, setActiveTab] = useState<TabId>("home");
   /** Filters the Contratos tab should adopt the next time it renders. */
   const [contractsPreset, setContractsPreset] = useState<ContractFilterPreset | null>(null);
   const [currency, setCurrency] = useState<Currency>("HNL");
@@ -235,7 +236,7 @@ export default function App() {
     setDraftOwner(session.status === "signed-in" ? session.user.id : null);
   }, [session]);
 
-  // The session expired underneath a request. Drop to the login screen rather
+  // The session expired underneath a request. Return to the public home rather
   // than sit on stale numbers. Defined before the data hooks because they call
   // it from their own refresh failures — a 401 there used to surface as a
   // generic "no se pudo cargar" card with a Retry button that could only 401
@@ -257,7 +258,7 @@ export default function App() {
     state: dashboardState,
     reload: reloadDashboard,
     setMonth: setDashboardMonth,
-  } = useDashboard(isSignedIn);
+  } = useDashboard(isSignedIn || session.status === "anonymous");
   const { rate, setRate, reload: reloadRate } = useExchangeRate(isSignedIn, handleSessionExpired);
   /*
    * Only fetched for somebody who can manage accounts.
@@ -321,7 +322,7 @@ export default function App() {
   const sidebarRef = useRef<HTMLElement>(null);
 
   // If the session expires while the app is open, any request will come back
-  // 401. Drop straight to the login screen rather than showing stale data.
+  // 401. Return to the public home rather than showing stale data.
   const handleApiError = useCallback(
     (error: unknown) => {
       if (error instanceof ApiError && error.isUnauthenticated) {
@@ -376,7 +377,7 @@ export default function App() {
    * Read into a ref on the FIRST render, before anything else can rewrite the
    * URL, but acted on only once there is a session — sharing into an app you
    * are signed out of is entirely normal, and the payload has to survive the
-   * login screen rather than being thrown away at the door.
+   * sign-in prompt rather than being thrown away at the door.
    */
   useEffect(() => {
     const request = pendingShare.current;
@@ -408,7 +409,7 @@ export default function App() {
      */
     if (!canRecordPayment) {
       setShareRefusal(
-        "Tu cuenta no puede registrar pagos. Pídele a quien sí pueda que registre el comprobante.",
+        "Your account can't record payments. Ask someone who can to record the payment proof.",
       );
 
       if (request.kind === "payload") {
@@ -568,22 +569,87 @@ export default function App() {
     return () => document.body.classList.remove("is-dragging-file");
   }, [isDraggingFiles]);
 
-  if (session.status === "checking") {
-    return <div className="app-booting">Cargando…</div>;
-  }
-
-  if (session.status === "anonymous") {
-    return <LoginPage onSignedIn={(user) => setSession({ status: "signed-in", user })} />;
-  }
-
-  const { user } = session;
-
   const handleSelectTab = (tab: TabId) => {
+    if (!isSignedIn) {
+      setTabAfterLogin(tab);
+      setLoginOpen(true);
+      return;
+    }
+
     setActiveTab(tab);
     if (isMobileViewport()) {
       setSidebarOpen(false);
     }
   };
+
+  const signInDialog = isLoginOpen ? (
+    <LoginDialog
+      onSignedIn={(user) => {
+        setSession({ status: "signed-in", user });
+        setActiveTab(tabAfterLogin ?? "home");
+        setTabAfterLogin(null);
+        setLoginOpen(false);
+      }}
+      onClose={() => {
+        setLoginOpen(false);
+        setTabAfterLogin(null);
+      }}
+    />
+  ) : null;
+
+  if (session.status === "checking") {
+    return <div className="app-booting">Loading…</div>;
+  }
+
+  if (session.status === "anonymous") {
+    if (dashboardState.status === "loading") {
+      return (
+        <>
+          <main className="public-home-shell">
+            <section className="card public-home-state">
+              <h1>Home</h1>
+              <p className="state-message">Loading home…</p>
+            </section>
+          </main>
+          {signInDialog}
+        </>
+      );
+    }
+
+    if (dashboardState.status === "error") {
+      return (
+        <>
+          <main className="public-home-shell">
+            <section className="card public-home-state">
+              <h1>Home</h1>
+              <p className="form-error">{dashboardState.message}</p>
+              <button type="button" className="btn-secondary" onClick={() => void reloadDashboard()}>
+                Try again
+              </button>
+            </section>
+          </main>
+          {signInDialog}
+        </>
+      );
+    }
+
+    return (
+      <>
+        <main className="public-home-shell">
+          <HomePage
+            data={dashboardState.data}
+            money={money}
+            isPublic
+            onNavigate={handleSelectTab}
+            onOpenContract={() => handleSelectTab("contracts")}
+          />
+        </main>
+        {signInDialog}
+      </>
+    );
+  }
+
+  const { user } = session;
 
   /*
    * Open one contract's panel from a screen that only knows its id.
@@ -622,6 +688,7 @@ export default function App() {
     await authApi.logout().catch(() => undefined);
     // The next person to sign in on this phone starts from default views.
     forgetViewMemory();
+    setLoginOpen(false);
     setSession({ status: "anonymous" });
   };
 
@@ -909,7 +976,7 @@ export default function App() {
     await resetUserPassword(accountChangingPassword.id, password).catch(handleApiError);
 
     // Not just the row: resetting your OWN password ends this session too, and
-    // the next request is what will find that out and drop to the login screen.
+    // the next request is what will find that out and return to the public home.
     await reloadUsers();
     setAccountChangingPassword(null);
   };
@@ -953,9 +1020,9 @@ export default function App() {
           ? () => openCustomerForm(null)
           : undefined;
 
-      // The Panel General offers the same action as Contratos, since its own
-      // heading already says "Nuevo contrato" and a button that does nothing is
-      // worse than no button.
+      // The home page and the dashboard offer the same action as Contratos,
+      // since they all lead to the same flow of creating a new sale.
+      case "home":
       case "dashboard":
       case "contracts":
         return contractsState.status === "ready" &&
@@ -1019,11 +1086,43 @@ export default function App() {
           {/* Keyed by tab, so a render error is contained to the screen that
               caused it: the sidebar, the top bar and every other tab keep
               working, and switching away resets the boundary. */}
-          <ErrorBoundary variant="panel" area={`la pantalla de ${pageTitles[activeTab]}`} key={activeTab}>
+          <ErrorBoundary variant="panel" area={`the ${pageTitles[activeTab]} page`} key={activeTab}>
+          {activeTab === "home" && dashboardState.status === "loading" && (
+            <section className="panel active">
+              <div className="card">
+                <p className="state-message">Loading home…</p>
+              </div>
+            </section>
+          )}
+
+          {activeTab === "home" && dashboardState.status === "error" && (
+            <section className="panel active">
+              <div className="card">
+                <p className="form-error">{dashboardState.message}</p>
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={() => void reloadDashboard()}
+                >
+                  Reintentar
+                </button>
+              </div>
+            </section>
+          )}
+
+          {activeTab === "home" && dashboardState.status === "ready" && (
+            <HomePage
+              data={dashboardState.data}
+              money={money}
+              onNavigate={handleSelectTab}
+              onOpenContract={handleOpenContractById}
+            />
+          )}
+
           {activeTab === "dashboard" && dashboardState.status === "loading" && (
             <section className="panel active">
               <div className="card">
-                <p className="state-message">Cargando el panel…</p>
+                <p className="state-message">Loading dashboard…</p>
               </div>
             </section>
           )}
@@ -1072,7 +1171,7 @@ export default function App() {
           {activeTab === "users" && usersState.status === "loading" && (
             <section className="panel active">
               <div className="card">
-                <p className="state-message">Cargando cuentas…</p>
+                <p className="state-message">Loading accounts…</p>
               </div>
             </section>
           )}
@@ -1102,7 +1201,7 @@ export default function App() {
           {activeTab === "projects" && projectsState.status === "loading" && (
             <section className="panel active">
               <div className="card">
-                <p className="state-message">Cargando proyectos…</p>
+                <p className="state-message">Loading projects…</p>
               </div>
             </section>
           )}
@@ -1136,7 +1235,7 @@ export default function App() {
           {activeTab === "customers" && customersState.status === "loading" && (
             <section className="panel active">
               <div className="card">
-                <p className="state-message">Cargando clientes…</p>
+                <p className="state-message">Loading customers…</p>
               </div>
             </section>
           )}
@@ -1168,7 +1267,7 @@ export default function App() {
           {activeTab === "contracts" && contractsState.status === "loading" && (
             <section className="panel active">
               <div className="card">
-                <p className="state-message">Cargando contratos…</p>
+                <p className="state-message">Loading contracts…</p>
               </div>
             </section>
           )}
@@ -1204,7 +1303,7 @@ export default function App() {
           {activeTab === "receipts" && transactionsState.status === "loading" && (
             <section className="panel active">
               <div className="card">
-                <p className="state-message">Cargando transacciones…</p>
+                <p className="state-message">Loading transactions…</p>
               </div>
             </section>
           )}
@@ -1249,7 +1348,7 @@ export default function App() {
           {activeTab === "lots" && lotsState.status === "loading" && (
             <section className="panel active">
               <div className="card">
-                <p className="state-message">Cargando inventario…</p>
+                <p className="state-message">Loading inventory…</p>
               </div>
             </section>
           )}
@@ -1284,16 +1383,16 @@ export default function App() {
 
       {/* The dialogs share a boundary of their own: a crash inside a form must
           not blank the tables and the navigation behind it. */}
-      <ErrorBoundary variant="panel" area="una ventana">
+      <ErrorBoundary variant="panel" area="a dialog">
       {/* A share this account cannot act on. Its own dialog rather than a line
           inside the receipt form, because the whole point is that the receipt
           form is not opening. */}
       {shareRefusal && (
-        <Dialog ariaLabel="No se puede registrar el pago" onClose={() => setShareRefusal(null)}>
+        <Dialog ariaLabel="Unable to record payment" onClose={() => setShareRefusal(null)}>
           <div className="modal-header">
             <div>
-              <p className="modal-eyebrow">Comprobante compartido</p>
-              <h2>No se puede registrar el pago</h2>
+              <p className="modal-eyebrow">Shared payment proof</p>
+              <h2>Unable to record payment</h2>
             </div>
           </div>
 
@@ -1301,7 +1400,7 @@ export default function App() {
 
           <div className="modal-actions">
             <button type="button" className="btn-secondary" onClick={() => setShareRefusal(null)}>
-              Entendido
+              Got it
             </button>
           </div>
         </Dialog>
@@ -1625,12 +1724,12 @@ export default function App() {
                 file lands. Saying "comprobante" on the Contratos screen would
                 promise the wrong form. */}
             <p className="window-drop-title">
-              {dropTarget === "contract" ? "Suelta el contrato firmado" : "Suelta el comprobante"}
+              {dropTarget === "contract" ? "Drop the signed contract" : "Drop the payment proof"}
             </p>
             <p className="window-drop-hint">
               {dropTarget === "contract"
-                ? "Se abre un contrato nuevo con el documento adjunto."
-                : "Se abre una transacción nueva con la imagen adjunta."}
+                ? "A new contract will open with the document attached."
+                : "A new transaction will open with the image attached."}
             </p>
           </div>
         </div>

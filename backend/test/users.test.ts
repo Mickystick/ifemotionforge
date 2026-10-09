@@ -88,7 +88,7 @@ describe("user accounts", async () => {
     });
 
     assert.equal(response.statusCode, 400);
-    assert.match(JSON.stringify(response.json().issues), /al menos 10 caracteres/);
+    assert.match(JSON.stringify(response.json().issues), /at least 10 characters/);
   });
 
   it("lists the accounts with their last sign-in, and never a hash", async () => {

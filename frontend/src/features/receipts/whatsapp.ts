@@ -53,7 +53,7 @@ import type { Receipt } from "../../types";
  * type alongside it.
  */
 export const THANK_YOU_MESSAGE =
-  "Gracias por su reciente abono. Cualquier duda me deja saber.";
+  "Thank you for your recent payment. Please let me know if you have any questions.";
 
 /**
  * The message to send with this particular receipt.
@@ -66,7 +66,7 @@ export const THANK_YOU_MESSAGE =
  */
 export function receiptCaption(receipt: Receipt): string {
   if (receipt.voidedAt !== null) {
-    return `*RECIBO ANULADO* — ${receipt.voidReason ?? "sin motivo registrado"}`;
+    return `*VOIDED RECEIPT* — ${receipt.voidReason ?? "no reason recorded"}`;
   }
 
   return THANK_YOU_MESSAGE;
@@ -124,15 +124,15 @@ export function pasteShortcut(): string {
  */
 export function pasteInstruction(): string {
   return isTouchDevice()
-    ? "Mantén pulsado el campo del chat, pega la imagen y envía."
-    : `Pégalo en el chat con ${pasteShortcut()} y envía.`;
+    ? "Press and hold the chat field, paste the image, and send."
+    : `Paste it into the chat with ${pasteShortcut()} and send.`;
 }
 
 /** How to get the image off the screen by hand, in the words of this device. */
 export function copyGesture(): string {
   return isTouchDevice()
-    ? "mantén pulsada la imagen y compártela"
-    : "clic derecho → Copiar imagen, y pégala en el chat";
+    ? "press and hold the image to share it"
+    : "right-click → Copy image, then paste it into the chat";
 }
 
 /**

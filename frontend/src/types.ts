@@ -1,8 +1,9 @@
 import type { AreaUnit } from "./lib/area";
 import type { Cents } from "./lib/money";
 
-/** The five screens in the sidebar. */
+/** The screens in the sidebar. */
 export type TabId =
+  | "home"
   | "dashboard"
   | "lots"
   | "projects"

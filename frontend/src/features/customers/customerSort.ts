@@ -28,22 +28,22 @@ export const SORT_OPTIONS: Array<{
   ascLabel: string;
   descLabel: string;
 }> = [
-  { field: "name", label: "Cliente", ascLabel: "A → Z", descLabel: "Z → A" },
-  { field: "identification", label: "Identidad", ascLabel: "A → Z", descLabel: "Z → A" },
+  { field: "name", label: "Customer", ascLabel: "A → Z", descLabel: "Z → A" },
+  { field: "identification", label: "ID number", ascLabel: "A → Z", descLabel: "Z → A" },
   {
     field: "since",
-    label: "Cliente desde",
-    ascLabel: "Más antiguos primero",
-    descLabel: "Más recientes primero",
+    label: "Customer since",
+    ascLabel: "Oldest first",
+    descLabel: "Newest first",
   },
   {
     field: "contracts",
-    label: "Contratos activos",
-    ascLabel: "Menos a más",
-    descLabel: "Más a menos",
+    label: "Active contracts",
+    ascLabel: "Fewest first",
+    descLabel: "Most first",
   },
-  { field: "lot", label: "Lote", ascLabel: "A → Z", descLabel: "Z → A" },
-  { field: "project", label: "Proyecto", ascLabel: "A → Z", descLabel: "Z → A" },
+  { field: "lot", label: "Lot", ascLabel: "A → Z", descLabel: "Z → A" },
+  { field: "project", label: "Project", ascLabel: "A → Z", descLabel: "Z → A" },
 ];
 
 /**
@@ -63,7 +63,7 @@ function compareBlankSinking(a: string, b: string, direction: SortDirection): nu
     return 0;
   }
 
-  const raw = a.localeCompare(b, "es");
+  const raw = a.localeCompare(b, "en");
   return direction === "asc" ? raw : -raw;
 }
 
@@ -89,7 +89,7 @@ export function sortCustomers(
   sort: CustomerSort,
 ): CustomerRecord[] {
   const byName = (a: CustomerRecord, b: CustomerRecord) =>
-    a.fullName.localeCompare(b.fullName, "es");
+    a.fullName.localeCompare(b.fullName, "en");
 
   const compareField = (a: CustomerRecord, b: CustomerRecord, rule: SortRule<SortField>): number => {
     switch (rule.field) {

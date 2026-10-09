@@ -39,7 +39,7 @@ describe("triagePickedDocs", () => {
     );
 
     assert.deepEqual(wanted, []);
-    assert.deepEqual(rejections, ["«contrato.docx» no es una imagen ni un PDF."]);
+    assert.deepEqual(rejections, ["“contrato.docx” is not an image or PDF."]);
   });
 
   it("says what a Google Doc actually needs, rather than blaming the download", () => {
@@ -52,7 +52,7 @@ describe("triagePickedDocs", () => {
 
     assert.deepEqual(wanted, []);
     assert.deepEqual(rejections, [
-      "«Recibo» es un archivo de Google. Descárgalo como PDF y vuelve a adjuntarlo.",
+      "“Recibo” is a Google file. Download it as a PDF and attach it again.",
     ]);
   });
 
@@ -63,7 +63,7 @@ describe("triagePickedDocs", () => {
     );
 
     assert.deepEqual(wanted, []);
-    assert.deepEqual(rejections, ["«video.pdf» pesa 20.0 MB; el máximo es 12 MB."]);
+    assert.deepEqual(rejections, ["“video.pdf” is 20.0 MB; the maximum is 12 MB."]);
   });
 
   it("reads the size Google sends as a string", () => {

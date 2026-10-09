@@ -93,9 +93,9 @@ function lotCodeClash(
   // An archived clash is the confusing one: the number looks free because the
   // lot holding it is hidden from every screen, so the message has to say so.
   return clash.archivedAt === null
-    ? `El lote ${code} ya existe en ${project.name}. Usa otro número.`
-    : `El lote ${code} ya existe en ${project.name}, pero está archivado. ` +
-        "Usa otro número o restaura ese lote.";
+    ? `Lot ${code} already exists in ${project.name}. Use a different number.`
+    : `Lot ${code} already exists in ${project.name}, but it is archived. ` +
+        "Use a different number or restore that lot.";
 }
 
 const updateLotBody = z.object({
@@ -201,7 +201,7 @@ export const lotRoutes: FastifyPluginAsync = async (app) => {
     if (!parsed.success) {
       return reply.code(400).send({
         error: "invalid_body",
-        message: "Revisa los datos del lote.",
+        message: "Check the lot details.",
         issues: parsed.error.issues.map((issue) => issue.message),
       });
     }
@@ -215,7 +215,7 @@ export const lotRoutes: FastifyPluginAsync = async (app) => {
     if (!project || project.archivedAt !== null) {
       return reply.code(400).send({
         error: "unknown_project",
-        message: "Ese proyecto no existe o está archivado.",
+        message: "That project does not exist or has been archived.",
       });
     }
 
@@ -255,7 +255,7 @@ export const lotRoutes: FastifyPluginAsync = async (app) => {
       if (!parsed.success) {
         return reply.code(400).send({
           error: "invalid_body",
-          message: "Revisa los datos del lote.",
+          message: "Check the lot details.",
           issues: parsed.error.issues.map((issue) => issue.message),
         });
       }
@@ -264,7 +264,7 @@ export const lotRoutes: FastifyPluginAsync = async (app) => {
       const existing = app.db.select().from(lots).where(eq(lots.id, request.params.id)).get();
 
       if (!existing || existing.archivedAt !== null) {
-        return reply.code(404).send({ error: "not_found", message: "Lote no encontrado." });
+        return reply.code(404).send({ error: "not_found", message: "Lot not found." });
       }
 
       const project = app.db
@@ -276,7 +276,7 @@ export const lotRoutes: FastifyPluginAsync = async (app) => {
       if (!project || project.archivedAt !== null) {
         return reply.code(400).send({
           error: "unknown_project",
-          message: "Ese proyecto no existe o está archivado.",
+          message: "That project does not exist or has been archived.",
         });
       }
 
@@ -306,7 +306,7 @@ export const lotRoutes: FastifyPluginAsync = async (app) => {
       if (needsJustification && !roleCan(app.db, actor.role, "price:change")) {
         return reply.code(403).send({
           error: "forbidden",
-          message: "Tu usuario no puede cambiar el precio de un lote con contrato.",
+          message: "Your account cannot change the price of a lot with a contract.",
         });
       }
 
@@ -314,8 +314,8 @@ export const lotRoutes: FastifyPluginAsync = async (app) => {
         return reply.code(400).send({
           error: "reason_required",
           message:
-            `El lote tiene el contrato ${activeContract.code} vigente. ` +
-            "Explica el motivo del cambio de precio (mínimo 10 caracteres).",
+            `This lot has active contract ${activeContract.code}. ` +
+            "Explain the reason for the price change (at least 10 characters).",
         });
       }
 
@@ -374,7 +374,7 @@ export const lotRoutes: FastifyPluginAsync = async (app) => {
       if (!parsed.success) {
         return reply.code(400).send({
           error: "invalid_body",
-          message: "Explica el motivo con al menos 10 caracteres.",
+          message: "Please explain the reason in at least 10 characters.",
         });
       }
 
@@ -382,7 +382,7 @@ export const lotRoutes: FastifyPluginAsync = async (app) => {
       const existing = app.db.select().from(lots).where(eq(lots.id, request.params.id)).get();
 
       if (!existing || existing.archivedAt !== null) {
-        return reply.code(404).send({ error: "not_found", message: "Lote no encontrado." });
+        return reply.code(404).send({ error: "not_found", message: "Lot not found." });
       }
 
       // Archiving a lot that is still spoken for would orphan its contract —
@@ -397,7 +397,7 @@ export const lotRoutes: FastifyPluginAsync = async (app) => {
       if (activeContract) {
         return reply.code(409).send({
           error: "lot_has_contract",
-          message: `No se puede archivar: el lote tiene el contrato ${activeContract.code} vigente.`,
+          message: `Cannot archive this lot: it has an active contract ${activeContract.code}.`,
         });
       }
 
@@ -443,7 +443,7 @@ export const lotRoutes: FastifyPluginAsync = async (app) => {
       if (!existing || existing.archivedAt === null) {
         return reply
           .code(404)
-          .send({ error: "not_found", message: "Lote archivado no encontrado." });
+          .send({ error: "not_found", message: "Archived lot not found." });
       }
 
       // A lot's number is unique within its project, archived lots included, so
@@ -465,8 +465,8 @@ export const lotRoutes: FastifyPluginAsync = async (app) => {
         return reply.code(409).send({
           error: "duplicate_code",
           message:
-            `No se puede restaurar: ya hay un lote activo con el número ${existing.code} ` +
-            "en este proyecto.",
+            `Cannot restore this lot: an active lot numbered ${existing.code} ` +
+            "already exists in this project.",
         });
       }
 

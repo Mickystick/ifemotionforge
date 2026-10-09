@@ -37,7 +37,7 @@ export function contractTag(transaction: Transaction): ContractTag | null {
     return {
       side: "adenda",
       code: transaction.contractCode,
-      title: `Adenda de ${transaction.replacesContractCode}: este pago es del contrato nuevo`,
+      title: `Amendment to ${transaction.replacesContractCode}: this payment is under the new contract`,
     };
   }
 
@@ -45,7 +45,7 @@ export function contractTag(transaction: Transaction): ContractTag | null {
     return {
       side: "replaced",
       code: transaction.contractCode,
-      title: "Contrato reemplazado por una adenda: este pago es anterior a ella",
+      title: "Contract replaced by an amendment: this payment predates it",
     };
   }
 

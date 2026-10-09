@@ -61,7 +61,7 @@ export interface MoneyView {
   usdRate: number;
 }
 
-const hnlFormat = new Intl.NumberFormat("es-HN", {
+const hnlFormat = new Intl.NumberFormat("en-HN", {
   minimumFractionDigits: 0,
   maximumFractionDigits: 2,
 });
@@ -87,7 +87,7 @@ export function formatMoney(amount: Cents, view: MoneyView): string {
   return `L. ${hnlFormat.format(lempiras)}`;
 }
 
-const documentFormat = new Intl.NumberFormat("es-HN", {
+const documentFormat = new Intl.NumberFormat("en-HN", {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 });
@@ -142,7 +142,7 @@ export function subtractMoney(minuend: Cents, subtrahend: Cents): Cents {
   return cents(minuend - subtrahend);
 }
 
-const rateFormat = new Intl.NumberFormat("es-HN", {
+const rateFormat = new Intl.NumberFormat("en-HN", {
   minimumFractionDigits: 2,
   maximumFractionDigits: 4,
 });
@@ -166,7 +166,7 @@ export function formatRate(rate: number): string {
  * rounded or converted until the form submits.
  */
 
-const groupFormat = new Intl.NumberFormat("es-HN", { maximumFractionDigits: 0 });
+const groupFormat = new Intl.NumberFormat("en-HN", { maximumFractionDigits: 0 });
 
 /**
  * Add thousand separators to what the user has typed so far, leaving the

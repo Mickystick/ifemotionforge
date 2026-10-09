@@ -542,7 +542,7 @@ describe("receipt identifiers", () => {
   });
 
   it("gives up rather than spinning when no code is ever free", () => {
-    assert.throws(() => allocateReceiptCode(() => true), /único/);
+    assert.throws(() => allocateReceiptCode(() => true), /unique/);
   });
 
   it("mints lookup codes that are unguessable and never repeat", () => {

@@ -29,7 +29,7 @@ export function useProjects(enabled: boolean, onSessionExpired: () => void) {
         return;
       }
 
-      const message = caught instanceof Error ? caught.message : "No se pudieron cargar los proyectos.";
+      const message = caught instanceof Error ? caught.message : "Could not load the projects.";
 
       /*
        * A failed REFRESH leaves what is on screen alone.

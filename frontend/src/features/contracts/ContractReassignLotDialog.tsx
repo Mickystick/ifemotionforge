@@ -53,11 +53,11 @@ export function ContractReassignLotDialog({
     setError(null);
 
     if (!lot) {
-      setError("Elige el lote correcto.");
+      setError("Choose the correct lot.");
       return;
     }
     if (reason.trim().length < MINIMUM_REASON_LENGTH) {
-      setError(`Explica el motivo con al menos ${MINIMUM_REASON_LENGTH} caracteres.`);
+      setError(`Please provide a reason with at least ${MINIMUM_REASON_LENGTH} characters.`);
       return;
     }
 
@@ -66,7 +66,7 @@ export function ContractReassignLotDialog({
     try {
       await onConfirm(lot.id, reason.trim());
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "No se pudo reasignar el lote.");
+      setError(caught instanceof Error ? caught.message : "Unable to reassign the lot.");
     } finally {
       setSaving(false);
     }
@@ -74,34 +74,34 @@ export function ContractReassignLotDialog({
 
   return (
     <Dialog
-      ariaLabel={`Reasignar lote de ${contract.code}`}
+      ariaLabel={`Reassign the lot for ${contract.code}`}
       dismissible={!isDirty && !isSaving}
       onClose={onCancel}
     >
       <form onSubmit={handleSubmit}>
         <div className="modal-header">
           <div>
-            <p className="modal-eyebrow">Corregir el lote</p>
+            <p className="modal-eyebrow">Correct lot</p>
             <h2>{contract.code}</h2>
             <p className="modal-description">
-              {contract.customer.fullName} · Actualmente Lote {contract.lot.code} ·{" "}
+              {contract.customer.fullName} · Current lot {contract.lot.code} ·{" "}
               {contract.lot.projectName}
             </p>
           </div>
-          <button type="button" className="modal-close" onClick={onCancel} aria-label="Cerrar">
+          <button type="button" className="modal-close" onClick={onCancel} aria-label="Close">
             <IconClose />
           </button>
         </div>
 
         <div className="modal-form-grid">
           <p className="form-blocked full-width">
-            Esto es para un lote mal capturado, no para vender otro lote — eso es un contrato
-            nuevo. Los pagos ya registrados se quedan con este contrato; el lote {contract.lot.code}{" "}
-            queda libre en cuanto guardes.
+            Use this to correct an incorrectly entered lot, not to sell a different lot—that
+            requires a new contract. Payments already recorded stay with this contract; lot{" "}
+            {contract.lot.code} will become available as soon as you save.
           </p>
 
           <div className="form-field full-width">
-            <label>Lote correcto</label>
+            <label>Correct lot</label>
             <LotPicker
               lots={lots}
               unitByProject={unitByProject}
@@ -113,17 +113,17 @@ export function ContractReassignLotDialog({
 
           <div className="form-field full-width">
             <label htmlFor="reassign-reason">
-              Motivo<span className="required-mark" aria-hidden="true"> *</span>
+              Reason<span className="required-mark" aria-hidden="true"> *</span>
             </label>
             <textarea
               id="reassign-reason"
               rows={3}
               value={reason}
-              placeholder="Ej. Se capturó el lote B-12 por error; el cliente compró el B-21."
+              placeholder="e.g. Lot B-12 was entered by mistake; the customer bought B-21."
               onChange={(event) => setReason(event.target.value)}
             />
             <span className="field-hint">
-              Obligatorio: queda en el Historial con tu nombre, la fecha y este motivo.
+              Required: this will be saved in the history with your name, the date, and this reason.
             </span>
           </div>
 
@@ -132,10 +132,10 @@ export function ContractReassignLotDialog({
 
         <div className="modal-actions">
           <button type="button" className="btn-secondary" onClick={onCancel} disabled={isSaving}>
-            Cancelar
+            Cancel
           </button>
           <button type="submit" className="btn-primary modal-submit" disabled={isSaving || !lot}>
-            <span>{isSaving ? "Guardando…" : "Reasignar lote"}</span>
+            <span>{isSaving ? "Saving…" : "Reassign lot"}</span>
           </button>
         </div>
       </form>

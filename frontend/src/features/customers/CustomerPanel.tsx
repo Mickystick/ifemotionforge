@@ -33,10 +33,10 @@ export function CustomerPanel({
           <div className="cp-identity">
             <div className="cust-avatar cp-avatar">{getInitials(customer.fullName)}</div>
             <div>
-              <p className="modal-eyebrow">Cliente</p>
+              <p className="modal-eyebrow">Customer</p>
               <h2>{customer.fullName}</h2>
               <p className="modal-description">
-                Cliente desde {customer.customerSince} · Lote {lot.code}
+                Customer since {customer.customerSince} · Lot {lot.code}
               </p>
             </div>
           </div>
@@ -45,7 +45,7 @@ export function CustomerPanel({
             type="button"
             className="modal-close"
             onClick={onClose}
-            aria-label="Cerrar"
+            aria-label="Close"
           >
             <IconClose />
           </button>
@@ -53,15 +53,15 @@ export function CustomerPanel({
 
         <div className="cp-body">
           <section className="cp-section">
-            <h3 className="cp-section-title">Contacto</h3>
+            <h3 className="cp-section-title">Contact</h3>
             <div className="cp-row">
-              <span>Identidad</span>
+              <span>ID number</span>
               <span className={hasIdentification(customer.identification) ? "mono" : "holder-empty"}>
                 {identificationLabel(customer.identification)}
               </span>
             </div>
             <div className="cp-row">
-              <span>Teléfono</span>
+              <span>Phone</span>
               {/* Stored with its country code; read back the local way. `null`
                   when it was never given — a paid-off lot may never have
                   needed one. */}
@@ -70,11 +70,11 @@ export function CustomerPanel({
               </span>
             </div>
             <div className="cp-row">
-              <span>Correo</span>
+              <span>Email</span>
               <span>{customer.email ?? "—"}</span>
             </div>
             <div className="cp-row">
-              <span>Dirección</span>
+              <span>Address</span>
               <span>{customer.address ?? "—"}</span>
             </div>
           </section>
@@ -82,36 +82,36 @@ export function CustomerPanel({
           {holding && balance !== null && (
             <section className="cp-section">
               <h3 className="cp-section-title">
-                {holding.kind === "reservation" ? "Reserva" : "Contrato"}
+                {holding.kind === "reservation" ? "Reservation" : "Contract"}
               </h3>
               <div className="cp-row">
-                <span>Número</span>
+                <span>Number</span>
                 <span className="mono">{holding.contractCode}</span>
               </div>
               <div className="cp-row">
-                <span>Lote</span>
+                <span>Lot</span>
                 <span>
                   <span className="code-badge">{lot.code}</span>
                 </span>
               </div>
               <div className="cp-row">
-                <span>Proyecto</span>
+                <span>Project</span>
                 <span>{lot.projectName}</span>
               </div>
               <div className="cp-row">
-                <span>Precio de venta</span>
+                <span>Sale price</span>
                 <span className="cell-money">{formatMoney(holding.salePrice, money)}</span>
               </div>
               <div className="cp-row">
-                <span>Pagado</span>
+                <span>Paid</span>
                 <span className="cell-money">{formatMoney(holding.paidToDate, money)}</span>
               </div>
               <div className="cp-row cp-row-total">
-                <span>Saldo</span>
+                <span>Balance</span>
                 <span className="cell-money">{formatMoney(balance, money)}</span>
               </div>
               <p className="cp-note">
-                El saldo se calcula a partir de los pagos registrados. No es un valor editable.
+                The balance is calculated from recorded payments. It can't be edited.
               </p>
             </section>
           )}
@@ -119,10 +119,10 @@ export function CustomerPanel({
 
         <div className="modal-actions">
           <button type="button" className="btn-secondary" onClick={onClose}>
-            Cerrar
+            Close
           </button>
           <button type="button" className="btn-primary" onClick={onViewFullRecord}>
-            <span>Ver ficha completa</span>
+            <span>View full record</span>
           </button>
         </div>
     </Dialog>

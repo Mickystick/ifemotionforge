@@ -170,7 +170,7 @@ export function ContractEditDialog({
     const day = parseIntOrNull(dueDay);
 
     if (!Number.isFinite(price) || price < 0) {
-      setError("Escribe el precio de venta en lempiras.");
+      setError("Enter the sale price in lempiras.");
       return;
     }
 
@@ -178,27 +178,27 @@ export function ContractEditDialog({
     // so a mistake is caught before the round trip rather than after it.
     if (isFinanced) {
       if (!Number.isFinite(down) || down < 0) {
-        setError("Escribe la prima en lempiras.");
+        setError("Enter the down payment in lempiras.");
         return;
       }
       if (down > price) {
-        setError("La prima no puede ser mayor que el precio de venta.");
+        setError("The down payment can't exceed the sale price.");
         return;
       }
       if (months === null || !Number.isFinite(months) || months < 1) {
-        setError("Un contrato a crédito necesita el plazo en meses.");
+        setError("A financed contract requires a term in months.");
         return;
       }
       if (monthly === null || !Number.isFinite(monthly) || monthly <= 0) {
-        setError("Un contrato a crédito necesita la cuota mensual.");
+        setError("A financed contract requires a monthly installment.");
         return;
       }
       if (day === null || !Number.isFinite(day) || day < 1 || day > 31) {
-        setError("El día de pago debe estar entre 1 y 31.");
+        setError("Due day must be between 1 and 31.");
         return;
       }
       if (down === price) {
-        setError("Si la prima cubre todo el precio, la venta es de contado, no a crédito.");
+        setError("If the down payment covers the full price, this is a cash sale, not a financed sale.");
         return;
       }
     }
@@ -210,30 +210,30 @@ export function ContractEditDialog({
     // is an error nobody can act on. They are sent as null instead.
 
     if (saleType === "donation" && (price > 0 || down > 0)) {
-      setError("Una donación se registra con precio y prima en cero.");
+      setError("A donation is recorded with a price and down payment of zero.");
       return;
     }
     if (isReservation && expiresOn.trim() === "") {
-      setError("Una reserva necesita una fecha de vencimiento.");
+      setError("A reservation requires an expiration date.");
       return;
     }
     if (isFinanced && firstDueOn.trim() !== "" && firstDueOn < signedOn) {
-      setError("La primera cuota no puede vencer antes de firmar el contrato.");
+      setError("The first installment can't be due before the contract is signed.");
       return;
     }
     if (isReservation && expiresOn.trim() !== "" && expiresOn < signedOn) {
-      setError("El vencimiento de la reserva no puede ser anterior a la firma.");
+      setError("The reservation can't expire before the signing date.");
       return;
     }
     if (fromCurrencyUnits(price) < contract.paidToDate) {
       setError(
-        `Este contrato ya tiene ${formatMoney(contract.paidToDate, money)} pagados. ` +
-          "El precio no puede quedar por debajo de esa cifra.",
+        `This contract already has ${formatMoney(contract.paidToDate, money)} in payments. ` +
+          "The price can't be lower than that amount.",
       );
       return;
     }
     if (reason.trim().length < MINIMUM_REASON_LENGTH) {
-      setError(`Explica el motivo con al menos ${MINIMUM_REASON_LENGTH} caracteres.`);
+      setError(`Please provide a reason with at least ${MINIMUM_REASON_LENGTH} characters.`);
       return;
     }
 
@@ -259,7 +259,7 @@ export function ContractEditDialog({
     } catch (caught) {
       // The server checks every one of these rules independently, so this is
       // where a permission refusal surfaces too.
-      setError(caught instanceof Error ? caught.message : "No se pudo guardar el contrato.");
+      setError(caught instanceof Error ? caught.message : "Could not save the contract.");
     } finally {
       setSaving(false);
     }
@@ -267,7 +267,7 @@ export function ContractEditDialog({
 
   return (
     <Dialog
-      ariaLabel={`Editar contrato ${contract.code}`}
+      ariaLabel={`Edit contract ${contract.code}`}
       /* A correction is typed off a document in somebody's hand, same as the
          contract was. The X and Cancelar are the way out. */
       dismissible={!isDirty && !isSaving}
@@ -276,14 +276,14 @@ export function ContractEditDialog({
       <form onSubmit={handleSubmit}>
         <div className="modal-header">
           <div>
-            <p className="modal-eyebrow">Editar contrato</p>
+            <p className="modal-eyebrow">Edit contract</p>
             <h2>{contract.code}</h2>
             <p className="modal-description">
-              {contract.customer.fullName} · Lote {contract.lot.code} ·{" "}
+              {contract.customer.fullName} · Lot {contract.lot.code} ·{" "}
               {contract.lot.projectName}
             </p>
           </div>
-          <button type="button" className="modal-close" onClick={onCancel} aria-label="Cerrar">
+          <button type="button" className="modal-close" onClick={onCancel} aria-label="Close">
             <IconClose />
           </button>
         </div>
@@ -294,14 +294,14 @@ export function ContractEditDialog({
               fix the wrong lot should find that out now rather than after
               filling in nine fields. */}
           <p className="form-blocked full-width">
-            El cliente no se cambia aquí: un cliente distinto es otra venta, no una corrección. El
-            lote tampoco se cambia en este formulario — si se capturó mal, usa «Corregir lote» en
-            el contrato. Todo lo demás queda registrado en el Historial con tu nombre, la fecha y
-            el motivo que escribas abajo.
+            You can't change the customer here: a different customer means a different sale, not
+            a correction. The lot can't be changed in this form either—if it was entered
+            incorrectly, use “Correct lot” on the contract. All other changes are recorded in
+            the history with your name, the date, and the reason you enter below.
           </p>
 
           <div className="form-field">
-            <label htmlFor="contract-kind">Tipo</label>
+            <label htmlFor="contract-kind">Type</label>
             <select
               id="contract-kind"
               value={kind}
@@ -313,11 +313,11 @@ export function ContractEditDialog({
                 </option>
               ))}
             </select>
-            <span className="field-hint">Una reserva es un apartado; un contrato es la venta.</span>
+            <span className="field-hint">A reservation holds a lot; a contract is the sale.</span>
           </div>
 
           <div className="form-field">
-            <label htmlFor="contract-sale-type">Forma de pago</label>
+            <label htmlFor="contract-sale-type">Payment type</label>
             <select
               id="contract-sale-type"
               value={saleType}
@@ -330,13 +330,13 @@ export function ContractEditDialog({
               ))}
             </select>
             <span className="field-hint">
-              Solo el crédito lleva prima, plazo, cuota y día de pago. Lo de contado se paga
-              completo al firmar.
+              Financed sales have a down payment, term, installments, and due day. Cash sales are
+              paid in full when signed.
             </span>
           </div>
 
           <div className="form-field">
-            <label htmlFor="contract-price">Precio de venta</label>
+            <label htmlFor="contract-price">Sale price</label>
             <MoneyInput
               id="contract-price"
               value={salePrice}
@@ -345,8 +345,8 @@ export function ContractEditDialog({
             />
             <span className="field-hint">
               {priceLocked
-                ? "Tu usuario no puede cambiar el precio de un contrato. Pídeselo a un supervisor."
-                : "Es el precio de ESTA venta, independiente del precio de lista del lote."}
+                ? "Your account can't change a contract's price. Ask an owner."
+                : "This is the price for THIS sale, separate from the lot's list price."}
             </span>
           </div>
 
@@ -358,7 +358,7 @@ export function ContractEditDialog({
               record in the payments. */}
           {isFinanced && (
             <div className="form-field">
-              <label htmlFor="contract-down">Prima acordada</label>
+              <label htmlFor="contract-down">Agreed down payment</label>
               <MoneyInput id="contract-down" value={downPayment} onChange={setDownPayment} />
               <span className="field-hint">
                 Lo acordado, no lo cobrado. Van {formatMoney(contract.downPaymentPaid, money)}{" "}
@@ -370,7 +370,7 @@ export function ContractEditDialog({
           {isFinanced && (
             <>
               <div className="form-field">
-                <label htmlFor="contract-term">Plazo en meses</label>
+                <label htmlFor="contract-term">Term in months</label>
                 <input
                   id="contract-term"
                   type="number"
@@ -383,7 +383,7 @@ export function ContractEditDialog({
               </div>
 
               <div className="form-field">
-                <label htmlFor="contract-monthly">Cuota mensual</label>
+                <label htmlFor="contract-monthly">Monthly installment</label>
                 <MoneyInput
                   id="contract-monthly"
                   value={monthlyPayment}
@@ -393,7 +393,7 @@ export function ContractEditDialog({
                   {suggestedMonthly !== null && suggestionDiffers ? (
                     <>
                       Con el precio, la prima y el plazo de arriba, repartido en partes iguales
-                      daría {formatMoney(cents(suggestedMonthly), money)}.{" "}
+                      would be {formatMoney(cents(suggestedMonthly), money)}.{" "}
                       <button
                         type="button"
                         className="link-btn"
@@ -401,16 +401,16 @@ export function ContractEditDialog({
                       >
                         Usar esa cuota
                       </button>
-                      {" · "}O deja la que se negoció: la última absorbe la diferencia.
+                      {" · "}Or keep the agreed amount; the last payment covers the difference.
                     </>
                   ) : (
-                    "La cuota que se negoció. La última absorbe la diferencia del redondeo."
+                    "The agreed installment. The last payment accounts for rounding."
                   )}
                 </span>
               </div>
 
               <div className="form-field">
-                <label htmlFor="contract-due-day">Día de pago</label>
+                <label htmlFor="contract-due-day">Due day</label>
                 <input
                   id="contract-due-day"
                   type="number"
@@ -428,19 +428,19 @@ export function ContractEditDialog({
           )}
 
           <div className="form-field">
-            <label htmlFor="contract-signed">Fecha de firma</label>
+            <label htmlFor="contract-signed">Signing date</label>
             <input
               id="contract-signed"
               type="date"
               value={signedOn}
               onChange={(event) => setSignedOn(event.target.value)}
             />
-            <span className="field-hint">Desde aquí cuenta el calendario de pagos.</span>
+            <span className="field-hint">The payment schedule starts from this date.</span>
           </div>
 
           {isFinanced && (
             <div className="form-field">
-              <label htmlFor="contract-first-due">Primera cuota</label>
+              <label htmlFor="contract-first-due">First installment</label>
               <input
                 id="contract-first-due"
                 type="date"
@@ -449,8 +449,8 @@ export function ContractEditDialog({
               />
               <span className="field-hint">
                 {firstDueOn.trim() === "" && contract.terms.firstDueOn
-                  ? `Opcional. Sin fecha, vence el ${formatDate(contract.terms.firstDueOn)}, un mes después de firmar.`
-                  : "Solo si se negoció aparte. Déjalo vacío para contar un mes desde la firma."}
+                  ? `Optional. If left blank, it's due ${formatDate(contract.terms.firstDueOn)}, one month after signing.`
+                  : "Only if negotiated separately. Leave blank to set it one month after signing."}
               </span>
             </div>
           )}
@@ -458,7 +458,7 @@ export function ContractEditDialog({
           {isReservation && (
             <div className="form-field">
               <label htmlFor="contract-expires">
-                Vence la reserva<span className="required-mark" aria-hidden="true"> *</span>
+                Reservation expires<span className="required-mark" aria-hidden="true"> *</span>
               </label>
               <input
                 id="contract-expires"
@@ -467,18 +467,18 @@ export function ContractEditDialog({
                 onChange={(event) => setExpiresOn(event.target.value)}
               />
               <span className="field-hint">
-                Un apartado sin fecha deja el lote fuera del mercado para siempre.
+                A reservation without an expiration date keeps the lot off the market indefinitely.
               </span>
             </div>
           )}
 
           <div className="form-field full-width">
-            <label htmlFor="contract-notes">Notas</label>
+            <label htmlFor="contract-notes">Notes</label>
             <textarea
               id="contract-notes"
               rows={2}
               value={notes}
-              placeholder="Ej. Paga por transferencia los primeros días del mes."
+              placeholder="e.g. Pays by bank transfer in the first few days of the month."
               onChange={(event) => setNotes(event.target.value)}
             />
             <span className="field-hint">
@@ -499,18 +499,18 @@ export function ContractEditDialog({
 
           <div className="form-field full-width">
             <label htmlFor="contract-reason">
-              Motivo del cambio<span className="required-mark" aria-hidden="true"> *</span>
+              Reason for change<span className="required-mark" aria-hidden="true"> *</span>
             </label>
             <textarea
               id="contract-reason"
               rows={3}
               value={reason}
-              placeholder="Ej. El contrato firmado dice día 15; se capturó día 5 por error."
+              placeholder="e.g. Signed contract says the 15th; the 5th was entered by mistake."
               onChange={(event) => setReason(event.target.value)}
             />
             <span className="field-hint">
-              Obligatorio en todos los cambios: esto es lo que se firmó, no un dato que se
-              corrige sin más.
+              Required for all changes: this is what was signed, not a detail to change without
+              explanation.
             </span>
           </div>
 
@@ -519,10 +519,10 @@ export function ContractEditDialog({
 
         <div className="modal-actions">
           <button type="button" className="btn-secondary" onClick={onCancel} disabled={isSaving}>
-            Cancelar
+            Cancel
           </button>
           <button type="submit" className="btn-primary modal-submit" disabled={isSaving}>
-            <span>{isSaving ? "Guardando…" : "Guardar cambios"}</span>
+            <span>{isSaving ? "Saving…" : "Save changes"}</span>
           </button>
         </div>
       </form>

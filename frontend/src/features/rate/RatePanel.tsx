@@ -15,29 +15,29 @@ interface RatePanelProps {
 /** "hace 3 horas" — how old a reading is, in words. */
 export function describeAge(capturedAt: string | null): string {
   if (!capturedAt) {
-    return "sin actualizar";
+    return "not updated";
   }
 
   const minutes = Math.max(0, Math.round((Date.now() - new Date(capturedAt).getTime()) / 60000));
 
   if (minutes < 60) {
-    return minutes <= 1 ? "hace un momento" : `hace ${minutes} minutos`;
+    return minutes <= 1 ? "just now" : `${minutes} minutes ago`;
   }
 
   const hours = Math.round(minutes / 60);
 
   if (hours < 24) {
-    return hours === 1 ? "hace una hora" : `hace ${hours} horas`;
+    return hours === 1 ? "1 hour ago" : `${hours} hours ago`;
   }
 
   const days = Math.round(hours / 24);
-  return days === 1 ? "ayer" : `hace ${days} días`;
+  return days === 1 ? "yesterday" : `${days} days ago`;
 }
 
 const SOURCE_LABELS: Record<ExchangeRate["source"], string> = {
-  auto: "Automática",
+  auto: "Automatic",
   manual: "Manual",
-  default: "Sin definir",
+  default: "Not set",
 };
 
 /**
@@ -73,7 +73,7 @@ export function RatePanel({ rate, canEdit, onChanged, onDone }: RatePanelProps) 
       onChanged(await action());
       onDone();
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "No se pudo actualizar la tasa.");
+      setError(caught instanceof Error ? caught.message : "Unable to update the rate.");
     } finally {
       setSaving(false);
     }
@@ -83,7 +83,7 @@ export function RatePanel({ rate, canEdit, onChanged, onDone }: RatePanelProps) 
     const value = parseMoneyInput(draft);
 
     if (!Number.isFinite(value) || value <= 0) {
-      setError("Escribe cuántos lempiras cuesta un dólar.");
+      setError("Enter how many lempiras equal one US dollar.");
       return;
     }
 
@@ -94,7 +94,7 @@ export function RatePanel({ rate, canEdit, onChanged, onDone }: RatePanelProps) 
     const percent = Number(adjustmentDraft.replace(",", ".").trim());
 
     if (!Number.isFinite(percent)) {
-      setError("Escribe el ajuste como un porcentaje, por ejemplo 0.33.");
+      setError("Enter the adjustment as a percentage, for example 0.33.");
       return;
     }
 
@@ -105,7 +105,7 @@ export function RatePanel({ rate, canEdit, onChanged, onDone }: RatePanelProps) 
     <div className="rate-panel">
       <p className="rate-headline">
         <span className="rate-headline-value">L. {formatRate(rate.rate)}</span>
-        <span className="rate-headline-unit">por dólar</span>
+        <span className="rate-headline-unit">per US dollar</span>
       </p>
 
       <p className="rate-panel-head">
@@ -115,7 +115,7 @@ export function RatePanel({ rate, canEdit, onChanged, onDone }: RatePanelProps) 
 
       {rate.source === "auto" && rate.provider && (
         <p className="field-hint">
-          Tomada de {rate.provider}
+          From {rate.provider}
           {/*
             Both numbers, whenever they differ. An adjustment nobody can see is
             indistinguishable from a feed that is simply wrong — and the next
@@ -125,7 +125,7 @@ export function RatePanel({ rate, canEdit, onChanged, onDone }: RatePanelProps) 
           {rate.providerRate !== null && rate.adjustmentPercent !== 0 && (
             <>
               {" "}
-              a L. {formatRate(rate.providerRate)}, más un ajuste de{" "}
+              to L. {formatRate(rate.providerRate)}, plus an adjustment of{" "}
               {rate.adjustmentPercent > 0 ? "+" : ""}
               {rate.adjustmentPercent} %
             </>
@@ -136,18 +136,18 @@ export function RatePanel({ rate, canEdit, onChanged, onDone }: RatePanelProps) 
 
       {rate.source === "manual" && rate.adjustmentPercent !== 0 && (
         <p className="field-hint">
-          El ajuste de {rate.adjustmentPercent > 0 ? "+" : ""}
-          {rate.adjustmentPercent} % está guardado, pero no se aplica a una tasa escrita a
-          mano. Vuelve a automática para que cuente.
+          The {rate.adjustmentPercent > 0 ? "+" : ""}
+          {rate.adjustmentPercent} % adjustment is saved, but doesn't apply to a manually entered
+          rate. Switch back to automatic to apply it.
         </p>
       )}
       {rate.source === "default" && (
         <p className="field-hint">
-          Todavía no hay una tasa registrada. Se está mostrando un valor de referencia.
+          No rate has been recorded yet. A reference value is being shown.
         </p>
       )}
       {rate.isStale && rate.source !== "default" && (
-        <p className="field-hint">Esta tasa lleva más de dos días sin actualizarse.</p>
+        <p className="field-hint">This rate hasn't been updated in more than two days.</p>
       )}
 
       {canEdit ? (
@@ -163,7 +163,7 @@ export function RatePanel({ rate, canEdit, onChanged, onDone }: RatePanelProps) 
             means retyping a rate by hand every morning forever.
           */}
           <div className="rate-edit">
-            <label htmlFor="rate-input">Lempiras por dólar</label>
+            <label htmlFor="rate-input">Lempiras per US dollar</label>
             <div className="rate-edit-row">
               <input
                 id="rate-input"
@@ -179,17 +179,17 @@ export function RatePanel({ rate, canEdit, onChanged, onDone }: RatePanelProps) 
                 disabled={isSaving}
                 onClick={handleSave}
               >
-                {isSaving ? "Guardando…" : "Guardar"}
+                {isSaving ? "Saving…" : "Save"}
               </button>
             </div>
             <span className="field-hint">
-              Escribirla la fija: deja de seguir al mercado hasta que alguien pida lo
-              contrario.
+              Entering a rate fixes it: it will no longer follow the market until someone
+              switches it back.
             </span>
           </div>
 
           <div className="rate-edit">
-            <label htmlFor="rate-adjustment">Ajuste sobre la tasa del mercado (%)</label>
+            <label htmlFor="rate-adjustment">Adjustment to the market rate (%)</label>
             <div className="rate-edit-row">
               <input
                 id="rate-adjustment"
@@ -205,14 +205,13 @@ export function RatePanel({ rate, canEdit, onChanged, onDone }: RatePanelProps) 
                 disabled={isSaving}
                 onClick={handleAdjust}
               >
-                Guardar ajuste
+                Save adjustment
               </button>
             </div>
             <span className="field-hint">
-              El proveedor publica la tasa del mercado, y un banco compra y vende a los lados
-              de ella. Un porcentaje, no una cantidad, para que siga significando lo mismo
-              cuando la tasa se mueva: con 0.33 %, una tasa de 26.8118 se muestra como
-              26.9003.
+              The provider publishes the market rate, while banks buy and sell above or below
+              it. Use a percentage, not a fixed amount, so the adjustment keeps the same meaning
+              as the rate changes: at 0.33%, a rate of 26.8118 is shown as 26.9003.
             </span>
           </div>
 
@@ -225,18 +224,18 @@ export function RatePanel({ rate, canEdit, onChanged, onDone }: RatePanelProps) 
               disabled={isSaving}
               onClick={() => void run(useMarketRate)}
             >
-              Volver a automática
+              Switch to automatic
             </button>
           </div>
         </>
       ) : (
-        <p className="field-hint">Solo el supervisor puede cambiarla.</p>
+        <p className="field-hint">Only an owner can change it.</p>
       )}
 
       {/* The one thing everybody must understand about this number. */}
       <p className="rate-caveat">
-        Solo para referencia visual. Cada pago guarda la tasa con la que se recibió, y los saldos
-        nunca se recalculan con esta.
+        For display only. Each payment stores the rate used when it was received, and balances
+        are never recalculated using this rate.
       </p>
     </div>
   );

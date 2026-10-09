@@ -96,7 +96,7 @@ export function ContractDocuments({ contractId, user, onCountChanged }: Contract
       .catch(() => {
         if (!cancelled) {
           setDocuments([]);
-          setError("No se pudieron cargar los documentos.");
+          setError("Could not load the documents.");
         }
       });
 
@@ -138,13 +138,13 @@ export function ContractDocuments({ contractId, user, onCountChanged }: Contract
     let filed = 0;
 
     for (const file of accepted) {
-      setBusy(`Subiendo ${file.name}…`);
+      setBusy(`Uploading ${file.name}…`);
 
       try {
         await uploadContractDocument(contractId, file);
         filed += 1;
       } catch (caught) {
-        setError(caught instanceof Error ? caught.message : "No se pudo subir el documento.");
+        setError(caught instanceof Error ? caught.message : "Could not upload the document.");
       }
     }
 
@@ -162,7 +162,7 @@ export function ContractDocuments({ contractId, user, onCountChanged }: Contract
    * file gets.
    */
   const pickFromDrive = async () => {
-    setDriveBusy("Abriendo Google Drive…");
+    setDriveBusy("Opening Google Drive…");
 
     try {
       const { files: picked, rejections } = await pickContractFilesFromDrive(setDriveBusy);
@@ -173,7 +173,7 @@ export function ContractDocuments({ contractId, user, onCountChanged }: Contract
 
       await add(picked);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "No se pudo abrir Google Drive.");
+      setError(caught instanceof Error ? caught.message : "Could not open Google Drive.");
     } finally {
       setDriveBusy(null);
     }
@@ -188,7 +188,7 @@ export function ContractDocuments({ contractId, user, onCountChanged }: Contract
    */
   const remove = async (documentId: string) => {
     setError(null);
-    setBusy("Quitando el documento…");
+    setBusy("Removing document…");
 
     try {
       await deleteContractDocument(documentId);
@@ -217,7 +217,7 @@ export function ContractDocuments({ contractId, user, onCountChanged }: Contract
   return (
     <section className="cp-section">
       <div className="cp-docs-head">
-        <h3 className="cp-section-title">Documentos del contrato</h3>
+        <h3 className="cp-section-title">Contract documents</h3>
 
         {canFile && (documents?.length ?? 0) < MAX_CONTRACT_DOCUMENTS && (
           <span className="cp-docs-actions">
@@ -227,7 +227,7 @@ export function ContractDocuments({ contractId, user, onCountChanged }: Contract
               disabled={busy !== null || driveBusy !== null || documents === null}
               onClick={() => inputRef.current?.click()}
             >
-              Agregar
+              Add
             </button>
 
             {/* Left out entirely where no Google credentials were configured —
@@ -239,7 +239,7 @@ export function ContractDocuments({ contractId, user, onCountChanged }: Contract
                 disabled={busy !== null || driveBusy !== null || documents === null}
                 onClick={() => void pickFromDrive()}
               >
-                Desde Google Drive
+                From Google Drive
               </button>
             )}
           </span>
@@ -248,12 +248,12 @@ export function ContractDocuments({ contractId, user, onCountChanged }: Contract
 
       {driveBusy !== null && <p className="state-message">{driveBusy}</p>}
 
-      {documents === null && <p className="state-message">Cargando…</p>}
+      {documents === null && <p className="state-message">Loading…</p>}
 
       {documents !== null && documents.length === 0 && (
         <p className="state-message">
-          Todavía no se ha guardado el contrato firmado
-          {canFile ? ". Sube el PDF o el escaneo para tenerlo a mano." : "."}
+          The signed contract hasn't been uploaded yet
+          {canFile ? ". Upload the PDF or scan to keep it handy." : "."}
         </p>
       )}
 
@@ -268,7 +268,7 @@ export function ContractDocuments({ contractId, user, onCountChanged }: Contract
                 type="button"
                 className="proof-open"
                 onClick={() => setViewing(document.id)}
-                aria-label={`Ver ${document.fileName}`}
+                aria-label={`View ${document.fileName}`}
               >
                 <DocumentThumb file={files[at]!} />
               </button>
@@ -292,9 +292,9 @@ export function ContractDocuments({ contractId, user, onCountChanged }: Contract
                   className="link-btn is-danger"
                   disabled={busy !== null}
                   onClick={() => setPendingRemoval(document)}
-                  aria-label={`Quitar ${document.fileName}`}
+                  aria-label={`Remove ${document.fileName}`}
                 >
-                  Quitar
+                  Remove
                 </button>
               )}
             </li>
@@ -349,20 +349,20 @@ export function ContractDocuments({ contractId, user, onCountChanged }: Contract
          * and that is the whole of what survives.
          */
         <ConfirmDialog
-          eyebrow="Quitar documento"
+          eyebrow="Remove document"
           title={pendingRemoval.fileName}
-          description={`${readableSize(pendingRemoval.byteSize)} · subido por ${pendingRemoval.uploadedBy}`}
-          confirmLabel="Quitar documento"
-          busyLabel="Quitando…"
+          description={`${readableSize(pendingRemoval.byteSize)} · uploaded by ${pendingRemoval.uploadedBy}`}
+          confirmLabel="Remove document"
+          busyLabel="Removing…"
           onCancel={() => setPendingRemoval(null)}
           onConfirm={async () => {
             await remove(pendingRemoval.id);
             setPendingRemoval(null);
           }}
         >
-          Esto borra el archivo del servidor para siempre y no se puede deshacer. Si es el
-          contrato firmado, asegúrate de tener otra copia antes de continuar. En el historial
-          solo queda constancia de que lo quitaste.
+          This permanently deletes the file from the server and can't be undone. If this is the
+          signed contract, make sure you have another copy before continuing. The history will
+          only show that you removed it.
         </ConfirmDialog>
       )}
     </section>

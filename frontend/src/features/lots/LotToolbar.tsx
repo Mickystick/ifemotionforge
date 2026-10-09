@@ -18,11 +18,11 @@ import type { LotSort } from "./lotSort";
 
 /** The wording used everywhere else for each status, in inventory order. */
 const STATUS_LABELS: Array<{ value: LotStatus; label: string }> = [
-  { value: "available", label: "Disponibles" },
-  { value: "reserved", label: "Reservados" },
-  { value: "financed", label: "Financiados" },
-  { value: "sold", label: "Vendidos" },
-  { value: "donated", label: "Donados" },
+  { value: "available", label: "Available" },
+  { value: "reserved", label: "Reserved" },
+  { value: "financed", label: "Financed" },
+  { value: "sold", label: "Sold" },
+  { value: "donated", label: "Donated" },
 ];
 
 interface LotToolbarProps {
@@ -177,7 +177,7 @@ export function LotToolbar({
 
       chips.push({
         key: "price",
-        label: from && to ? `${from} – ${to}` : from ? `Desde ${from}` : `Hasta ${to}`,
+        label: from && to ? `${from} – ${to}` : from ? `From ${from}` : `Up to ${to}`,
         clear: () => {
           setMinPriceText("");
           setMaxPriceText("");
@@ -194,7 +194,7 @@ export function LotToolbar({
 
       chips.push({
         key: "area",
-        label: from && to ? `${from} – ${to}` : from ? `Desde ${from}` : `Hasta ${to}`,
+        label: from && to ? `${from} – ${to}` : from ? `From ${from}` : `Up to ${to}`,
         clear: () => {
           setMinAreaText("");
           setMaxAreaText("");
@@ -210,7 +210,7 @@ export function LotToolbar({
   const filterBody = (
     <>
       <div className="filter-section">
-        <p className="menu-title">Estado</p>
+        <p className="menu-title">Status</p>
         {STATUS_LABELS.map((option) => (
           <label key={option.value} className="filter-check">
             <input
@@ -222,13 +222,13 @@ export function LotToolbar({
           </label>
         ))}
         {filters.statuses.length === 0 && (
-          <p className="field-hint">Sin marcar ninguno se muestran todos.</p>
+          <p className="field-hint">Leave all unchecked to show all statuses.</p>
         )}
       </div>
 
       <div className="filter-section">
-        <p className="menu-title">Proyecto</p>
-        {projectNames.length === 0 && <p className="field-hint">No hay proyectos.</p>}
+        <p className="menu-title">Project</p>
+        {projectNames.length === 0 && <p className="field-hint">No projects.</p>}
         {projectNames.map((name) => (
           <label key={name} className="filter-check">
             <input
@@ -242,12 +242,12 @@ export function LotToolbar({
       </div>
 
       <div className="filter-section">
-        <p className="menu-title">Precio base</p>
+        <p className="menu-title">Base price</p>
         <div className="filter-range">
           <MoneyInput
             id="filter-min-price"
             value={minPriceText}
-            placeholder="Desde"
+            placeholder="From"
             onChange={(next) => {
               setMinPriceText(next);
               commitPrice("min", next);
@@ -256,18 +256,18 @@ export function LotToolbar({
           <MoneyInput
             id="filter-max-price"
             value={maxPriceText}
-            placeholder="Hasta"
+            placeholder="To"
             onChange={(next) => {
               setMaxPriceText(next);
               commitPrice("max", next);
             }}
           />
         </div>
-        <span className="field-hint">Siempre en lempiras, como se capturan.</span>
+        <span className="field-hint">Always in lempiras, as entered.</span>
       </div>
 
       <div className="filter-section">
-        <p className="menu-title">Área</p>
+        <p className="menu-title">Area</p>
         <div className="filter-range">
           <div className="input-with-suffix">
             <input
@@ -275,7 +275,7 @@ export function LotToolbar({
               inputMode="decimal"
               min="0"
               step="any"
-              placeholder="Desde"
+              placeholder="From"
               value={minAreaText}
               onChange={(event) => {
                 setMinAreaText(event.target.value);
@@ -290,7 +290,7 @@ export function LotToolbar({
               inputMode="decimal"
               min="0"
               step="any"
-              placeholder="Hasta"
+              placeholder="To"
               value={maxAreaText}
               onChange={(event) => {
                 setMaxAreaText(event.target.value);
@@ -302,8 +302,8 @@ export function LotToolbar({
         </div>
         <span className="field-hint">
           {filters.projects.length === 1
-            ? `En ${areaUnitInfo.label.toLowerCase()}, la unidad de ${filters.projects[0]}.`
-            : "En metros cuadrados, la unidad en que se guardan todas las áreas."}
+            ? `In ${areaUnitInfo.label.toLowerCase()}, the unit used by ${filters.projects[0]}.`
+            : "In square meters, the unit used to store all areas."}
         </span>
       </div>
     </>
@@ -313,7 +313,7 @@ export function LotToolbar({
     <div className="lots-toolbar">
       <div className="toolbar">
         <span className="result-count">
-          Mostrando {shownCount} de {totalCount} lote{totalCount === 1 ? "" : "s"}
+          Showing {shownCount} of {totalCount} lot{totalCount === 1 ? "" : "s"}
         </span>
 
         <div className="toolbar-spacer" />
@@ -337,7 +337,7 @@ export function LotToolbar({
 
           <MenuSurface
             isOpen={openMenu === "sort"}
-            title="Ordenar por"
+            title="Sort by"
             onClose={() => setOpenMenu(null)}
             className="sort-popover"
           >
@@ -345,7 +345,7 @@ export function LotToolbar({
               options={SORT_OPTIONS}
               rules={sort}
               onChange={onSortChange}
-              hint="Vuelve a elegir el mismo campo para invertir el orden."
+              hint="Select the same field again to reverse the order."
             />
           </MenuSurface>
         </div>
@@ -358,22 +358,22 @@ export function LotToolbar({
             onClick={() => setOpenMenu(openMenu === "filter" ? null : "filter")}
           >
             <IconFilter />
-            <span>Filtros</span>
+            <span>Filters</span>
             {activeCount > 0 && <span className="filter-count">{activeCount}</span>}
           </button>
 
           <MenuSurface
             isOpen={openMenu === "filter"}
-            title="Filtros"
+            title="Filters"
             onClose={() => setOpenMenu(null)}
             className="filter-popover"
             footer={
               <>
                 <button type="button" className="link-btn" onClick={clearAll}>
-                  Limpiar filtros
+                  Clear filters
                 </button>
                 <button type="button" className="btn-primary" onClick={() => setOpenMenu(null)}>
-                  Ver {shownCount} lote{shownCount === 1 ? "" : "s"}
+                  Show {shownCount} lot{shownCount === 1 ? "" : "s"}
                 </button>
               </>
             }
@@ -391,7 +391,7 @@ export function LotToolbar({
               type="button"
               className="filter-chip"
               onClick={chip.clear}
-              title={`Quitar ${chip.label}`}
+              title={`Remove ${chip.label}`}
             >
               <span>{chip.label}</span>
               <IconClose />
@@ -399,7 +399,7 @@ export function LotToolbar({
           ))}
 
           <button type="button" className="link-btn" onClick={clearAll}>
-            Limpiar filtros
+            Clear filters
           </button>
         </div>
       )}

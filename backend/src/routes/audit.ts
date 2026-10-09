@@ -58,7 +58,7 @@ export const auditRoutes: FastifyPluginAsync = async (app) => {
     const parsed = auditQuery.safeParse(request.query);
 
     if (!parsed.success) {
-      return reply.code(400).send({ error: "invalid_query", message: "Parámetros inválidos." });
+      return reply.code(400).send({ error: "invalid_query", message: "Invalid parameters." });
     }
 
     const { limit, offset, entityType } = parsed.data;

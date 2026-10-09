@@ -104,14 +104,14 @@ export async function fetchMarketRate(): Promise<number> {
   });
 
   if (!response.ok) {
-    throw new Error(`El proveedor respondió ${response.status}.`);
+    throw new Error(`The provider responded with status ${response.status}.`);
   }
 
   const payload = (await response.json()) as { rates?: Record<string, unknown> };
   const value = payload.rates?.HNL;
 
   if (typeof value !== "number" || !isPlausibleRate(value)) {
-    throw new Error("El proveedor no devolvió una tasa de lempiras utilizable.");
+    throw new Error("The provider did not return a usable lempira exchange rate.");
   }
 
   return value;

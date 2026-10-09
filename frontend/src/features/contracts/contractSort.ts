@@ -39,17 +39,17 @@ export const SORT_OPTIONS: Array<{
 }> = [
   {
     field: "groupSize",
-    label: "Contratos por cliente",
-    ascLabel: "uno primero",
-    descLabel: "varios primero",
+    label: "Contracts per customer",
+    ascLabel: "One first",
+    descLabel: "Multiple first",
   },
-  { field: "health", label: "Estado de pago", ascLabel: "al día primero", descLabel: "atrasados primero" },
-  { field: "customer", label: "Cliente", ascLabel: "A → Z", descLabel: "Z → A" },
-  { field: "balance", label: "Saldo", ascLabel: "menor primero", descLabel: "mayor primero" },
-  { field: "nextDue", label: "Próxima cuota", ascLabel: "más próxima", descLabel: "más lejana" },
-  { field: "code", label: "Contrato desde", ascLabel: "más antiguo", descLabel: "más reciente" },
-  { field: "lot", label: "Lote", ascLabel: "A → Z", descLabel: "Z → A" },
-  { field: "project", label: "Proyecto", ascLabel: "A → Z", descLabel: "Z → A" },
+  { field: "health", label: "Payment status", ascLabel: "Current first", descLabel: "Overdue first" },
+  { field: "customer", label: "Customer", ascLabel: "A → Z", descLabel: "Z → A" },
+  { field: "balance", label: "Balance", ascLabel: "Lowest first", descLabel: "Highest first" },
+  { field: "nextDue", label: "Next installment", ascLabel: "Soonest first", descLabel: "Latest first" },
+  { field: "code", label: "Contract date", ascLabel: "Oldest first", descLabel: "Newest first" },
+  { field: "lot", label: "Lot", ascLabel: "A → Z", descLabel: "Z → A" },
+  { field: "project", label: "Project", ascLabel: "A → Z", descLabel: "Z → A" },
 ];
 
 /** Worst first when sorting descending, so the severity order is explicit. */
@@ -74,7 +74,7 @@ function customerCounts(contracts: Contract[]): Map<string, number> {
 function compare(a: Contract, b: Contract, field: SortField, counts: Map<string, number>): number {
   switch (field) {
     case "customer":
-      return a.customer.fullName.localeCompare(b.customer.fullName, "es");
+      return a.customer.fullName.localeCompare(b.customer.fullName, "en");
     case "balance":
       return a.balance - b.balance;
     case "health":
@@ -84,7 +84,7 @@ function compare(a: Contract, b: Contract, field: SortField, counts: Map<string,
       // either way rather than jumping to the top as an empty string would.
       return (a.health.nextDueOn ?? "9999-12-31").localeCompare(b.health.nextDueOn ?? "9999-12-31");
     case "code":
-      return a.code.localeCompare(b.code, "es");
+      return a.code.localeCompare(b.code, "en");
     case "groupSize":
       return (counts.get(a.customer.id) ?? 1) - (counts.get(b.customer.id) ?? 1);
     case "lot":
@@ -92,7 +92,7 @@ function compare(a: Contract, b: Contract, field: SortField, counts: Map<string,
       // A-2 comes before A-10 here too rather than reading as plain text.
       return compareLotCodes(a.lot.code, b.lot.code);
     case "project":
-      return a.lot.projectName.localeCompare(b.lot.projectName, "es");
+      return a.lot.projectName.localeCompare(b.lot.projectName, "en");
   }
 }
 
@@ -114,8 +114,8 @@ export function sortContracts(contracts: Contract[], sort: ContractSort): Contra
     // name keeps a person's contracts adjacent, which is what the grouping
     // below depends on.
     return (
-      a.customer.fullName.localeCompare(b.customer.fullName, "es") ||
-      a.code.localeCompare(b.code, "es")
+      a.customer.fullName.localeCompare(b.customer.fullName, "en") ||
+      a.code.localeCompare(b.code, "en")
     );
   });
 }

@@ -37,14 +37,14 @@ export type ContactChannel = "whatsapp" | "sms" | "email";
  * is owed is stated as a fact only when something actually is.
  */
 export function defaultMessage(contract: Contract, money: MoneyView): string {
-  const greeting = `Buenos días, ${firstName(contract.customer.fullName)}.`;
-  const reference = `Le escribimos por el lote ${contract.lot.code} (${contract.lot.projectName}), contrato ${contract.code}.`;
+  const greeting = `Good morning, ${firstName(contract.customer.fullName)}.`;
+  const reference = `We're contacting you about lot ${contract.lot.code} (${contract.lot.projectName}), contract ${contract.code}.`;
 
   if (contract.health.arrears > 0) {
-    return `${greeting} ${reference} Tiene un saldo vencido de ${formatMoney(
+    return `${greeting} ${reference} You have an overdue balance of ${formatMoney(
       contract.health.arrears,
       money,
-    )}. ¿Podemos coordinar el pago?`;
+    )}. Can we coordinate payment?`;
   }
 
   if (contract.health.nextDueOn && contract.health.nextDueAmount > 0) {
@@ -52,13 +52,13 @@ export function defaultMessage(contract: Contract, money: MoneyView): string {
     // screens show it: "L 7,249.51" would read as a different cuota.
     const advance =
       contract.health.nextDueCredit > 0
-        ? ` Ya tiene abonado ${formatMoney(contract.health.nextDueCredit, money)} de esa cuota.`
+        ? ` ${formatMoney(contract.health.nextDueCredit, money)} has already been paid toward that installment.`
         : "";
 
-    return `${greeting} ${reference} Su próxima cuota es de ${formatMoney(
+    return `${greeting} ${reference} Your next installment is ${formatMoney(
       contract.health.nextInstallment,
       money,
-    )} y vence el ${formatDueDate(contract.health.nextDueOn)}.${advance}`;
+    )}, due on ${formatDueDate(contract.health.nextDueOn)}.${advance}`;
   }
 
   return `${greeting} ${reference}`;
@@ -66,7 +66,7 @@ export function defaultMessage(contract: Contract, money: MoneyView): string {
 
 /** The subject line, for the one channel that has one. */
 export function defaultSubject(contract: Contract): string {
-  return `Lote ${contract.lot.code} · Contrato ${contract.code}`;
+  return `Lot ${contract.lot.code} · Contract ${contract.code}`;
 }
 
 /**
@@ -83,7 +83,7 @@ function firstName(fullName: string): string {
 function formatDueDate(isoDate: string): string {
   const [year, month, day] = isoDate.split("-").map(Number);
 
-  return new Intl.DateTimeFormat("es-HN", {
+  return new Intl.DateTimeFormat("en-US", {
     day: "numeric",
     month: "long",
     timeZone: "UTC",
@@ -145,14 +145,14 @@ export function contactUrl(
 
 /** What each button is called, for its tooltip and its screen-reader label. */
 export const CHANNEL_LABELS: Record<ContactChannel, string> = {
-  whatsapp: "Enviar WhatsApp",
-  sms: "Enviar mensaje",
-  email: "Enviar correo",
+  whatsapp: "Send WhatsApp message",
+  sms: "Send text message",
+  email: "Send email",
 };
 
 /** Why a button is off, said in the tooltip rather than left to be guessed. */
 export const CHANNEL_MISSING: Record<ContactChannel, string> = {
-  whatsapp: "Este cliente no tiene teléfono registrado",
-  sms: "Este cliente no tiene teléfono registrado",
-  email: "Este cliente no tiene correo registrado",
+  whatsapp: "This customer has no phone number on file",
+  sms: "This customer has no phone number on file",
+  email: "This customer has no email address on file",
 };

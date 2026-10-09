@@ -42,15 +42,15 @@ export type SectionId = (typeof DEFAULT_SECTION_ORDER)[number];
  * and "Avisos" covers three small cards that travel together.
  */
 export const SECTION_LABELS: Record<SectionId, string> = {
-  income: "Resumen del mes",
-  history: "Cobrado mes a mes",
-  composition: "De dónde vino el dinero",
-  collections: "Cobranza",
-  worklist: "A quién llamar primero",
-  projects: "Por proyecto",
-  projection: "Lo que viene",
-  attention: "Avisos: reservas, contratos por terminar y primas",
-  control: "Control",
+  income: "Monthly summary",
+  history: "Monthly collections",
+  composition: "Where the money came from",
+  collections: "Collections",
+  worklist: "Who to call first",
+  projects: "By project",
+  projection: "Coming up",
+  attention: "Alerts: reservations, contracts nearing completion, and down payments",
+  control: "Oversight",
 };
 
 /** One person's arrangement, as it travels to and from the server. */

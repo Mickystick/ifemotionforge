@@ -3,7 +3,7 @@ import type { Contract, ContractStatus, PaymentHealth, SaleType } from "../../ty
 /**
  * How the three status concepts read on screen, defined once.
  *
- * The Spanish wording and the colour live here rather than being scattered
+ * The wording and the colour live here rather than being scattered
  * through JSX, for the same reason `lotStatus.ts` exists: a label that appears
  * in a table, a filter chip and a detail panel has to say the same word in all
  * three, and the only way to guarantee that is to have one copy of it.
@@ -22,24 +22,24 @@ export const HEALTH_PRESENTATION: Record<
   { label: string; stampClass: string; hint: string }
 > = {
   current: {
-    label: "Al día",
+    label: "Current",
     stampClass: "stamp success",
-    hint: "No debe nada vencido.",
+    hint: "No overdue payments.",
   },
   due_soon: {
-    label: "Por vencer",
+    label: "Due soon",
     stampClass: "stamp warning",
-    hint: "Tiene una cuota próxima o dentro de los cinco días de gracia.",
+    hint: "An installment is coming due or within the five-day grace period.",
   },
   overdue: {
-    label: "Atrasado",
+    label: "Overdue",
     stampClass: "stamp clay",
-    hint: "Pasaron los cinco días de gracia y la cuota no entró.",
+    hint: "The five-day grace period has passed without a payment.",
   },
   at_risk: {
-    label: "En riesgo",
+    label: "At risk",
     stampClass: "stamp danger",
-    hint: "Dos meses o más sin pagar.",
+    hint: "Two or more months without a payment.",
   },
 };
 
@@ -48,32 +48,32 @@ export const STATUS_PRESENTATION: Record<
   ContractStatus,
   { label: string; stampClass: string }
 > = {
-  draft: { label: "Borrador", stampClass: "stamp neutral" },
-  active: { label: "Vigente", stampClass: "stamp success" },
-  paid_off: { label: "Pagado", stampClass: "stamp neutral" },
-  cancelled: { label: "Cancelado", stampClass: "stamp neutral" },
-  defaulted: { label: "Incumplido", stampClass: "stamp danger" },
-  replaced: { label: "Reemplazado", stampClass: "stamp neutral" },
+  draft: { label: "Draft", stampClass: "stamp neutral" },
+  active: { label: "Active", stampClass: "stamp success" },
+  paid_off: { label: "Paid off", stampClass: "stamp neutral" },
+  cancelled: { label: "Canceled", stampClass: "stamp neutral" },
+  defaulted: { label: "Defaulted", stampClass: "stamp danger" },
+  replaced: { label: "Replaced", stampClass: "stamp neutral" },
 };
 
-/** Crédito / Contado / Donación. */
+/** Financing / Cash / Donation. */
 export const SALE_TYPE_LABELS: Record<SaleType, string> = {
-  financed: "Crédito",
-  cash: "Contado",
-  donation: "Donación",
+  financed: "Financed",
+  cash: "Cash",
+  donation: "Donation",
 };
 
 /** What became of money already paid, when a contract was cancelled. */
 export const SETTLEMENT_LABELS: Record<"none" | "held" | "refunded", string> = {
-  none: "Quedó como ingreso",
-  held: "Retenido temporalmente",
-  refunded: "Reembolsado al cliente",
+  none: "Kept as income",
+  held: "Temporarily held",
+  refunded: "Refunded to customer",
 };
 
 /** A hold versus a signed sale. */
 export const KIND_LABELS: Record<Contract["kind"], string> = {
-  reservation: "Reserva",
-  contract: "Contrato",
+  reservation: "Reservation",
+  contract: "Contract",
 };
 
 /**
@@ -94,11 +94,11 @@ export function primaryStamp(contract: Contract): { label: string; stampClass: s
   // A reservation past its expiry date. The row still says "active", but the
   // hold is over and the lot is back on the market.
   if (contract.expired) {
-    return { label: "Vencida", stampClass: "stamp neutral" };
+    return { label: "Expired", stampClass: "stamp neutral" };
   }
 
   if (contract.health.settled) {
-    return { label: "Pagado", stampClass: "stamp neutral" };
+    return { label: "Paid", stampClass: "stamp neutral" };
   }
 
   return HEALTH_PRESENTATION[contract.health.status];
@@ -114,11 +114,11 @@ export function healthDetail(contract: Contract): string {
   const { monthsBehind, monthsAhead } = contract.health;
 
   if (monthsBehind > 0) {
-    return monthsBehind === 1 ? "1 mes atrasado" : `${monthsBehind} meses atrasados`;
+    return monthsBehind === 1 ? "1 month overdue" : `${monthsBehind} months overdue`;
   }
 
   if (monthsAhead > 0) {
-    return monthsAhead === 1 ? "1 mes adelantado" : `${monthsAhead} meses adelantados`;
+    return monthsAhead === 1 ? "1 month ahead" : `${monthsAhead} months ahead`;
   }
 
   return "";
@@ -133,11 +133,11 @@ export function healthDetail(contract: Contract): string {
  * A due date that moves depending on where the browser is is not a due date.
  */
 const MONTHS = [
-  "ene", "feb", "mar", "abr", "may", "jun",
-  "jul", "ago", "sep", "oct", "nov", "dic",
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
 ];
 
-/** "05 mar 2026". */
+/** "Mar 05, 2026". */
 export function formatDate(isoDate: string | null): string {
   if (!isoDate) {
     return "—";
@@ -149,16 +149,16 @@ export function formatDate(isoDate: string | null): string {
     return isoDate;
   }
 
-  return `${day} ${MONTHS[Number(month) - 1] ?? month} ${year}`;
+  return `${MONTHS[Number(month) - 1] ?? month} ${Number(day)}, ${year}`;
 }
 
-/** "L 6,700 · día 5", or an em dash for a sale with no schedule. */
+/** "L 6,700 · due day 5", or an em dash for a sale with no schedule. */
 export function formatSchedule(contract: Contract, formatted: string | null): string {
   if (contract.terms.monthlyPayment === null || contract.terms.dueDay === null) {
     return "—";
   }
 
-  return `${formatted ?? ""} · día ${contract.terms.dueDay}`;
+  return `${formatted ?? ""} · due day ${contract.terms.dueDay}`;
 }
 
 /** How far through the price this contract is, 0–100, for the progress bar. */

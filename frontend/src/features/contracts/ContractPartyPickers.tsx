@@ -79,7 +79,7 @@ export function CustomerPicker({
               .includes(needle),
           );
 
-    return [...pool].sort((a, b) => a.fullName.localeCompare(b.fullName, "es"));
+    return [...pool].sort((a, b) => a.fullName.localeCompare(b.fullName, "en"));
   }, [customers, search]);
 
   if (selected) {
@@ -91,7 +91,7 @@ export function CustomerPicker({
           <span className="holder-contract">{customerLine(selected)}</span>
         </span>
         <button id={inputId} type="button" className="link-btn" onClick={() => onSelect(null)}>
-          Cambiar
+          Change
         </button>
       </div>
     );
@@ -100,8 +100,8 @@ export function CustomerPicker({
   if (customers.length === 0) {
     return (
       <p className="picker-empty">
-        Todavía no hay clientes. Registra primero a la persona en la pestaña Clientes: un
-        contrato es de alguien, y ese alguien tiene que existir antes que el contrato.
+        No customers yet. Add the person on the Customers screen first: a contract belongs to
+        someone, and that person must exist before the contract can be created.
       </p>
     );
   }
@@ -115,15 +115,15 @@ export function CustomerPicker({
           type="search"
           aria-invalid={invalid}
           value={search}
-          placeholder="Buscar por nombre, identidad o teléfono…"
-          aria-label="Buscar cliente"
+          placeholder="Search by name, ID number, or phone…"
+          aria-label="Search customers"
           onChange={(event) => setSearch(event.target.value)}
         />
       </div>
 
-      <div className="picker-list" role="listbox" aria-label="Clientes">
+      <div className="picker-list" role="listbox" aria-label="Customers">
         {matches.length === 0 && (
-          <p className="picker-empty">Ningún cliente coincide con «{search.trim()}».</p>
+          <p className="picker-empty">No customers match “{search.trim()}”.</p>
         )}
 
         {matches.slice(0, MAX_RESULTS).map((customer) => (
@@ -145,7 +145,8 @@ export function CustomerPicker({
                 exactly the case where the purchase should be grouped. */}
             {customer.contracts.length > 0 && (
               <span className="picker-tag">
-                {customer.contracts.length} vigente{customer.contracts.length === 1 ? "" : "s"}
+                {customer.contracts.length} active contract
+                {customer.contracts.length === 1 ? "" : "s"}
               </span>
             )}
           </button>
@@ -153,7 +154,7 @@ export function CustomerPicker({
 
         {matches.length > MAX_RESULTS && (
           <p className="picker-more">
-            {matches.length - MAX_RESULTS} más. Escribe un poco más para encontrarlos.
+            {matches.length - MAX_RESULTS} more. Type a little more to find them.
           </p>
         )}
       </div>
@@ -211,9 +212,9 @@ export function LotPicker({ lots, unitByProject, money, selected, onSelect }: Lo
     return [...byProject.entries()]
       .map(([projectName, projectLots]) => ({
         projectName,
-        lots: [...projectLots].sort((a, b) => a.code.localeCompare(b.code, "es", { numeric: true })),
+        lots: [...projectLots].sort((a, b) => a.code.localeCompare(b.code, "en", { numeric: true })),
       }))
-      .sort((a, b) => a.projectName.localeCompare(b.projectName, "es"));
+      .sort((a, b) => a.projectName.localeCompare(b.projectName, "en"));
   }, [available, search]);
 
   const shown = groups.reduce((total, group) => total + group.lots.length, 0);
@@ -227,11 +228,11 @@ export function LotPicker({ lots, unitByProject, money, selected, onSelect }: Lo
         <span className="holder-text">
           <span className="holder-name">{selected.projectName}</span>
           <span className="holder-contract">
-            {formatArea(selected.areaM2, unit)} · lista {formatMoney(selected.basePrice, money)}
+            {formatArea(selected.areaM2, unit)} · list price {formatMoney(selected.basePrice, money)}
           </span>
         </span>
         <button type="button" className="link-btn" onClick={() => onSelect(null)}>
-          Cambiar
+          Change
         </button>
       </div>
     );
@@ -240,8 +241,7 @@ export function LotPicker({ lots, unitByProject, money, selected, onSelect }: Lo
   if (available.length === 0) {
     return (
       <p className="picker-empty">
-        No queda ningún lote disponible. Todos los lotes activos ya tienen un contrato o una
-        reserva vigente.
+        No lots are available. All active lots already have a contract or reservation.
       </p>
     );
   }
@@ -253,15 +253,15 @@ export function LotPicker({ lots, unitByProject, money, selected, onSelect }: Lo
         <input
           type="search"
           value={search}
-          placeholder="Buscar por número de lote o proyecto…"
-          aria-label="Buscar lote"
+          placeholder="Search by lot number or project…"
+          aria-label="Search lots"
           onChange={(event) => setSearch(event.target.value)}
         />
       </div>
 
-      <div className="picker-list" role="listbox" aria-label="Lotes disponibles">
+      <div className="picker-list" role="listbox" aria-label="Available lots">
         {shown === 0 && (
-          <p className="picker-empty">Ningún lote disponible coincide con «{search.trim()}».</p>
+          <p className="picker-empty">No available lots match “{search.trim()}”.</p>
         )}
 
         {groups.map((group) => {
@@ -272,7 +272,7 @@ export function LotPicker({ lots, unitByProject, money, selected, onSelect }: Lo
               <p className="picker-group-label">
                 {group.projectName}
                 <span>
-                  {group.lots.length} disponible{group.lots.length === 1 ? "" : "s"}
+                  {group.lots.length} available
                 </span>
               </p>
 

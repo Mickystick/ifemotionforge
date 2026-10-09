@@ -93,8 +93,8 @@ describe("PAYMENT_TYPE_OPTIONS", () => {
 
 describe("paymentTypeLabel", () => {
   it("names the four the form can record", () => {
-    assert.equal(paymentTypeLabel("down_payment"), "Prima");
-    assert.equal(paymentTypeLabel("installment"), "Cuota");
+    assert.equal(paymentTypeLabel("down_payment"), "Down payment");
+    assert.equal(paymentTypeLabel("installment"), "Installment");
   });
 
   /* `Transaction.type` is a plain string off the wire and the schema allows a

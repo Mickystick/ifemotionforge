@@ -113,11 +113,11 @@ export const COUNTRY_CODES: readonly CountryCode[] = [
   { dial: "+503", label: "El Salvador", nationalDigits: null },
   { dial: "+505", label: "Nicaragua", nationalDigits: null },
   { dial: "+506", label: "Costa Rica", nationalDigits: null },
-  { dial: "+507", label: "Panamá", nationalDigits: null },
-  { dial: "+1", label: "EE. UU. / Canadá", nationalDigits: null },
-  { dial: "+52", label: "México", nationalDigits: null },
-  { dial: "+34", label: "España", nationalDigits: null },
-  { dial: OTHER_DIAL, label: "Otro país", nationalDigits: null },
+  { dial: "+507", label: "Panama", nationalDigits: null },
+  { dial: "+1", label: "US / Canada", nationalDigits: null },
+  { dial: "+52", label: "Mexico", nationalDigits: null },
+  { dial: "+34", label: "Spain", nationalDigits: null },
+  { dial: OTHER_DIAL, label: "Other country", nationalDigits: null },
 ];
 
 /** The default for a new customer: the country the land is in. */
@@ -156,7 +156,7 @@ export function joinPhone(dialCode: string, national: string): string {
 }
 
 /**
- * What is wrong with these two fields, in Spanish, or `null` if nothing is.
+ * What is wrong with these two fields, or `null` if nothing is.
  *
  * Blank is not a problem: the phone is optional, and a customer who paid a lot
  * outright in one visit may simply never have come up in a conversation that
@@ -177,11 +177,11 @@ export function describePhoneProblem(dialCode: string, national: string): string
   const country = COUNTRY_CODES.find((entry) => entry.dial === dialCode);
 
   if (country?.nationalDigits && digits.length !== country.nationalDigits) {
-    return `Un número de ${country.label} tiene ${country.nationalDigits} dígitos.`;
+    return `A phone number from ${country.label} has ${country.nationalDigits} digits.`;
   }
 
   // The generic E.164 bounds, for everywhere the list is not strict about.
   return normalizePhone(joinPhone(dialCode, digits)) === null
-    ? "Ese número no tiene una cantidad de dígitos válida."
+    ? "That number doesn't have a valid number of digits."
     : null;
 }

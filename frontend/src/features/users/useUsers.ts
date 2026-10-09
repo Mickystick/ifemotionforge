@@ -25,7 +25,7 @@ export function useUsers(enabled: boolean) {
       setState({ status: "ready", users: await fetchUsers() });
     } catch (caught) {
       const message =
-        caught instanceof Error ? caught.message : "No se pudieron cargar las cuentas.";
+        caught instanceof Error ? caught.message : "Unable to load accounts.";
 
       setState((current) => (current.status === "ready" ? current : { status: "error", message }));
     }

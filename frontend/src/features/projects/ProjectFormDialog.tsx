@@ -33,7 +33,7 @@ export function ProjectFormDialog({ project, onCancel, onSave }: ProjectFormDial
     setError(null);
 
     if (!name.trim()) {
-      setError("El nombre del proyecto es obligatorio.");
+      setError("Project name is required.");
       return;
     }
 
@@ -42,7 +42,7 @@ export function ProjectFormDialog({ project, onCancel, onSave }: ProjectFormDial
     try {
       await onSave({ name: name.trim(), areaUnit });
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "No se pudo guardar el proyecto.");
+      setError(caught instanceof Error ? caught.message : "Unable to save the project.");
     } finally {
       setSaving(false);
     }
@@ -50,37 +50,37 @@ export function ProjectFormDialog({ project, onCancel, onSave }: ProjectFormDial
 
   return (
     <Dialog
-      ariaLabel={isEditing ? `Editar ${project.name}` : "Nuevo proyecto"}
+      ariaLabel={isEditing ? `Edit ${project.name}` : "New project"}
       dismissible={!isDirty && !isSaving}
       onClose={onCancel}
     >
       <form onSubmit={handleSubmit}>
         <div className="modal-header">
           <div>
-            <p className="modal-eyebrow">{isEditing ? "Editar proyecto" : "Nuevo proyecto"}</p>
-            <h2>{name.trim() || "Sin nombre"}</h2>
+            <p className="modal-eyebrow">{isEditing ? "Edit project" : "New project"}</p>
+            <h2>{name.trim() || "No name"}</h2>
             <p className="modal-description">
-              La unidad decide cómo se escriben y se leen las áreas de sus lotes.
+              This unit determines how lot areas are entered and displayed.
             </p>
           </div>
-          <button type="button" className="modal-close" onClick={onCancel} aria-label="Cerrar">
+          <button type="button" className="modal-close" onClick={onCancel} aria-label="Close">
             <IconClose />
           </button>
         </div>
 
         <div className="modal-form-grid">
           <div className="form-field full-width">
-            <label htmlFor="project-name">Nombre</label>
+            <label htmlFor="project-name">Name</label>
             <input
               id="project-name"
               value={name}
-              placeholder="Ej. Villa Lindero"
+              placeholder="e.g. Lindero Village"
               onChange={(event) => setName(event.target.value)}
             />
           </div>
 
           <div className="form-field full-width">
-            <label htmlFor="project-unit">Unidad de área</label>
+            <label htmlFor="project-unit">Area unit</label>
             <select
               id="project-unit"
               value={areaUnit}
@@ -93,16 +93,16 @@ export function ProjectFormDialog({ project, onCancel, onSave }: ProjectFormDial
               ))}
             </select>
             <span className="field-hint">
-              Los lotes de este proyecto se capturan y se muestran en esta unidad.
+              Lots in this project are entered and displayed in this unit.
             </span>
           </div>
 
           {unitChanged && (
             <p className="form-blocked full-width">
-              Cambiar la unidad no altera el tamaño de ningún lote. Las áreas se guardan
-              siempre en metros cuadrados; solo cambia cómo se escriben en pantalla — los{" "}
+              Changing the unit does not change the size of any lot. Areas are always stored in
+              square meters; only how they're displayed changes—the{" "}
               {project.lotCount} lote{project.lotCount === 1 ? "" : "s"} de {project.name}{" "}
-              seguirán midiendo exactamente lo mismo.
+              will remain exactly the same size.
             </p>
           )}
 
@@ -111,11 +111,11 @@ export function ProjectFormDialog({ project, onCancel, onSave }: ProjectFormDial
 
         <div className="modal-actions">
           <button type="button" className="btn-secondary" onClick={onCancel} disabled={isSaving}>
-            Cancelar
+            Cancel
           </button>
           <button type="submit" className="btn-primary modal-submit" disabled={isSaving}>
             <span>
-              {isSaving ? "Guardando…" : isEditing ? "Guardar cambios" : "Crear proyecto"}
+              {isSaving ? "Saving…" : isEditing ? "Save changes" : "Create project"}
             </span>
           </button>
         </div>

@@ -80,11 +80,11 @@ interface ReceiptsPageProps {
   onLedgerChanged: () => void;
 }
 
-/** "15 mar 2026" — compact, for a list rather than a document. */
+/** "Mar 15, 2026" — compact, for a list rather than a document. */
 function shortDate(isoDate: string): string {
   const [year, month, day] = isoDate.split("-").map(Number);
 
-  return new Intl.DateTimeFormat("es-HN", {
+  return new Intl.DateTimeFormat("en-US", {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -146,8 +146,8 @@ function ProofSourceMenu({ anchorRef, onClose, onDevice, onDrive }: ProofSourceM
   useDismiss(!isMobile, anchorRef, onClose);
 
   return (
-    <MenuSurface isOpen title="Adjuntar comprobante" onClose={onClose} className="proof-source-menu">
-      <p className="menu-title desktop-only">Adjuntar comprobante</p>
+    <MenuSurface isOpen title="Attach proof file" onClose={onClose} className="proof-source-menu">
+      <p className="menu-title desktop-only">Attach proof file</p>
       <button
         type="button"
         className="menu-item"
@@ -317,7 +317,7 @@ function TransactionRow({
           checked={isChecked}
           disabled={!canCheck}
           readOnly
-          aria-label={`Sumar la transacción de ${transaction.customerName} del ${shortDate(transaction.paidOn)}`}
+          aria-label={`Select transaction for ${transaction.customerName} dated ${shortDate(transaction.paidOn)}`}
         />
       </span>
 
@@ -337,10 +337,10 @@ function TransactionRow({
           onClick={() => onOpenProof(proofs, proofs[0]!.id)}
           title={
             proofs.length === 1
-              ? `Ver el comprobante: ${proofs[0]!.name}`
-              : `Ver ${proofs.length} comprobantes`
+              ? `View proof file: ${proofs[0]!.name}`
+              : `View ${proofs.length} proof files`
           }
-          aria-label={`Ver el comprobante de ${transaction.customerName}`}
+          aria-label={`View proof file for ${transaction.customerName}`}
         >
           <DocumentThumb file={proofs[0]!} />
           {proofs.length > 1 && <span className="txn-proof-count">{proofs.length}</span>}
@@ -386,9 +386,9 @@ function TransactionRow({
             }}
             title={
               attach.error ??
-              (attach.busy ?? "Sin comprobante. Suelta aquí el que envió el cliente, o haz clic para buscarlo.")
+              (attach.busy ?? "No proof attached. Drop the customer's file here, or click to browse.")
             }
-            aria-label={`Adjuntar el comprobante de ${transaction.customerName} del ${transaction.paidOn}`}
+            aria-label={`Attach proof for ${transaction.customerName} dated ${transaction.paidOn}`}
           >
             <IconPaperclip />
           </button>
@@ -464,8 +464,8 @@ function TransactionRow({
           {/* The one thing the old receipt tag also said, and only when it is
               the exception: this money was never put on paper. */}
           {transaction.receiptCode === null && (
-            <span className="txn-receipt is-missing" title="Este pago nunca se imprimió">
-              sin recibo
+            <span className="txn-receipt is-missing" title="This payment was never printed">
+              no receipt
             </span>
           )}
           {isReversed && <span className="txn-void">anulada</span>}
@@ -479,8 +479,8 @@ function TransactionRow({
           type="button"
           className="icon-btn txn-edit"
           onClick={onEdit}
-          aria-label={`Corregir la transacción de ${transaction.customerName} del ${transaction.paidOn}`}
-          title="Corregir esta transacción"
+          aria-label={`Edit transaction for ${transaction.customerName} dated ${transaction.paidOn}`}
+          title="Edit this transaction"
         >
           <IconEdit />
         </button>
@@ -870,7 +870,7 @@ export function ReceiptsPage({
           if (!cancelled) {
             setShareNote({
               tone: "error",
-              text: "No se pudo preparar la imagen del recibo.",
+              text: "Could not prepare the receipt image.",
             });
           }
         });
@@ -907,7 +907,7 @@ export function ReceiptsPage({
       if (outcome.status === "copied") {
         setShareNote({
           tone: "info",
-          text: `Se abrió el chat de ${detail.customer.fullName}. ${pasteInstruction()}`,
+          text: `Opened the chat with ${detail.customer.fullName}. ${pasteInstruction()}`,
         });
       } else if (outcome.status === "manual") {
         const gesture = copyGesture();
@@ -929,15 +929,15 @@ export function ReceiptsPage({
            */
           text:
             outcome.reason === "insecure"
-              ? `Esta página está abierta por http://, y los navegadores solo permiten compartir por HTTPS. Ábrela por HTTPS y este botón enviará el recibo directamente. Por ahora el recibo está abierto aquí: ${gesture}.`
-              : `El recibo está abierto aquí. ${gesture[0]!.toUpperCase()}${gesture.slice(1)}.`,
+              ? `This page is open over HTTP, and browsers only allow sharing over HTTPS. Open it over HTTPS and this button will send the receipt directly. For now, the receipt is open here: ${gesture}.`
+              : `The receipt is open here. ${gesture[0]!.toUpperCase()}${gesture.slice(1)}.`,
           chatUrl: outcome.chatUrl,
         });
       }
       // "shared" and "cancelled" need no words: the share sheet either appeared
       // and was used, or appeared and was dismissed. Both are self-evident.
     } catch {
-      setShareNote({ tone: "error", text: "No se pudo abrir WhatsApp." });
+      setShareNote({ tone: "error", text: "Could not open WhatsApp." });
     } finally {
       setSharing(false);
     }
@@ -1053,13 +1053,13 @@ export function ReceiptsPage({
     }
 
     for (const proof of accepted) {
-      setProofBusy(`Subiendo ${proof.file.name}…`);
+      setProofBusy(`Uploading ${proof.file.name}…`);
 
       try {
         await uploadAttachment(detail.id, proof.file);
       } catch (caught) {
         setProofError(
-          caught instanceof Error ? caught.message : "No se pudo subir el comprobante.",
+          caught instanceof Error ? caught.message : "Could not upload the proof file.",
         );
       }
 
@@ -1097,7 +1097,7 @@ export function ReceiptsPage({
         setProofError((shown) => shown ?? rejections[0]!);
       }
     } catch (caught) {
-      setProofError(caught instanceof Error ? caught.message : "No se pudo abrir Google Drive.");
+      setProofError(caught instanceof Error ? caught.message : "Could not open Google Drive.");
     } finally {
       setProofBusy(null);
     }
@@ -1126,7 +1126,7 @@ export function ReceiptsPage({
     }
 
     setProofError(null);
-    setProofBusy("Quitando el comprobante…");
+    setProofBusy("Removing proof file…");
 
     try {
       await deleteAttachment(attachmentId);
@@ -1180,7 +1180,7 @@ export function ReceiptsPage({
       files: [
         {
           id,
-          name: `Recibo ${detail.code}`,
+          name: `Receipt ${detail.code}`,
           contentType: "image/png",
           url: shareImageUrl,
           caption: detail.customer.fullName,
@@ -1367,7 +1367,7 @@ export function ReceiptsPage({
           shows its box, not just the one under the pointer. See `.txn-check`. */}
       <div className={`card txn-list${checkedTransactions.length > 0 ? " is-selecting" : ""}`}>
         <div className="card-head">
-          <h2>Transacciones</h2>
+          <h2>Transactions</h2>
         </div>
 
         <TransactionToolbar
@@ -1407,8 +1407,8 @@ export function ReceiptsPage({
           {visible.length === 0 && (
             <p className="state-message">
               {transactions.length === 0
-                ? "Todavía no se ha registrado ninguna transacción."
-                : "Ninguna transacción coincide con la búsqueda."}
+                ? "No transactions have been recorded yet."
+                : "No transactions match your search."}
             </p>
           )}
 
@@ -1455,14 +1455,14 @@ export function ReceiptsPage({
                     <span className="txn-who">
                       <span className="txn-name">{group.customerName}</span>
                       <span className="txn-detail">
-                        {group.transactions.length} transacci
-                        {group.transactions.length === 1 ? "ón" : "ones"} · última{" "}
+                        {group.transactions.length} transaction
+                        {group.transactions.length === 1 ? "" : "s"} · last{" "}
                         {shortDate(group.lastPaidOn)}
                       </span>
                       {group.hasAmendment && (
                         <span
                           className="stamp neutral txn-amendment-badge"
-                          title="Uno de sus contratos fue reemplazado por una adenda"
+                          title="One of this customer's contracts was replaced by an amendment"
                         >
                           Adenda
                         </span>
@@ -1546,22 +1546,22 @@ export function ReceiptsPage({
               <span className="receipt-sheet-back-icon">
                 <IconChevronDown />
               </span>
-              Transacciones
+              Transactions
             </button>
           </div>
         ) : (
-          <p className="receipt-preview-label">Vista del recibo</p>
+          <p className="receipt-preview-label">Receipt preview</p>
         )}
 
         {detail === null && !isLoadingDetail && (
           <p className="state-message">
             {selectedReceiptId === null
-              ? "Selecciona una transacción para ver su recibo. Las marcadas «sin recibo» nunca se imprimieron."
-              : "No se pudo cargar el recibo."}
+              ? "Select a transaction to view its receipt. Items marked “no receipt” were never printed."
+              : "Could not load the receipt."}
           </p>
         )}
 
-        {isLoadingDetail && detail === null && <p className="state-message">Cargando…</p>}
+        {isLoadingDetail && detail === null && <p className="state-message">Loading…</p>}
 
         {detail && (
           <>
@@ -1590,7 +1590,7 @@ export function ReceiptsPage({
                 </button>
 
                 <button type="button" className="btn-secondary" onClick={() => window.print()}>
-                  Imprimir
+                  Print
                 </button>
 
                 {/* The document itself, not a description of it — see
@@ -1607,8 +1607,8 @@ export function ReceiptsPage({
                   onClick={() => void share()}
                   title={
                     detail.customer.phone === null
-                      ? "Este cliente no tiene teléfono registrado"
-                      : `Enviar el recibo a ${detail.customer.fullName} por WhatsApp`
+                      ? "This customer has no phone number on file"
+                      : `Send the receipt to ${detail.customer.fullName} on WhatsApp`
                   }
                 >
                   <IconWhatsApp />
@@ -1616,7 +1616,7 @@ export function ReceiptsPage({
                     ? "Preparando…"
                     : isSharing
                       ? "Enviando…"
-                      : "Enviar"}
+                      : "Send"}
                 </button>
               </div>
 
@@ -1625,7 +1625,7 @@ export function ReceiptsPage({
                   type="button"
                   className="btn-secondary"
                   onClick={() => setReceiptBeingSplit(detail)}
-                  title="Mover parte de este recibo a otro lote del mismo cliente"
+                  title="Move part of this receipt to another lot belonging to the same customer"
                 >
                   Repartir
                 </button>
@@ -1655,7 +1655,7 @@ export function ReceiptsPage({
             */}
             <div className="receipt-proofs">
               <div className="receipt-proofs-head">
-                <p className="receipt-preview-label">Comprobantes del cliente</p>
+                <p className="receipt-preview-label">Customer payment proofs</p>
               </div>
 
               {/* The same zone the receipt form and the correction dialog
@@ -1669,9 +1669,9 @@ export function ReceiptsPage({
                   }`}
                   {...dropHandlers}
                 >
-                  <p className="proof-dropzone-title">Arrastra el comprobante aquí</p>
+                  <p className="proof-dropzone-title">Drop the proof file here</p>
                   <p className="proof-dropzone-hint">
-                    La captura del depósito, directo desde WhatsApp.
+                    The deposit screenshot, straight from WhatsApp.
                   </p>
 
                   <div className="proof-dropzone-actions">
@@ -1701,7 +1701,7 @@ export function ReceiptsPage({
               {/* Only where there is no dropzone above already saying it by
                   being empty. */}
               {detail.attachments.length === 0 && !canRecord && (
-                <p className="state-message">Este recibo no tiene comprobante adjunto.</p>
+                <p className="state-message">No proof files are attached to this receipt.</p>
               )}
 
               {/* The zone is gone and the reason is not obvious: without this,
@@ -1709,8 +1709,8 @@ export function ReceiptsPage({
                   permission to attach. */}
               {canRecord && detail.attachments.length >= MAX_PROOFS && (
                 <p className="state-message">
-                  Este recibo ya tiene los {MAX_PROOFS} comprobantes que caben. Quita uno para
-                  poder agregar otro.
+                  This receipt already has the maximum of {MAX_PROOFS} proof files. Remove one to
+                  add another.
                 </p>
               )}
 
@@ -1722,7 +1722,7 @@ export function ReceiptsPage({
                       type="button"
                       className="proof-tile"
                       onClick={() => setViewing({ source: "proofs", startId: file.id })}
-                      title={`Ver ${file.name}`}
+                      title={`View ${file.name}`}
                     >
                       <DocumentThumb file={file} />
                       <span className="proof-tile-name">{file.name}</span>
@@ -1805,14 +1805,14 @@ export function ReceiptsPage({
 
       {pendingRemoval !== null && (
         <ConfirmDialog
-          eyebrow="Quitar comprobante"
+          eyebrow="Remove proof file"
           title={pendingRemoval.name}
           description={
             pendingRemoval.sizeBytes === undefined
               ? undefined
               : readableSize(pendingRemoval.sizeBytes)
           }
-          confirmLabel="Quitar comprobante"
+          confirmLabel="Remove proof file"
           busyLabel="Quitando…"
           onCancel={() => setPendingRemoval(null)}
           onConfirm={async () => {
@@ -1820,9 +1820,9 @@ export function ReceiptsPage({
             setPendingRemoval(null);
           }}
         >
-          Esto borra el archivo del servidor para siempre. El pago y el recibo no cambian —
-          solo se pierde la prueba que envió el cliente, y si ya no está en el chat no hay
-          otra copia.
+          This permanently deletes the file from the server. The payment and receipt won't change;
+          only the customer's proof file is removed, and if it is no longer in the chat, there is no
+          other copy.
         </ConfirmDialog>
       )}
 

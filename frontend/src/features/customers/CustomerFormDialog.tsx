@@ -107,11 +107,11 @@ export function CustomerFormDialog({
     const year = Number(customerSince);
 
     if (!fullName.trim()) {
-      setError("El nombre del cliente es obligatorio.");
+      setError("Customer name is required.");
       return;
     }
     if (duplicate) {
-      setError(`La identidad ${typedIdentification} ya está registrada a nombre de ${duplicate.fullName}.`);
+      setError(`ID number ${typedIdentification} is already registered to ${duplicate.fullName}.`);
       return;
     }
     if (phoneProblem) {
@@ -119,7 +119,7 @@ export function CustomerFormDialog({
       return;
     }
     if (!Number.isInteger(year) || year < 1900 || year > 2200) {
-      setError("El año en que se volvió cliente no parece correcto.");
+      setError("The year the person became a customer doesn't look right.");
       return;
     }
 
@@ -142,7 +142,7 @@ export function CustomerFormDialog({
         notes: orNull(notes),
       });
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "No se pudo guardar el cliente.");
+      setError(caught instanceof Error ? caught.message : "Unable to save the customer.");
     } finally {
       setSaving(false);
     }
@@ -150,38 +150,38 @@ export function CustomerFormDialog({
 
   return (
     <Dialog
-      ariaLabel={isEditing ? `Editar ${customer.fullName}` : "Nuevo cliente"}
+      ariaLabel={isEditing ? `Edit ${customer.fullName}` : "New customer"}
       dismissible={!isDirty && !isSaving}
       onClose={onCancel}
     >
       <form onSubmit={handleSubmit}>
         <div className="modal-header">
           <div>
-            <p className="modal-eyebrow">{isEditing ? "Editar cliente" : "Nuevo cliente"}</p>
-            <h2>{fullName.trim() || "Sin nombre"}</h2>
+            <p className="modal-eyebrow">{isEditing ? "Edit customer" : "New customer"}</p>
+            <h2>{fullName.trim() || "No name"}</h2>
             <p className="modal-description">
-              Los contratos y el saldo no se escriben aquí: se calculan a partir de los
-              contratos y los pagos registrados.
+              Contracts and balances aren't entered here; they're calculated from recorded
+              contracts and payments.
             </p>
           </div>
-          <button type="button" className="modal-close" onClick={onCancel} aria-label="Cerrar">
+          <button type="button" className="modal-close" onClick={onCancel} aria-label="Close">
             <IconClose />
           </button>
         </div>
 
         <div className="modal-form-grid">
           <div className="form-field full-width">
-            <label htmlFor="customer-name">Nombre completo</label>
+            <label htmlFor="customer-name">Full name</label>
             <input
               id="customer-name"
               value={fullName}
-              placeholder="Ej. María Fernández"
+              placeholder="e.g. Maria Fernandez"
               onChange={(event) => setFullName(event.target.value)}
             />
           </div>
 
           <div className="form-field">
-            <label htmlFor="customer-id">Identidad (opcional)</label>
+            <label htmlFor="customer-id">ID number (optional)</label>
             <input
               id="customer-id"
               value={identification}
@@ -190,28 +190,28 @@ export function CustomerFormDialog({
               onChange={(event) => setIdentification(event.target.value)}
             />
             {duplicate ? (
-              <span className="field-error">Ya registrada a nombre de {duplicate.fullName}.</span>
+              <span className="field-error">Already registered to {duplicate.fullName}.</span>
             ) : (
               /* Said out loud, because a blank field with no hint reads as one
                  the user forgot rather than one they are allowed to leave. */
               <span className="field-hint">
-                Déjala en blanco si el cliente no la ha dado. Una persona, un número.
+                Leave this blank if the customer hasn't provided it. One person, one ID number.
               </span>
             )}
           </div>
 
           <div className="form-field">
-            <label htmlFor="customer-phone">Teléfono (opcional)</label>
+            <label htmlFor="customer-phone">Phone (optional)</label>
             <div className="phone-input">
               <select
                 className="phone-dial"
                 value={dialCode}
-                aria-label="Código de país"
+                aria-label="Country code"
                 onChange={(event) => setDialCode(event.target.value)}
               >
                 {COUNTRY_CODES.map((country) => (
                   <option key={country.dial} value={country.dial}>
-                    {country.dial === "+" ? "+ Otro" : `${country.dial} ${country.label}`}
+                    {country.dial === "+" ? "+ Other" : `${country.dial} ${country.label}`}
                   </option>
                 ))}
               </select>
@@ -232,30 +232,30 @@ export function CustomerFormDialog({
                  with no explanation reads as one the user forgot rather than
                  one they are allowed to leave. */
               <span className="field-hint">
-                Déjalo en blanco si nunca ha hecho falta contactar a este cliente.
+                Leave this blank if you have never needed to contact this customer.
               </span>
             ) : (
               <span className="field-hint">
                 {dialCode === "+504"
-                  ? "Honduras. Cámbialo si el cliente está en otro país."
-                  : `Se guardará como ${joinPhone(dialCode, national)}.`}
+                  ? "Honduras. Change this if the customer is in another country."
+                  : `It will be saved as ${joinPhone(dialCode, national)}.`}
               </span>
             )}
           </div>
 
           <div className="form-field">
-            <label htmlFor="customer-email">Correo</label>
+            <label htmlFor="customer-email">Email</label>
             <input
               id="customer-email"
               type="email"
               value={email}
-              placeholder="Opcional"
+              placeholder="Optional"
               onChange={(event) => setEmail(event.target.value)}
             />
           </div>
 
           <div className="form-field">
-            <label htmlFor="customer-since">Cliente desde</label>
+            <label htmlFor="customer-since">Customer since</label>
             <input
               id="customer-since"
               type="number"
@@ -268,27 +268,26 @@ export function CustomerFormDialog({
           </div>
 
           <div className="form-field full-width">
-            <label htmlFor="customer-address">Dirección</label>
+            <label htmlFor="customer-address">Address</label>
             <input
               id="customer-address"
               value={address}
-              placeholder="Opcional"
+              placeholder="Optional"
               onChange={(event) => setAddress(event.target.value)}
             />
           </div>
 
           <div className="form-field full-width">
-            <label htmlFor="customer-notes">Notas</label>
+            <label htmlFor="customer-notes">Notes</label>
             <textarea
               id="customer-notes"
               rows={3}
               value={notes}
-              placeholder="Ej. Prefiere que le escriban por WhatsApp en las tardes."
+              placeholder="e.g. Prefers WhatsApp messages in the afternoon."
               onChange={(event) => setNotes(event.target.value)}
             />
             <span className="field-hint">
-              Lo que conviene recordar de esta persona: cómo paga, a quién llamar, qué se
-              acordó de palabra.
+              Useful details to remember: how they pay, who to call, or what was agreed verbally.
             </span>
           </div>
 
@@ -297,7 +296,7 @@ export function CustomerFormDialog({
 
         <div className="modal-actions">
           <button type="button" className="btn-secondary" onClick={onCancel} disabled={isSaving}>
-            Cancelar
+            Cancel
           </button>
           <button
             type="submit"
@@ -305,7 +304,7 @@ export function CustomerFormDialog({
             disabled={isSaving || duplicate !== undefined}
           >
             <span>
-              {isSaving ? "Guardando…" : isEditing ? "Guardar cambios" : "Crear cliente"}
+              {isSaving ? "Saving…" : isEditing ? "Save changes" : "Create customer"}
             </span>
           </button>
         </div>

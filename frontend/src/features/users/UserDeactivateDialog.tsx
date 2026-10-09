@@ -39,7 +39,7 @@ export function UserDeactivateDialog({ account, onCancel, onConfirm }: UserDeact
       await onConfirm();
     } catch (caught) {
       setError(
-        caught instanceof Error ? caught.message : `No se pudo desactivar a ${account.name}.`,
+        caught instanceof Error ? caught.message : `Unable to deactivate ${account.name}.`,
       );
     } finally {
       setSaving(false);
@@ -47,31 +47,30 @@ export function UserDeactivateDialog({ account, onCancel, onConfirm }: UserDeact
   };
 
   return (
-    <Dialog ariaLabel={`Desactivar la cuenta de ${account.name}`} onClose={onCancel}>
+    <Dialog ariaLabel={`Deactivate ${account.name}'s account`} onClose={onCancel}>
       <form onSubmit={handleSubmit}>
         <div className="modal-header">
           <div>
-            <p className="modal-eyebrow danger-eyebrow">Desactivar cuenta</p>
+            <p className="modal-eyebrow danger-eyebrow">Deactivate account</p>
             <h2>{account.name}</h2>
             <p className="modal-description">
               {ROLE_LABELS[account.role]} · {account.email}
             </p>
           </div>
-          <button type="button" className="modal-close" onClick={onCancel} aria-label="Cerrar">
+          <button type="button" className="modal-close" onClick={onCancel} aria-label="Close">
             <IconClose />
           </button>
         </div>
 
         <div className="modal-form-grid">
           <p className="form-warning full-width">
-            {account.name} dejará de poder entrar de inmediato, incluso si tiene la aplicación
-            abierta ahora mismo.
+            {account.name} will lose access immediately, even if the app is open right now.
           </p>
 
           <p className="field-hint full-width">
-            La cuenta no se borra, y eso es a propósito: los pagos que {account.name} registró
-            y todo lo que hizo siguen llevando su nombre en el historial. Si vuelve, se puede
-            reactivar desde esta misma pantalla y su contraseña seguirá siendo la misma.
+            The account is not deleted on purpose: payments recorded and other actions by{" "}
+            {account.name} will remain attributed to them in the history. If they return, you
+            can reactivate the account from this screen, and their password will stay the same.
           </p>
 
           {error && <p className="form-error full-width">{error}</p>}
@@ -79,10 +78,10 @@ export function UserDeactivateDialog({ account, onCancel, onConfirm }: UserDeact
 
         <div className="modal-actions">
           <button type="button" className="btn-secondary" onClick={onCancel} disabled={isSaving}>
-            Cancelar
+            Cancel
           </button>
           <button type="submit" className="btn-danger" disabled={isSaving}>
-            {isSaving ? "Desactivando…" : "Desactivar cuenta"}
+            {isSaving ? "Deactivating…" : "Deactivate account"}
           </button>
         </div>
       </form>

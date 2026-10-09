@@ -32,32 +32,32 @@ function line(
 
 describe("appliedLabel", () => {
   it("names the cuota a plain payment went to", () => {
-    assert.equal(appliedLabel(line([[4, 2_500_000]])), "cuota 4 de 12");
+    assert.equal(appliedLabel(line([[4, 2_500_000]])), "Installment 4 of 12");
   });
 
   it("ignores a rounding crumb in the next cuota", () => {
     // The production receipt: L 24,999.97 of cuota 4 and three centavos of
     // cuota 5. It used to read "cuotas 4 y 5 de 12".
-    assert.equal(appliedLabel(line([[4, 2_499_997], [5, 3]])), "cuota 4 de 12");
+    assert.equal(appliedLabel(line([[4, 2_499_997], [5, 3]])), "Installment 4 of 12");
   });
 
   it("names the cuota that took the most when a payment covers two", () => {
     // Mostly cuota 5: the customer was a hundred lempiras short on 4.
-    assert.equal(appliedLabel(line([[4, 10_000], [5, 2_490_000]])), "cuota 5 de 12");
+    assert.equal(appliedLabel(line([[4, 10_000], [5, 2_490_000]])), "Installment 5 of 12");
   });
 
   it("keeps the earlier cuota when a payment splits exactly across two", () => {
     // The one being caught up on is the one worth naming.
-    assert.equal(appliedLabel(line([[4, 2_500_000], [5, 2_500_000]])), "cuota 4 de 12");
+    assert.equal(appliedLabel(line([[4, 2_500_000], [5, 2_500_000]])), "Installment 4 of 12");
   });
 
   it("names the cuota a partial payment went towards", () => {
-    assert.equal(appliedLabel(line([[4, 500_000]])), "cuota 4 de 12");
+    assert.equal(appliedLabel(line([[4, 500_000]])), "Installment 4 of 12");
   });
 
   it("drops the total when the contract has no schedule", () => {
     // A cash sale: "cuota 1 de 0" would be worse than no total at all.
-    assert.equal(appliedLabel(line([[1, 2_500_000]], 0)), "cuota 1");
+    assert.equal(appliedLabel(line([[1, 2_500_000]], 0)), "Installment 1");
   });
 
   it("says nothing when the money went to no cuota at all", () => {

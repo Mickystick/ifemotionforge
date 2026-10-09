@@ -15,18 +15,18 @@ interface ReceiptPaperProps {
 }
 
 const METHOD_LABELS: Record<string, string> = {
-  cash: "Efectivo",
-  transfer: "Transferencia",
-  card: "Tarjeta",
+  cash: "Cash",
+  transfer: "Bank transfer",
+  card: "Card",
 };
 
-/** "15 de marzo de 2026" — a date on a document is written out, not abbreviated. */
+/** "March 15, 2026" — a date on a document is written out, not abbreviated. */
 function longDate(isoDate: string): string {
   // Parsed as UTC parts rather than through `new Date(iso)`, which reads a bare
   // date as midnight UTC and then renders it in local time — one timezone west
   // of Greenwich and the receipt is dated the day before.
   const [year, month, day] = isoDate.split("-").map(Number);
-  const formatter = new Intl.DateTimeFormat("es-HN", {
+  const formatter = new Intl.DateTimeFormat("en-US", {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -52,8 +52,8 @@ function clientDetail(customer: Receipt["customer"]): string | null {
   const phone = customer.phone?.trim() ?? "";
 
   const parts = [
-    identification ? `Identidad ${identification}` : null,
-    phone ? `Tel ${formatPhone(phone)}` : null,
+    identification ? `ID ${identification}` : null,
+    phone ? `Phone ${formatPhone(phone)}` : null,
   ].filter((part): part is string => part !== null);
 
   return parts.length > 0 ? parts.join(" · ") : null;
@@ -164,7 +164,7 @@ export function ReceiptPaper({ receipt, money }: ReceiptPaperProps) {
         // sheet is the thing that gets printed, photographed and forwarded. A
         // voided receipt that prints as though it were valid is the one bug on
         // this page that costs real money.
-        <p className="receipt-void-banner">ANULADO — {receipt.voidReason}</p>
+        <p className="receipt-void-banner">VOIDED — {receipt.voidReason}</p>
       )}
 
       <header className="receipt-header">
@@ -174,16 +174,16 @@ export function ReceiptPaper({ receipt, money }: ReceiptPaperProps) {
         </div>
 
         <div className="receipt-meta">
-          <h1>RECIBO DE PAGO</h1>
+          <h1>PAYMENT RECEIPT</h1>
           <p>
-            <span className="receipt-label">RECIBO #</span> {receipt.code}
+            <span className="receipt-label">RECEIPT #</span> {receipt.code}
           </p>
           <p>
-            <span className="receipt-label">FECHA:</span> {longDate(receipt.issuedOn)}
+            <span className="receipt-label">DATE:</span> {longDate(receipt.issuedOn)}
           </p>
           {receipt.method && (
             <p>
-              <span className="receipt-label">MÉTODO DE PAGO:</span>{" "}
+              <span className="receipt-label">PAYMENT METHOD:</span>{" "}
               {METHOD_LABELS[receipt.method] ?? receipt.method}
             </p>
           )}
@@ -191,7 +191,7 @@ export function ReceiptPaper({ receipt, money }: ReceiptPaperProps) {
       </header>
 
       <div className="receipt-client">
-        <span className="receipt-label">CLIENTE</span>
+        <span className="receipt-label">CUSTOMER</span>
         <div className="receipt-client-name">{receipt.customer.fullName}</div>
         {/* Not on the original, which took its names from Airtable and had
             nothing else. An identidad is how a receipt is matched to a person
@@ -206,8 +206,8 @@ export function ReceiptPaper({ receipt, money }: ReceiptPaperProps) {
       <table className="receipt-items">
         <thead>
           <tr>
-            <th>DESCRIPCIÓN / LOTE</th>
-            <th className="receipt-right">MONTO PAGADO</th>
+            <th>DESCRIPTION / LOT</th>
+            <th className="receipt-right">AMOUNT PAID</th>
           </tr>
         </thead>
         <tbody>
@@ -237,11 +237,11 @@ export function ReceiptPaper({ receipt, money }: ReceiptPaperProps) {
       <div className="receipt-summary">
         <div className="receipt-summary-col">
           <div className="receipt-summary-row">
-            <span>Valor Total del Contrato</span>
+            <span>Total Contract Value</span>
             <span className="receipt-summary-value">{formatDocumentMoney(contractTotal, money)}</span>
           </div>
           <div className="receipt-summary-row">
-            <span>Total Pagado Acumulado</span>
+            <span>Total Paid to Date</span>
             <span className="receipt-summary-value">
               {formatDocumentMoney(receipt.cumulativePaid, money)}
             </span>
@@ -250,13 +250,13 @@ export function ReceiptPaper({ receipt, money }: ReceiptPaperProps) {
 
         <div className="receipt-summary-col">
           <div className="receipt-summary-row">
-            <span>Balance Anterior Total</span>
+            <span>Previous Total Balance</span>
             <span className="receipt-summary-value">
               {formatDocumentMoney(receipt.previousBalance, money)}
             </span>
           </div>
           <div className="receipt-summary-row is-bold">
-            <span>Total Pagado Hoy</span>
+            <span>Paid Today</span>
             <span>{formatDocumentMoney(receipt.totalPaid, money)}</span>
           </div>
 
@@ -264,7 +264,7 @@ export function ReceiptPaper({ receipt, money }: ReceiptPaperProps) {
               original, and kept that way: the three numbers above it are the
               working, and this is the answer. */}
           <div className="receipt-highlight">
-            <span className="receipt-highlight-label">Nuevo Balance Pendiente</span>
+            <span className="receipt-highlight-label">New Outstanding Balance</span>
             <span className="receipt-highlight-value">
               {formatDocumentMoney(receipt.newBalance, money)}
             </span>
@@ -303,7 +303,7 @@ export function ReceiptPaper({ receipt, money }: ReceiptPaperProps) {
         <div className="receipt-signature">
           <p className="receipt-signature-name">{BUSINESS.signatory}</p>
           <hr />
-          <p className="receipt-signature-label">Firma Autorizada</p>
+          <p className="receipt-signature-label">Authorized Signature</p>
         </div>
 
         <p className="receipt-thanks">{THANK_YOU}</p>
@@ -323,13 +323,13 @@ export function ReceiptPaper({ receipt, money }: ReceiptPaperProps) {
           preserveAspectRatio="none"
           shapeRendering="crispEdges"
           role="img"
-          aria-label={`Código de barras del recibo ${receipt.code}`}
+          aria-label={`Barcode for receipt ${receipt.code}`}
         >
           <path d={barcode.path} fill="#000000" />
         </svg>
 
         <p className="receipt-stamp">
-          Recibido por {receipt.issuedBy.name} · código de consulta{" "}
+          Received by {receipt.issuedBy.name} · lookup code{" "}
           <strong>{receipt.lookupCode}</strong>
         </p>
       </footer>

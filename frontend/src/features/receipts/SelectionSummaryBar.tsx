@@ -48,22 +48,22 @@ export function SelectionSummaryBar({
   return (
     <div className="selection-bar">
       <span className="selection-bar-count">
-        {count} seleccionad{count === 1 ? "a" : "as"}
+        {count} selected
         {/* Only where it tells you something. On one-lot receipts the two
             numbers are the same, and saying both twice over is noise. */}
         {receiptCount !== count && (
           <span className="selection-bar-receipts">
             {" · "}
-            {receiptCount} recibo{receiptCount === 1 ? "" : "s"}
+            {receiptCount} receipt{receiptCount === 1 ? "" : "s"}
           </span>
         )}
       </span>
 
       <span className="selection-bar-figure">
-        Suma <strong>{formatMoney(sumCents, money)}</strong>
+        Total <strong>{formatMoney(sumCents, money)}</strong>
       </span>
       <span className="selection-bar-figure">
-        Promedio <strong>{formatMoney(averageCents, money)}</strong>
+        Average <strong>{formatMoney(averageCents, money)}</strong>
       </span>
 
       <span className="selection-bar-actions">
@@ -77,12 +77,12 @@ export function SelectionSummaryBar({
         */}
         {!isEverything && (
           <button type="button" className="link-btn" onClick={onSelectAll}>
-            Seleccionar las {selectableCount} de la vista
+            Select all {selectableCount} shown
           </button>
         )}
 
         <button type="button" className="link-btn" onClick={onClear}>
-          Limpiar selección
+          Clear selection
         </button>
       </span>
     </div>

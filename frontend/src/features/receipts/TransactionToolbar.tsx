@@ -155,8 +155,8 @@ export function TransactionToolbar({
           filters.fromDate && filters.toDate
             ? `${filters.fromDate} – ${filters.toDate}`
             : filters.fromDate
-              ? `Desde ${filters.fromDate}`
-              : `Hasta ${filters.toDate}`,
+              ? `From ${filters.fromDate}`
+              : `Through ${filters.toDate}`,
         clear: () => onFiltersChange({ ...filters, fromDate: null, toDate: null }),
       });
     }
@@ -168,7 +168,7 @@ export function TransactionToolbar({
   const filterBody = (
     <>
       <div className="filter-section">
-        <p className="menu-title">Estado</p>
+        <p className="menu-title">Status</p>
         {STATUS_LABELS.map((option) => (
           <label key={option.value} className="filter-check">
             <input
@@ -180,12 +180,12 @@ export function TransactionToolbar({
           </label>
         ))}
         <span className="field-hint">
-          «Sin recibo» son pagos reales que nunca se imprimieron. Cuentan en los saldos igual.
+          “No receipt” means these payments were received but never printed. They still count in balances.
         </span>
       </div>
 
       <div className="filter-section">
-        <p className="menu-title">Forma de pago</p>
+        <p className="menu-title">Payment method</p>
         {METHOD_LABELS.map((option) => (
           <label key={option.value} className="filter-check">
             <input
@@ -197,13 +197,13 @@ export function TransactionToolbar({
           </label>
         ))}
         {filters.methods.length === 0 && (
-          <p className="field-hint">Sin marcar ninguna se muestran todas.</p>
+          <p className="field-hint">Leave all unchecked to show every method.</p>
         )}
       </div>
 
       <div className="filter-section">
-        <p className="menu-title">Proyecto</p>
-        {projectNames.length === 0 && <p className="field-hint">Todavía no hay transacciones.</p>}
+        <p className="menu-title">Project</p>
+        {projectNames.length === 0 && <p className="field-hint">There are no transactions yet.</p>}
         {projectNames.map((name) => (
           <label key={name} className="filter-check">
             <input
@@ -217,13 +217,13 @@ export function TransactionToolbar({
       </div>
 
       <div className="filter-section">
-        <p className="menu-title">Fecha del pago</p>
+        <p className="menu-title">Payment date</p>
         {/* One field per row, each with its own label — a date input cannot be
             squeezed into half of this popover without the browser clipping the
             end of it, picker button included. See `.filter-range-dates`. */}
         <div className="filter-range filter-range-dates">
           <label>
-            <span>Desde</span>
+            <span>From</span>
             <input
               type="date"
               value={filters.fromDate ?? ""}
@@ -233,7 +233,7 @@ export function TransactionToolbar({
             />
           </label>
           <label>
-            <span>Hasta</span>
+            <span>Through</span>
             <input
               type="date"
               value={filters.toDate ?? ""}
@@ -243,7 +243,7 @@ export function TransactionToolbar({
             />
           </label>
         </div>
-        <span className="field-hint">El día que entró el dinero, no el día que se registró.</span>
+        <span className="field-hint">The day the money was received, not the day it was recorded.</span>
       </div>
     </>
   );
@@ -253,7 +253,7 @@ export function TransactionToolbar({
       <div className="toolbar">
         {/* Two arrangements of the same transactions. Neither hides anything,
             which is why this is a switch and not a filter. */}
-        <div className="view-switch" role="tablist" aria-label="Cómo agrupar las transacciones">
+        <div className="view-switch" role="tablist" aria-label="How to group transactions">
           <button
             type="button"
             role="tab"
@@ -261,7 +261,7 @@ export function TransactionToolbar({
             className={view === "date" ? "view-switch-option is-active" : "view-switch-option"}
             onClick={() => onViewChange("date")}
           >
-            Por fecha
+            By date
           </button>
           <button
             type="button"
@@ -270,12 +270,12 @@ export function TransactionToolbar({
             className={view === "customer" ? "view-switch-option is-active" : "view-switch-option"}
             onClick={() => onViewChange("customer")}
           >
-            Por cliente
+            By customer
           </button>
         </div>
 
         <span className="result-count">
-          {shownCount} de {totalCount}
+          {shownCount} of {totalCount}
         </span>
 
         <div className="toolbar-spacer" />
@@ -285,9 +285,9 @@ export function TransactionToolbar({
           <input
             type="search"
             value={search}
-            placeholder="Buscar recibo o cliente…"
-            aria-label="Buscar transacciones"
-            title="Busca por cliente, identidad, lote, contrato, recibo, referencia bancaria o nota"
+            placeholder="Search receipts or customers…"
+            aria-label="Search transactions"
+            title="Search by customer, ID, lot, contract, receipt, bank reference, or note"
             onChange={(event) => onSearchChange(event.target.value)}
           />
         </div>
@@ -311,7 +311,7 @@ export function TransactionToolbar({
 
           <MenuSurface
             isOpen={openMenu === "sort"}
-            title="Ordenar por"
+            title="Sort by"
             onClose={() => setOpenMenu(null)}
             className="sort-popover"
           >
@@ -322,8 +322,8 @@ export function TransactionToolbar({
               defaultDirection={(field) => (field === "date" || field === "amount" ? "desc" : "asc")}
               hint={
                 view === "customer"
-                  ? "Ordena los clientes y también las transacciones dentro de cada uno."
-                  : "Vuelve a elegir el mismo campo para invertir el orden."
+                  ? "Sort customers and the transactions within each customer."
+                  : "Select the same field again to reverse the sort order."
               }
             />
           </MenuSurface>
@@ -337,22 +337,22 @@ export function TransactionToolbar({
             onClick={() => setOpenMenu(openMenu === "filter" ? null : "filter")}
           >
             <IconFilter />
-            <span>Filtros</span>
+            <span>Filters</span>
             {activeCount > 0 && <span className="filter-count">{activeCount}</span>}
           </button>
 
           <MenuSurface
             isOpen={openMenu === "filter"}
-            title="Filtros"
+            title="Filters"
             onClose={() => setOpenMenu(null)}
             className="filter-popover"
             footer={
               <>
                 <button type="button" className="link-btn" onClick={clearAll}>
-                  Limpiar filtros
+                  Clear filters
                 </button>
                 <button type="button" className="btn-primary" onClick={() => setOpenMenu(null)}>
-                  Ver {shownCount} transacci{shownCount === 1 ? "ón" : "ones"}
+                  Show {shownCount} transaction{shownCount === 1 ? "" : "s"}
                 </button>
               </>
             }
@@ -370,7 +370,7 @@ export function TransactionToolbar({
               type="button"
               className="filter-chip"
               onClick={chip.clear}
-              title={`Quitar ${chip.label}`}
+              title={`Remove ${chip.label}`}
             >
               <span>{chip.label}</span>
               <IconClose />
@@ -378,7 +378,7 @@ export function TransactionToolbar({
           ))}
 
           <button type="button" className="link-btn" onClick={clearAll}>
-            Limpiar filtros
+            Clear filters
           </button>
         </div>
       )}

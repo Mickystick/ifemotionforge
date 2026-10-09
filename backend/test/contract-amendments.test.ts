@@ -150,7 +150,7 @@ describe("an adenda on a purchase of three lots", async () => {
       lines: newTerms.lines.map((line) => ({ ...line, downPaymentCents: lempiras(300_000) })),
     });
     assert.equal(response.statusCode, 400);
-    assert.match(response.json().message, /^Lote B-04: La prima no puede ser mayor/);
+    assert.match(response.json().message, /^Lot B-04: The down payment cannot exceed/);
   });
 
   it("refuses when an old contract already holds money dated after the adenda", async () => {

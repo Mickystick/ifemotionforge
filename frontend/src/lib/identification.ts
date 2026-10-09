@@ -23,7 +23,7 @@ import { formatPhone } from "./phone";
 export function identificationLabel(identification: string | null): string {
   const trimmed = identification?.trim() ?? "";
 
-  return trimmed === "" ? "Sin identidad" : trimmed;
+  return trimmed === "" ? "No ID" : trimmed;
 }
 
 /** True when the label above is standing in for a number rather than showing one. */

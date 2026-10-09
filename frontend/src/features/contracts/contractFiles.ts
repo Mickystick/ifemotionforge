@@ -54,7 +54,7 @@ export function screenContractFiles(
 
   for (const file of incoming) {
     if (alreadyHeld + accepted.length >= MAX_CONTRACT_DOCUMENTS) {
-      rejections.push(`Un contrato admite hasta ${MAX_CONTRACT_DOCUMENTS} documentos.`);
+      rejections.push(`A contract can have up to ${MAX_CONTRACT_DOCUMENTS} documents.`);
       break;
     }
 
@@ -64,17 +64,17 @@ export function screenContractFiles(
     const isHeicByName = /\.hei[cf]$/i.test(file.name);
 
     if (!ACCEPTED.includes(file.type) && !(file.type === "" && isHeicByName)) {
-      rejections.push(`«${file.name}» no es un PDF ni una imagen escaneada.`);
+      rejections.push(`“${file.name}” is not a PDF or scanned image.`);
       continue;
     }
 
     if (file.size === 0) {
-      rejections.push(`«${file.name}» está vacío.`);
+      rejections.push(`“${file.name}” is empty.`);
       continue;
     }
 
     if (file.size > MAX_BYTES) {
-      rejections.push(`«${file.name}» pesa ${readableSize(file.size)}; el máximo es 30 MB.`);
+      rejections.push(`“${file.name}” is ${readableSize(file.size)}; the maximum is 30 MB.`);
       continue;
     }
 

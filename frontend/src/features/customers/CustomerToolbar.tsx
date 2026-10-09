@@ -12,9 +12,9 @@ import type { CustomerSort } from "./customerSort";
 
 /** The wording used everywhere else for what a person is holding. */
 const HOLDING_LABELS: Array<{ value: HoldingFilter; label: string }> = [
-  { value: "contract", label: "Con contrato" },
-  { value: "reservation", label: "Con reserva" },
-  { value: "none", label: "Sin contrato activo" },
+  { value: "contract", label: "With contract" },
+  { value: "reservation", label: "With reservation" },
+  { value: "none", label: "No active contract" },
 ];
 
 interface CustomerToolbarProps {
@@ -149,10 +149,10 @@ export function CustomerToolbar({
         key: "since",
         label:
           from && to
-            ? `Cliente desde ${from} – ${to}`
+            ? `Customer since ${from} – ${to}`
             : from
-              ? `Cliente desde ${from}`
-              : `Cliente hasta ${to}`,
+              ? `Customer since ${from}`
+              : `Customer through ${to}`,
         clear: () => {
           setSinceFromText("");
           setSinceToText("");
@@ -168,7 +168,7 @@ export function CustomerToolbar({
   const filterBody = (
     <>
       <div className="filter-section">
-        <p className="menu-title">Contratos</p>
+        <p className="menu-title">Contracts</p>
         {HOLDING_LABELS.map((option) => (
           <label key={option.value} className="filter-check">
             <input
@@ -180,14 +180,14 @@ export function CustomerToolbar({
           </label>
         ))}
         {filters.holdings.length === 0 && (
-          <p className="field-hint">Sin marcar ninguno se muestran todos.</p>
+          <p className="field-hint">Leave all unchecked to show everyone.</p>
         )}
       </div>
 
       <div className="filter-section">
-        <p className="menu-title">Proyecto</p>
+        <p className="menu-title">Project</p>
         {projectNames.length === 0 && (
-          <p className="field-hint">Todavía nadie tiene un contrato activo.</p>
+          <p className="field-hint">No one has an active contract yet.</p>
         )}
         {projectNames.map((name) => (
           <label key={name} className="filter-check">
@@ -201,13 +201,13 @@ export function CustomerToolbar({
         ))}
         {projectNames.length > 0 && (
           <span className="field-hint">
-            Según los contratos vigentes de cada cliente.
+            Based on each customer's active contracts.
           </span>
         )}
       </div>
 
       <div className="filter-section">
-        <p className="menu-title">Cliente desde</p>
+        <p className="menu-title">Customer since</p>
         <div className="filter-range">
           <input
             type="number"
@@ -215,7 +215,7 @@ export function CustomerToolbar({
             min="1900"
             max="2200"
             step="1"
-            placeholder="Desde"
+            placeholder="From"
             value={sinceFromText}
             onChange={(event) => {
               setSinceFromText(event.target.value);
@@ -228,7 +228,7 @@ export function CustomerToolbar({
             min="1900"
             max="2200"
             step="1"
-            placeholder="Hasta"
+            placeholder="To"
             value={sinceToText}
             onChange={(event) => {
               setSinceToText(event.target.value);
@@ -236,7 +236,7 @@ export function CustomerToolbar({
             }}
           />
         </div>
-        <span className="field-hint">El año en que la persona entró a la cartera.</span>
+        <span className="field-hint">The year the person became a customer.</span>
       </div>
     </>
   );
@@ -245,7 +245,7 @@ export function CustomerToolbar({
     <div className="lots-toolbar">
       <div className="toolbar">
         <span className="result-count">
-          Mostrando {shownCount} de {totalCount} cliente{totalCount === 1 ? "" : "s"}
+          Showing {shownCount} of {totalCount} customer{totalCount === 1 ? "" : "s"}
         </span>
 
         <div className="toolbar-spacer" />
@@ -259,9 +259,9 @@ export function CustomerToolbar({
           <input
             type="search"
             value={search}
-            placeholder="Buscar cliente o lote…"
-            aria-label="Buscar cliente"
-            title="Busca por nombre, teléfono, identidad, dirección, notas, lote o contrato"
+            placeholder="Search customers or lots…"
+            aria-label="Search customers"
+            title="Search by name, phone, ID number, address, notes, lot, or contract"
             onChange={(event) => onSearchChange(event.target.value)}
           />
         </div>
@@ -285,7 +285,7 @@ export function CustomerToolbar({
 
           <MenuSurface
             isOpen={openMenu === "sort"}
-            title="Ordenar por"
+            title="Sort by"
             onClose={() => setOpenMenu(null)}
             className="sort-popover"
           >
@@ -293,7 +293,7 @@ export function CustomerToolbar({
               options={SORT_OPTIONS}
               rules={sort}
               onChange={onSortChange}
-              hint="Vuelve a elegir el mismo campo para invertir el orden."
+              hint="Select the same field again to reverse the order."
             />
           </MenuSurface>
         </div>
@@ -306,22 +306,22 @@ export function CustomerToolbar({
             onClick={() => setOpenMenu(openMenu === "filter" ? null : "filter")}
           >
             <IconFilter />
-            <span>Filtros</span>
+            <span>Filters</span>
             {activeCount > 0 && <span className="filter-count">{activeCount}</span>}
           </button>
 
           <MenuSurface
             isOpen={openMenu === "filter"}
-            title="Filtros"
+            title="Filters"
             onClose={() => setOpenMenu(null)}
             className="filter-popover"
             footer={
               <>
                 <button type="button" className="link-btn" onClick={clearAll}>
-                  Limpiar filtros
+                  Clear filters
                 </button>
                 <button type="button" className="btn-primary" onClick={() => setOpenMenu(null)}>
-                  Ver {shownCount} cliente{shownCount === 1 ? "" : "s"}
+                  Show {shownCount} customer{shownCount === 1 ? "" : "s"}
                 </button>
               </>
             }
@@ -339,7 +339,7 @@ export function CustomerToolbar({
               type="button"
               className="filter-chip"
               onClick={chip.clear}
-              title={`Quitar ${chip.label}`}
+              title={`Remove ${chip.label}`}
             >
               <span>{chip.label}</span>
               <IconClose />
@@ -347,7 +347,7 @@ export function CustomerToolbar({
           ))}
 
           <button type="button" className="link-btn" onClick={clearAll}>
-            Limpiar filtros
+            Clear filters
           </button>
         </div>
       )}

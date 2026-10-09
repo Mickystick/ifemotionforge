@@ -35,7 +35,7 @@ export function useTransactions(enabled: boolean, onSessionExpired: () => void) 
         return;
       }
 
-      const message = caught instanceof Error ? caught.message : "No se pudieron cargar las transacciones.";
+      const message = caught instanceof Error ? caught.message : "Could not load transactions.";
 
       /*
        * A failed REFRESH leaves what is on screen alone.

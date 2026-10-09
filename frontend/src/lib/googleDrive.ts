@@ -121,13 +121,13 @@ export function triagePickedDocs(
   for (const doc of docs) {
     if (doc.mimeType.startsWith("application/vnd.google-apps.")) {
       rejections.push(
-        `«${doc.name}» es un archivo de Google. Descárgalo como PDF y vuelve a adjuntarlo.`,
+        `“${doc.name}” is a Google file. Download it as a PDF and attach it again.`,
       );
       continue;
     }
 
     if (!limits.mimeTypes.includes(doc.mimeType)) {
-      rejections.push(`«${doc.name}» no es una imagen ni un PDF.`);
+      rejections.push(`“${doc.name}” is not an image or PDF.`);
       continue;
     }
 
@@ -136,7 +136,7 @@ export function triagePickedDocs(
     // Unknown size is let through rather than refused: the caller weighs the
     // real file once it is downloaded, and that check is the one that counts.
     if (typeof size === "number" && Number.isFinite(size) && size > limits.maxBytes) {
-      rejections.push(`«${doc.name}» pesa ${readableSize(size)}; el máximo es ${ceiling}.`);
+      rejections.push(`“${doc.name}” is ${readableSize(size)}; the maximum is ${ceiling}.`);
       continue;
     }
 
@@ -224,7 +224,7 @@ function loadScript(src: string): Promise<void> {
     element.src = src;
     element.async = true;
     element.onload = () => resolve();
-    element.onerror = () => reject(new Error("No se pudo cargar Google Drive."));
+    element.onerror = () => reject(new Error("Could not load Google Drive."));
 
     document.head.appendChild(element);
   });
@@ -252,13 +252,13 @@ function loadPicker(): Promise<void> {
         const gapi = window.gapi;
 
         if (!gapi) {
-          reject(new Error("No se pudo cargar Google Drive."));
+          reject(new Error("Could not load Google Drive."));
           return;
         }
 
         gapi.load("picker", {
           callback: () => resolve(),
-          onerror: () => reject(new Error("No se pudo cargar el selector de Google Drive.")),
+          onerror: () => reject(new Error("Could not load the Google Drive picker.")),
         });
       }),
   );
@@ -313,7 +313,7 @@ async function requestAccessToken(): Promise<string | null> {
   const oauth2 = window.google?.accounts?.oauth2;
 
   if (!oauth2) {
-    throw new Error("No se pudo cargar Google Drive.");
+    throw new Error("Could not load Google Drive.");
   }
 
   tokenClient ??= oauth2.initTokenClient({
@@ -355,7 +355,7 @@ function showPicker(token: string, mimeTypes: string[]): Promise<PickedDoc[]> {
     const picker = window.google?.picker;
 
     if (!picker) {
-      reject(new Error("No se pudo cargar el selector de Google Drive."));
+      reject(new Error("Could not load the Google Drive picker."));
       return;
     }
 
@@ -368,8 +368,8 @@ function showPicker(token: string, mimeTypes: string[]): Promise<PickedDoc[]> {
       .addView(view)
       .setOAuthToken(token)
       .setDeveloperKey(API_KEY)
-      .setLocale("es")
-      .setTitle("Elige el comprobante")
+      .setLocale("en")
+      .setTitle("Choose a proof file")
       .enableFeature(picker.Feature.MULTISELECT_ENABLED);
 
     /*
@@ -422,7 +422,7 @@ async function downloadDriveFile(doc: PickedDoc, token: string): Promise<File> {
   );
 
   if (!response.ok) {
-    throw new Error(`Google Drive respondió ${response.status}`);
+    throw new Error(`Google Drive returned ${response.status}`);
   }
 
   const blob = await response.blob();
@@ -443,7 +443,7 @@ async function downloadDriveFile(doc: PickedDoc, token: string): Promise<File> {
  */
 export async function openGoogleDrivePicker(request: DrivePickRequest): Promise<DrivePickResult> {
   if (!googleDriveConfigured()) {
-    throw new Error("Google Drive no está configurado en esta instalación.");
+    throw new Error("Google Drive is not configured for this installation.");
   }
 
   await loadPicker();
@@ -459,12 +459,12 @@ export async function openGoogleDrivePicker(request: DrivePickRequest): Promise<
   const files: File[] = [];
 
   for (const doc of wanted) {
-    request.onProgress?.(`Descargando ${doc.name}…`);
+    request.onProgress?.(`Downloading ${doc.name}…`);
 
     try {
       files.push(await downloadDriveFile(doc, token));
     } catch {
-      rejections.push(`No se pudo traer «${doc.name}» de Google Drive.`);
+      rejections.push(`Could not retrieve “${doc.name}” from Google Drive.`);
     }
   }
 

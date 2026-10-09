@@ -104,7 +104,7 @@ export function CustomersPage({
             customer.contracts.map((contract) => contract.projectName),
           ),
         ),
-      ].sort((a, b) => a.localeCompare(b, "es")),
+      ].sort((a, b) => a.localeCompare(b, "en")),
     [customers],
   );
 
@@ -133,12 +133,12 @@ export function CustomersPage({
           <table className="customers-table">
             <thead>
               <tr>
-                <th>Cliente</th>
-                <th>Teléfono</th>
-                <th>Identidad</th>
-                <th>Contratos</th>
-                <th className="col-notes">Notas</th>
-                <th className="col-actions">{showActions ? "Acciones" : ""}</th>
+                <th>Customer</th>
+                <th>Phone</th>
+                <th>ID number</th>
+                <th>Contracts</th>
+                <th className="col-notes">Notes</th>
+                <th className="col-actions">{showActions ? "Actions" : ""}</th>
               </tr>
             </thead>
             <tbody>
@@ -150,7 +150,7 @@ export function CustomersPage({
                       <span className="holder-text">
                         <span className="holder-name">{customer.fullName}</span>
                         <span className="holder-contract">
-                          Cliente desde {customer.customerSince}
+                          Customer since {customer.customerSince}
                         </span>
                       </span>
                     </span>
@@ -162,7 +162,7 @@ export function CustomersPage({
                       /* Not blank. An empty cell in a column of numbers reads
                          as data that failed to load rather than a customer who
                          never gave one. */
-                      <span className="holder-empty">Sin teléfono</span>
+                      <span className="holder-empty">No phone</span>
                     )}
                   </td>
                   <td className="mono">
@@ -172,14 +172,14 @@ export function CustomersPage({
                       /* Not blank. An empty cell in a column of numbers reads
                          as data that failed to load rather than a customer who
                          never gave one. */
-                      <span className="holder-empty">Sin identidad</span>
+                      <span className="holder-empty">No ID number</span>
                     )}
                   </td>
                   <td>
                     {/* Read from the contracts themselves on every load. There
                         is no "número de contratos" stored on a customer. */}
                     {customer.contracts.length === 0 ? (
-                      <span className="holder-empty">Sin contrato activo</span>
+                      <span className="holder-empty">No active contract</span>
                     ) : (
                       <span className="contract-list">
                         {customer.contracts.map((contract) => (
@@ -217,8 +217,8 @@ export function CustomersPage({
                             type="button"
                             className="row-action"
                             onClick={() => onEditCustomer(customer)}
-                            title={`Editar ${customer.fullName}`}
-                            aria-label={`Editar ${customer.fullName}`}
+                            title={`Edit ${customer.fullName}`}
+                            aria-label={`Edit ${customer.fullName}`}
                           >
                             <IconEdit />
                           </button>
@@ -231,15 +231,15 @@ export function CustomersPage({
                             type="button"
                             className="row-action danger"
                             onClick={() => onDeleteCustomer(customer)}
-                            title={`Eliminar a ${customer.fullName}`}
-                            aria-label={`Eliminar a ${customer.fullName}`}
+                            title={`Delete ${customer.fullName}`}
+                            aria-label={`Delete ${customer.fullName}`}
                           >
                             <IconTrash />
                           </button>
                         )}
                       </span>
                     ) : (
-                      <span className="row-actions-locked" title="Requiere permisos">
+                      <span className="row-actions-locked" title="Requires permission">
                         —
                       </span>
                     )}
@@ -251,13 +251,13 @@ export function CustomersPage({
                 <tr>
                   <td colSpan={6} className="table-empty">
                     {customers.length === 0 ? (
-                      "Todavía no hay clientes registrados."
+                      "No customers have been added yet."
                     ) : (
                       <>
                         <p>
                           {search.trim() === ""
-                            ? "Ningún cliente coincide con lo que estás buscando."
-                            : `Ningún cliente coincide con «${search.trim()}».`}
+                            ? "No customers match your search."
+                            : `No customers match “${search.trim()}”.`}
                         </p>
                         {/* An empty table is where a forgotten filter finally
                             shows itself, so the way out is offered right here
@@ -272,10 +272,10 @@ export function CustomersPage({
                             }}
                           >
                             {search.trim() === ""
-                              ? "Limpiar filtros"
+                              ? "Clear filters"
                               : hasActiveFilters(filters)
-                                ? "Limpiar la búsqueda y los filtros"
-                                : "Limpiar la búsqueda"}
+                                ? "Clear search and filters"
+                                : "Clear search"}
                           </button>
                         )}
                       </>

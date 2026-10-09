@@ -131,7 +131,7 @@ describe("projects", async () => {
 
     assert.equal(response.statusCode, 409);
     assert.equal(response.json().error, "project_has_lots");
-    assert.match(response.json().message, /2 lotes activos/);
+    assert.match(response.json().message, /2 active lots/);
   });
 
   it("archives an empty project, hides it from the lot form, and restores it", async () => {

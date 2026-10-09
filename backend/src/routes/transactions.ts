@@ -92,7 +92,7 @@ const transactionsQuery = (db: Db) => {
  */
 const editBody = z.object({
   amountCents: z.number().int().positive(),
-  paidOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Usa una fecha AAAA-MM-DD."),
+  paidOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use a date in YYYY-MM-DD format."),
   method: z.enum(PAYMENT_METHODS),
   type: z.enum(PAYMENT_TYPES),
   reference: z.string().trim().max(120).nullish(),
@@ -206,7 +206,7 @@ export const transactionRoutes: FastifyPluginAsync = async (app) => {
       if (!Number.isInteger(amountCents) || amountCents <= 0) {
         return reply.code(400).send({
           error: "invalid_amount",
-          message: "Indica el monto a repartir, en centavos.",
+          message: "Enter the amount to distribute, in cents.",
         });
       }
 
@@ -219,7 +219,7 @@ export const transactionRoutes: FastifyPluginAsync = async (app) => {
       if (!customer) {
         return reply
           .code(404)
-          .send({ error: "customer_not_found", message: "Ese cliente no existe." });
+          .send({ error: "customer_not_found", message: "That customer does not exist." });
       }
 
       const asOf = today();
@@ -355,7 +355,7 @@ export const transactionRoutes: FastifyPluginAsync = async (app) => {
       if (!parsed.success) {
         return reply.code(400).send({
           error: "invalid_transaction",
-          message: parsed.error.issues[0]?.message ?? "Revisa los datos de la transacción.",
+          message: parsed.error.issues[0]?.message ?? "Check the transaction details.",
         });
       }
 
@@ -370,13 +370,13 @@ export const transactionRoutes: FastifyPluginAsync = async (app) => {
       if (!existing) {
         return reply
           .code(404)
-          .send({ error: "not_found", message: "Esa transacción no existe." });
+          .send({ error: "not_found", message: "That transaction does not exist." });
       }
 
       if (existing.reversedAt) {
         return reply.code(409).send({
           error: "already_reversed",
-          message: "Esa transacción está revertida y ya no cuenta en los saldos.",
+          message: "That transaction has been reversed and is no longer included in balances.",
         });
       }
 
@@ -395,7 +395,7 @@ export const transactionRoutes: FastifyPluginAsync = async (app) => {
         if (existing.receiptId === null) {
           return reply.code(400).send({
             error: "no_receipt",
-            message: "Esa transacción no está en un recibo, así que no tiene otras líneas.",
+            message: "That transaction is not part of a receipt, so it has no other line items.",
           });
         }
 
@@ -408,7 +408,7 @@ export const transactionRoutes: FastifyPluginAsync = async (app) => {
         if (siblings.length !== siblingIds.length) {
           return reply
             .code(404)
-            .send({ error: "not_found", message: "Una de las líneas ya no existe." });
+            .send({ error: "not_found", message: "One of the line items no longer exists." });
         }
 
         const stray = siblings.find((row) => row.receiptId !== existing.receiptId);
@@ -416,7 +416,7 @@ export const transactionRoutes: FastifyPluginAsync = async (app) => {
         if (stray) {
           return reply.code(400).send({
             error: "different_receipt",
-            message: "Solo se pueden corregir juntas las líneas del mismo recibo.",
+            message: "Only line items from the same receipt can be corrected together.",
           });
         }
 
@@ -425,7 +425,7 @@ export const transactionRoutes: FastifyPluginAsync = async (app) => {
         if (reversed) {
           return reply.code(409).send({
             error: "already_reversed",
-            message: "Una de las líneas está revertida y ya no cuenta en los saldos.",
+            message: "One of the line items has been reversed and is no longer included in balances.",
           });
         }
       }
@@ -443,7 +443,7 @@ export const transactionRoutes: FastifyPluginAsync = async (app) => {
       if (!contract) {
         return reply
           .code(404)
-          .send({ error: "contract_not_found", message: "El contrato ya no existe." });
+          .send({ error: "contract_not_found", message: "The contract no longer exists." });
       }
 
       if (!body.allowOverpayment) {
@@ -470,9 +470,9 @@ export const transactionRoutes: FastifyPluginAsync = async (app) => {
           return reply.code(409).send({
             error: "overpayment",
             message:
-              `Sin esta transacción el contrato ${contract.code} debe ` +
-              `L ${(room / 100).toLocaleString("es-HN")}. ` +
-              "Confirma el sobrepago si el cliente realmente entregó de más.",
+              `Without this transaction, contract ${contract.code} would have L ` +
+              `${(room / 100).toLocaleString("en-HN")} remaining. ` +
+              "Confirm the overpayment if the customer actually paid extra.",
             balanceCents: room,
           });
         }
@@ -492,7 +492,7 @@ export const transactionRoutes: FastifyPluginAsync = async (app) => {
         if (existing.receiptId === null) {
           return reply.code(400).send({
             error: "no_receipt",
-            message: "Esa transacción no está en un recibo, así que no tiene nota del equipo.",
+            message: "That transaction is not part of a receipt, so it has no team note.",
           });
         }
 
@@ -511,7 +511,7 @@ export const transactionRoutes: FastifyPluginAsync = async (app) => {
           if (!roleCan(app.db, request.user!.role, "payment:record")) {
             return reply.code(403).send({
               error: "forbidden",
-              message: "Tu usuario puede corregir transacciones, pero no cambiar la nota del recibo.",
+              message: "Your account can correct transactions but cannot change the receipt note.",
             });
           }
 

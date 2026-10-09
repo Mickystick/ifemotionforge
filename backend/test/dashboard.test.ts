@@ -140,12 +140,15 @@ async function readDashboard(
 }
 
 describe("panel general — who may read it", () => {
-  it("refuses an anonymous request", async () => {
+  it("allows anonymous read-only access without user-specific controls", async () => {
     const { app } = await buildTestApp();
 
     const response = await app.inject({ method: "GET", url: "/api/dashboard" });
 
-    assert.equal(response.statusCode, 401);
+    assert.equal(response.statusCode, 200, response.body);
+    const body = response.json();
+    assert.equal(body.control, null);
+    assert.equal(body.layout, null);
     await app.close();
   });
 

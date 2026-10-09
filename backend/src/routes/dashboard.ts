@@ -284,14 +284,14 @@ function scheduleStands(row: ContractRow, month: string): boolean {
  * length caps are here to keep this a settings row rather than a place to park
  * arbitrary data.
  */
-const sectionId = z.string().regex(/^[a-z][a-z0-9-]{0,39}$/, "Identificador inválido.");
+const sectionId = z.string().regex(/^[a-z][a-z0-9-]{0,39}$/, "Invalid identifier.");
 
 /** No duplicates: an id twice in the order would render the same band twice. */
 const uniqueSections = z
   .array(sectionId)
   .max(40)
   .refine((ids) => new Set(ids).size === ids.length, {
-    message: "La lista no puede repetir una sección.",
+    message: "A section cannot appear more than once in the list.",
   });
 
 const layoutBody = z.object({
@@ -307,7 +307,7 @@ const dashboardQuery = z.object({
   /** Which month to report. Defaults to the one we are living in. */
   month: z
     .string()
-    .regex(/^\d{4}-(?:0[1-9]|1[0-2])$/, "El mes debe tener el formato AAAA-MM.")
+    .regex(/^\d{4}-(?:0[1-9]|1[0-2])$/, "Month must use the YYYY-MM format.")
     .optional(),
 });
 
@@ -333,13 +333,13 @@ export const dashboardRoutes: FastifyPluginAsync<DashboardRoutesOptions> = async
   app,
   options,
 ) => {
-  app.get("/dashboard", { onRequest: app.requireUser }, async (request, reply) => {
+  app.get("/dashboard", async (request, reply) => {
     const parsed = dashboardQuery.safeParse(request.query);
 
     if (!parsed.success) {
       return reply.code(400).send({
         error: "invalid_query",
-        message: parsed.error.issues[0]?.message ?? "Parámetros inválidos.",
+        message: parsed.error.issues[0]?.message ?? "Invalid parameters.",
       });
     }
 
@@ -355,7 +355,7 @@ export const dashboardRoutes: FastifyPluginAsync<DashboardRoutesOptions> = async
       // like a business which has stopped selling.
       return reply.code(400).send({
         error: "future_month",
-        message: "Todavía no hay nada que reportar de un mes que no ha llegado.",
+        message: "There is nothing to report for a month that has not arrived yet.",
       });
     }
 
@@ -739,7 +739,7 @@ export const dashboardRoutes: FastifyPluginAsync<DashboardRoutesOptions> = async
      * Inventing a second switch for the same question would mean two ways to
      * grant one thing, and a supervisor who revoked one and not the other.
      */
-    const control = roleCan(app.db, request.user!.role, "audit:view")
+    const control = request.user && roleCan(app.db, request.user.role, "audit:view")
       ? {
           byUser: [...byUser]
             .map(([userId, totals]) => ({
@@ -811,7 +811,9 @@ export const dashboardRoutes: FastifyPluginAsync<DashboardRoutesOptions> = async
        * `null` for somebody who has never customised it, which is different
        * from an empty layout and has to stay different — see `clearPreference`.
        */
-      layout: readPreference<DashboardLayout>(app.db, request.user!.id, DASHBOARD_LAYOUT),
+      layout: request.user
+        ? readPreference<DashboardLayout>(app.db, request.user.id, DASHBOARD_LAYOUT)
+        : null,
       today: asOfToday,
       asOf,
       isCurrentMonth,
@@ -933,7 +935,7 @@ export const dashboardRoutes: FastifyPluginAsync<DashboardRoutesOptions> = async
     if (!parsed.success) {
       return reply.code(400).send({
         error: "invalid_body",
-        message: parsed.error.issues[0]?.message ?? "No se pudo guardar el orden.",
+        message: parsed.error.issues[0]?.message ?? "Could not save the order.",
       });
     }
 

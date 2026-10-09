@@ -1,19 +1,19 @@
 :root {
-  --ink: #3D312A;
-  --ink-soft: #4F4037;
-  --ink-line: #69564B;
-  --paper: #FCF9F5;
+  --ink: #26364A;
+  --ink-soft: #354A60;
+  --ink-line: #52677D;
+  --paper: #F4F7FB;
   --card: #FFFFFF;
-  --line: #EBE3D5;
-  --line-strong: #D6C6B3;
+  --line: #DCE4EE;
+  --line-strong: #C5D1DF;
 
-  --text-primary: #3D312A;
-  --text-secondary: #7A695C;
-  --text-muted: #B3A495;
+  --text-primary: #26364A;
+  --text-secondary: #536579;
+  --text-muted: #8392A5;
 
-  --clay: #E07A5F;
-  --clay-dark: #C66247;
-  --clay-bg: #FBECE8;
+  --clay: #3569B7;
+  --clay-dark: #294F97;
+  --clay-bg: #EAF1FB;
 
   --green: #81B29A;
   --green-bg: #EAF3EF;
@@ -27,11 +27,11 @@
   --red-bg: #FAEBEC;
   --red-dark: #B54A4D;
 
-  --slate: #9B9B7A;
-  --slate-bg: #F0F0EA;
-  --slate-dark: #707052;
+  --slate: #8A9AAF;
+  --slate-bg: #EEF2F7;
+  --slate-dark: #586779;
 
-  --shadow-card: 0 4px 12px rgba(61, 49, 42, 0.04);
+  --shadow-card: 0 4px 12px rgba(38, 54, 74, 0.05);
   --font-display: 'Inter', sans-serif;
   --font-body: 'Inter', sans-serif;
   --font-mono: 'IBM Plex Mono', monospace;
@@ -352,8 +352,8 @@ nav.nav {
  * Without this it kept the full clay fill, the darkening on hover and the
  * pointer cursor while disabled, so a dead "Guardar" was pixel-identical to a
  * live one: pressing it did nothing, nothing on screen changed, and the only
- * available conclusion was that saving is broken. `.btn-secondary`,
- * `.btn-danger` and `.login-submit` all dim themselves already — the primary
+ * available conclusion was that saving is broken. `.btn-secondary` and
+ * `.btn-danger` already dim themselves — the primary
  * button, the one it matters most for, was the only one lying about its state.
  */
 .btn-primary:disabled {
@@ -506,6 +506,183 @@ nav.nav {
   font-family: var(--font-mono);
   font-size: 0.6875rem;
   color: var(--text-muted);
+}
+
+.home-page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: min(100%, 1280px);
+  margin-inline: auto;
+}
+
+.panel.active.home-page {
+  display: flex;
+}
+
+.home-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px 24px;
+  background: linear-gradient(135deg, rgba(53, 105, 183, 0.09), rgba(138, 154, 175, 0.08));
+}
+
+.home-eyebrow {
+  margin: 0 0 6px;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.home-hero h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 1.3rem + 0.8vw, 2.2rem);
+}
+
+.home-subtitle {
+  margin: 8px 0 0;
+  color: var(--text-secondary);
+  max-width: 42rem;
+  line-height: 1.5;
+}
+
+.home-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.home-actions .btn-primary {
+  padding: 9px 15px;
+}
+
+.home-actions .btn-primary span {
+  display: inline;
+}
+
+.home-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.home-stat {
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.home-stat-label {
+  font-size: 0.7188rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.home-stat strong {
+  font-size: clamp(1.2rem, 1rem + 0.7vw, 1.8rem);
+  font-family: var(--font-display);
+}
+
+.home-stat small {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+}
+
+.home-columns {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 16px;
+}
+
+.home-panel {
+  padding-bottom: 8px;
+}
+
+.home-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.home-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.home-list li:last-child {
+  border-bottom: none;
+}
+
+.home-list li > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.home-list li strong {
+  font-size: 0.9rem;
+}
+
+.home-list li span {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+}
+
+.link-button {
+  border: none;
+  background: none;
+  color: var(--clay-dark);
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+}
+
+.home-links {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  padding: 16px 18px 18px;
+}
+
+.home-link {
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--text-primary);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: background .15s ease, border-color .15s ease;
+}
+
+.home-link:hover {
+  background: var(--card);
+  border-color: var(--line-strong);
+}
+
+@media (max-width: 760px) {
+  .home-hero {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .home-columns {
+    grid-template-columns: 1fr;
+  }
 }
 
 .attention-list {
@@ -2112,7 +2289,7 @@ tbody tr:hover {
  */
 body.is-dragging-file .proof-dropzone:not(.is-disabled) {
   border-color: var(--clay);
-  box-shadow: 0 0 0 4px rgba(224, 122, 95, 0.18);
+  box-shadow: 0 0 0 4px rgba(53, 105, 183, 0.18);
 }
 
 .proof-dropzone.is-over {
@@ -5826,41 +6003,37 @@ input:disabled {
   margin-top: 4px;
 }
 
-.login-screen {
+.public-home-shell {
   min-height: 100vh;
   min-height: 100dvh;
-  display: grid;
-  place-items: center;
-  padding: 24px;
-  background: var(--paper);
+  padding: clamp(16px, 4vw, 40px);
 }
 
-.login-card {
-  width: min(400px, 100%);
+.public-home-state {
+  width: min(100%, 1280px);
+  margin: 0 auto;
+  padding: clamp(20px, 4vw, 36px);
+}
+
+.public-home-state h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.login-dialog {
   display: flex;
   flex-direction: column;
+  min-width: 0;
+}
+
+.login-dialog-fields {
+  display: grid;
   gap: 16px;
-  padding: 30px 28px 28px;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  box-shadow: var(--shadow-card);
+  padding: 22px 26px;
 }
 
-.login-brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding-bottom: 18px;
-  border-bottom: 1px solid var(--line);
-}
-
-.login-title {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: 1.3125rem;
-  font-weight: 600;
-  color: var(--text-primary);
+.login-dialog .login-submit {
+  padding: 9px 16px;
 }
 
 .login-submit {
@@ -5869,13 +6042,44 @@ input:disabled {
 }
 
 /* The topbar hides this button's label on phones; here it is the label. */
-.login-submit span {
+.login-dialog .login-submit span {
   display: inline;
 }
 
-.login-submit:disabled {
-  opacity: .6;
-  cursor: not-allowed;
+@media (max-width: 640px) {
+  .public-home-shell {
+    padding: 14px;
+  }
+
+  .home-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .home-stat {
+    min-width: 0;
+    padding: 14px;
+  }
+
+  .home-stat strong {
+    overflow-wrap: anywhere;
+    font-size: clamp(1.125rem, 4.5vw, 1.5rem);
+  }
+
+  .login-dialog-fields {
+    padding: 18px 16px;
+  }
+
+  .login-dialog .modal-actions {
+    padding: 14px 16px;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 360px) {
+  .home-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .state-message {

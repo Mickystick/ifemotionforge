@@ -142,7 +142,7 @@ export const projectRoutes: FastifyPluginAsync = async (app) => {
       if (!parsed.success) {
         return reply.code(400).send({
           error: "invalid_body",
-          message: "Revisa el nombre y la unidad del proyecto.",
+          message: "Check the project name and unit.",
           issues: parsed.error.issues.map((issue) => issue.message),
         });
       }
@@ -160,8 +160,8 @@ export const projectRoutes: FastifyPluginAsync = async (app) => {
           error: "duplicate_name",
           message:
             clash.archivedAt === null
-              ? `Ya existe un proyecto llamado ${parsed.data.name}.`
-              : `Ya existe un proyecto archivado llamado ${parsed.data.name}. Puedes restaurarlo.`,
+              ? `A project named ${parsed.data.name} already exists.`
+              : `An archived project named ${parsed.data.name} already exists. You can restore it.`,
         });
       }
 
@@ -195,7 +195,7 @@ export const projectRoutes: FastifyPluginAsync = async (app) => {
       if (!parsed.success) {
         return reply.code(400).send({
           error: "invalid_body",
-          message: "Revisa el nombre y la unidad del proyecto.",
+          message: "Check the project name and unit.",
           issues: parsed.error.issues.map((issue) => issue.message),
         });
       }
@@ -207,7 +207,7 @@ export const projectRoutes: FastifyPluginAsync = async (app) => {
         .get();
 
       if (!existing) {
-        return reply.code(404).send({ error: "not_found", message: "Proyecto no encontrado." });
+        return reply.code(404).send({ error: "not_found", message: "Project not found." });
       }
 
       const clash = app.db
@@ -219,7 +219,7 @@ export const projectRoutes: FastifyPluginAsync = async (app) => {
       if (clash && clash.id !== existing.id) {
         return reply.code(409).send({
           error: "duplicate_name",
-          message: `Ya existe un proyecto llamado ${parsed.data.name}.`,
+          message: `A project named ${parsed.data.name} already exists.`,
         });
       }
 
@@ -268,7 +268,7 @@ export const projectRoutes: FastifyPluginAsync = async (app) => {
       if (!parsed.success) {
         return reply.code(400).send({
           error: "invalid_body",
-          message: "Explica el motivo con al menos 10 caracteres.",
+          message: "Please explain the reason in at least 10 characters.",
         });
       }
 
@@ -279,7 +279,7 @@ export const projectRoutes: FastifyPluginAsync = async (app) => {
         .get();
 
       if (!existing || existing.archivedAt !== null) {
-        return reply.code(404).send({ error: "not_found", message: "Proyecto no encontrado." });
+        return reply.code(404).send({ error: "not_found", message: "Project not found." });
       }
 
       // Archiving a project with live inventory would hide lots that are still
@@ -295,9 +295,9 @@ export const projectRoutes: FastifyPluginAsync = async (app) => {
         return reply.code(409).send({
           error: "project_has_lots",
           message:
-            `No se puede archivar: ${existing.name} todavía tiene ${activeLots.count} ` +
-            `lote${activeLots.count === 1 ? "" : "s"} activo${activeLots.count === 1 ? "" : "s"}. ` +
-            "Archiva los lotes primero.",
+            `Cannot archive ${existing.name}: it still has ${activeLots.count} ` +
+            `active lot${activeLots.count === 1 ? "" : "s"}. ` +
+            "Archive the lots first.",
         });
       }
 
@@ -339,7 +339,7 @@ export const projectRoutes: FastifyPluginAsync = async (app) => {
       if (!existing || existing.archivedAt === null) {
         return reply
           .code(404)
-          .send({ error: "not_found", message: "Proyecto archivado no encontrado." });
+          .send({ error: "not_found", message: "Archived project not found." });
       }
 
       const actor = request.user!;

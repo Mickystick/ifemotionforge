@@ -51,9 +51,9 @@ interface TransactionEditDialogProps {
 type Method = "cash" | "transfer" | "card";
 
 const METHODS: Array<{ value: Method; label: string }> = [
-  { value: "cash", label: "Efectivo" },
-  { value: "transfer", label: "Transferencia" },
-  { value: "card", label: "Tarjeta" },
+  { value: "cash", label: "Cash" },
+  { value: "transfer", label: "Bank transfer" },
+  { value: "card", label: "Card" },
 ];
 
 const MINIMUM_REASON = 10;
@@ -62,7 +62,7 @@ const MINIMUM_REASON = 10;
 function shortDate(isoDate: string): string {
   const [year, month, day] = isoDate.split("-").map(Number);
 
-  return new Intl.DateTimeFormat("es-HN", {
+  return new Intl.DateTimeFormat("en-US", {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -335,7 +335,7 @@ export function TransactionEditDialog({
     }
 
     if (amountCents <= 0) {
-      return "Escribe el monto corregido.";
+      return "Enter the corrected amount.";
     }
 
     if (!hasChanges) {
@@ -344,10 +344,10 @@ export function TransactionEditDialog({
       // `proofWasTheWork` answered above and the button already says "Listo".
       return trimmedReason.length === 0
         ? null
-        : "Ninguna cifra cambió todavía, así que no hay corrección que guardar.";
+        : "No amount has changed yet, so there is nothing to correct.";
     }
 
-    return `Escribe el motivo del cambio: al menos ${MINIMUM_REASON} caracteres.`;
+    return `Enter a reason for the change (at least ${MINIMUM_REASON} characters).`;
   })();
 
   const submit = async (allowOverpayment: boolean) => {
@@ -402,7 +402,7 @@ export function TransactionEditDialog({
       if (caught instanceof ApiError && caught.code === "overpayment") {
         setOverpaymentPrompt(caught.message);
       } else {
-        setError(caught instanceof Error ? caught.message : "No se pudo guardar el cambio.");
+        setError(caught instanceof Error ? caught.message : "Could not save the change.");
       }
       setSaving(false);
     }
@@ -453,13 +453,13 @@ export function TransactionEditDialog({
     const stored: ReceiptAttachment[] = [];
 
     for (const proof of accepted) {
-      setProofBusy(`Subiendo ${proof.file.name}…`);
+      setProofBusy(`Uploading ${proof.file.name}…`);
 
       try {
         stored.push(await uploadAttachment(transaction.receiptId, proof.file, transaction.id));
       } catch (caught) {
         setProofError(
-          caught instanceof Error ? caught.message : "No se pudo subir el comprobante.",
+          caught instanceof Error ? caught.message : "Could not upload the proof file.",
         );
       }
 
@@ -488,7 +488,7 @@ export function TransactionEditDialog({
     }
 
     setProofError(null);
-    setProofBusy("Abriendo Google Drive…");
+    setProofBusy("Opening Google Drive…");
 
     try {
       const { files, rejections } = await pickProofsFromDrive(setProofBusy);
@@ -499,7 +499,7 @@ export function TransactionEditDialog({
         setProofError((shown) => shown ?? rejections[0]!);
       }
     } catch (caught) {
-      setProofError(caught instanceof Error ? caught.message : "No se pudo abrir Google Drive.");
+      setProofError(caught instanceof Error ? caught.message : "Could not open Google Drive.");
     } finally {
       setProofBusy(null);
     }
@@ -524,7 +524,7 @@ export function TransactionEditDialog({
    */
   const removeProof = async (attachmentId: string) => {
     setProofError(null);
-    setProofBusy("Quitando el comprobante…");
+    setProofBusy("Removing proof file…");
 
     try {
       await deleteAttachment(attachmentId);
@@ -541,7 +541,7 @@ export function TransactionEditDialog({
        the note on `size` in components/Dialog.tsx. It stacks under the form
        below 900px, where the room to put it beside them stops existing. */
     <Dialog
-      ariaLabel={`Corregir la transacción de ${transaction.customerName}`}
+      ariaLabel={`Edit transaction for ${transaction.customerName}`}
       size="wide"
       /*
        * Rewriting a posted figure is the one act on this screen that cannot be
@@ -555,14 +555,14 @@ export function TransactionEditDialog({
     >
       <div className="modal-header">
         <div>
-          <p className="modal-eyebrow">Corregir transacción</p>
+          <p className="modal-eyebrow">Edit transaction</p>
           <h2>{transaction.customerName}</h2>
           <p className="modal-description">
-            {transaction.lotCode} · {transaction.projectName} · registrada por{" "}
+            {transaction.lotCode} · {transaction.projectName} · recorded by{" "}
             {transaction.recordedByName}
           </p>
         </div>
-        <button type="button" className="modal-close" onClick={onClose} aria-label="Cerrar">
+        <button type="button" className="modal-close" onClick={onClose} aria-label="Close">
           <IconClose />
         </button>
       </div>
@@ -572,12 +572,12 @@ export function TransactionEditDialog({
           <div className="modal-form-grid">
             <div className="form-field">
               <label htmlFor="edit-amount">
-                Monto <span className="required-mark">*</span>
+                Amount <span className="required-mark">*</span>
               </label>
               <MoneyInput id="edit-amount" value={amountText} onChange={setAmountText} />
               {amountCents !== transaction.amount && amountCents > 0 && (
                 <span className="field-hint">
-                  Antes {formatMoney(transaction.amount, money)} → ahora{" "}
+                  Before {formatMoney(transaction.amount, money)} → now{" "}
                   {formatMoney(cents(amountCents), money)}
                 </span>
               )}
@@ -585,7 +585,7 @@ export function TransactionEditDialog({
 
             <div className="form-field">
               <label htmlFor="edit-date">
-                Fecha del pago <span className="required-mark">*</span>
+                Payment date <span className="required-mark">*</span>
               </label>
               <input
                 id="edit-date"
@@ -595,14 +595,13 @@ export function TransactionEditDialog({
               />
               {paidOn !== transaction.paidOn && (
                 <span className="field-hint">
-                  Cambiar la fecha la mueve de lugar en el historial y recalcula los saldos que
-                  vienen después.
+                  Changing the date moves it in the history and recalculates all following balances.
                 </span>
               )}
             </div>
 
             <div className="form-field">
-              <label htmlFor="edit-method">Forma de pago</label>
+              <label htmlFor="edit-method">Payment method</label>
               <select
                 id="edit-method"
                 value={method}
@@ -617,7 +616,7 @@ export function TransactionEditDialog({
             </div>
 
             <div className="form-field">
-              <label htmlFor="edit-type">Tipo</label>
+              <label htmlFor="edit-type">Type</label>
               <select
                 id="edit-type"
                 value={type}
@@ -632,18 +631,18 @@ export function TransactionEditDialog({
             </div>
 
             <div className="form-field full-width">
-              <label htmlFor="edit-reference">Número de confirmación</label>
+              <label htmlFor="edit-reference">Confirmation number</label>
               <input
                 id="edit-reference"
                 type="text"
                 value={reference}
                 onChange={(event) => setReference(event.target.value)}
-                placeholder="Ej. BAC-889231"
+                placeholder="e.g. BAC-889231"
               />
             </div>
 
             <div className="form-field full-width">
-              <label htmlFor="edit-notes">{receiptBacked ? "Nota del equipo" : "Nota"}</label>
+              <label htmlFor="edit-notes">{receiptBacked ? "Team note" : "Note"}</label>
               <textarea
                 id="edit-notes"
                 rows={2}
@@ -654,10 +653,10 @@ export function TransactionEditDialog({
               />
               <span className="field-hint">
                 {noteLocked
-                  ? "Tu usuario no puede cambiar la nota del recibo."
+                  ? "Your account can't change the receipt note."
                   : receiptBacked
-                    ? "Es la nota del recibo: la ven todos los usuarios y la comparten todas sus transacciones. No se imprime. Cambiar solo la nota no pide motivo."
-                    : "Este pago es anterior a los recibos, así que su nota queda solo en esta transacción."}
+                    ? "This receipt note is visible to all users and shared by all its transactions. It isn't printed. Changing only the note doesn't require a reason."
+                    : "This payment predates receipts, so its note belongs to this transaction only."}
               </span>
             </div>
 
@@ -671,7 +670,7 @@ export function TransactionEditDialog({
             {siblings.length > 0 && (
               <div className="apply-scope full-width">
                 <p className="apply-scope-title">
-                  Este recibo cubre {siblings.length + 1} lotes. ¿A cuáles aplica el cambio?
+                  This receipt covers {siblings.length + 1} lots. Which should this change apply to?
                 </p>
 
                 <div className="apply-scope-list">
@@ -683,7 +682,7 @@ export function TransactionEditDialog({
                     <input type="checkbox" checked readOnly disabled />
                     <span className="apply-scope-lot">{transaction.lotCode}</span>
                     <span className="apply-scope-meta">
-                      {formatMoney(transaction.amount, money)} · esta transacción
+                      {formatMoney(transaction.amount, money)} · this transaction
                     </span>
                   </label>
 
@@ -715,16 +714,16 @@ export function TransactionEditDialog({
                   * that does it under the rule that keeps the total intact.
                   */}
                 <p className="apply-scope-note">
-                  Se copian la fecha, el método, el tipo y el número de confirmación. El{" "}
-                  <strong>monto no</strong>: cada lote tiene su propia parte, y copiar una cifra a
-                  los tres multiplicaría el recibo. Para mover dinero de un lote a otro usa{" "}
-                  <strong>Repartir</strong> en la vista del recibo, que obliga a que las partes
-                  sigan sumando el total.
+                  The date, method, type, and confirmation number are copied. The{" "}
+                  <strong>amount is not</strong>: each lot has its own share, and copying one amount
+                  to all three would multiply the receipt total. To move money between lots, use{" "}
+                  <strong>Redistribute</strong> in the receipt view; it keeps the shares equal to
+                  the total.
                 </p>
 
                 {!sharedFieldsChanged && amountChanged && (
                   <p className="apply-scope-note is-muted">
-                    Solo cambiaste el monto, así que no hay nada que copiar a los otros lotes.
+                    You only changed the amount, so there is nothing to copy to the other lots.
                   </p>
                 )}
               </div>
@@ -732,7 +731,7 @@ export function TransactionEditDialog({
 
             <div className="form-field full-width">
               <label htmlFor="edit-reason">
-                Motivo del cambio{" "}
+                Reason for change{" "}
                 {/* Not asked for when the note is all that moved — see `isNoteOnly`. */}
                 {!isNoteOnly && <span className="required-mark">*</span>}
               </label>
@@ -741,15 +740,15 @@ export function TransactionEditDialog({
                 rows={3}
                 value={reason}
                 onChange={(event) => setReason(event.target.value)}
-                placeholder="Ej. El cliente entregó L 10,000, no L 5,000. Corregido con el recibo físico a la vista."
+                placeholder="e.g. The customer paid L 10,000, not L 5,000. Corrected using the printed receipt."
               />
               <span className="field-hint">
-                Queda en el historial junto al monto anterior. Es el único lugar donde sobrevive la
-                cifra que estás cambiando.
+                Kept in the history with the previous amount. This is the only place the changed
+                figure is preserved.
               </span>
               {trimmedReason.length > 0 && trimmedReason.length < MINIMUM_REASON && (
                 <span className="field-error">
-                  Escribe al menos {MINIMUM_REASON} caracteres.
+                  Enter at least {MINIMUM_REASON} characters.
                 </span>
               )}
             </div>
@@ -758,9 +757,8 @@ export function TransactionEditDialog({
                 touches no figure on the receipt. */}
             {transaction.receiptId && !isNoteOnly && (
               <p className="form-warning full-width">
-                Esta transacción está impresa en el recibo {transaction.receiptCode}. Al guardar,
-                los montos de ese recibo cambian — si el cliente ya tiene una copia en papel,
-                conviene volver a imprimírselo.
+                This transaction is printed on receipt {transaction.receiptCode}. Saving changes
+                the amounts on that receipt. If the customer has a paper copy, print it again.
               </p>
             )}
 
@@ -784,7 +782,7 @@ export function TransactionEditDialog({
             */}
             <div className="receipt-proofs full-width">
               <div className="receipt-proofs-head">
-                <p className="receipt-preview-label">Comprobante del cliente</p>
+                <p className="receipt-preview-label">Customer payment proof</p>
               </div>
 
               {transaction.receiptId === null ? (
@@ -793,9 +791,8 @@ export function TransactionEditDialog({
                    recorded before there were any. Saying "no se puede" without
                    the reason is what sends somebody hunting for a setting. */
                 <p className="state-message">
-                  Este pago no está en ningún recibo, y un comprobante se archiva junto al
-                  recibo — así que este no puede recibir uno. Los pagos registrados desde
-                  Recibos sí.
+                  This payment isn't part of a receipt, and proof files are stored with receipts,
+                  so this payment can't have one. Payments recorded in Receipts can.
                 </p>
               ) : (
                 <>
@@ -819,10 +816,10 @@ export function TransactionEditDialog({
                       }`}
                       {...dropHandlers}
                     >
-                      <p className="proof-dropzone-title">Arrastra el comprobante aquí</p>
+                      <p className="proof-dropzone-title">Drop the proof file here</p>
                       <p className="proof-dropzone-hint">
-                        Se sube al soltarlo, sin esperar a «Guardar corrección» — adjuntar la
-                        prueba no cambia ninguna cifra.
+                        Uploaded when dropped, without waiting for “Save correction” — attaching
+                        proof doesn't change any amounts.
                       </p>
 
                       <div className="proof-dropzone-actions">
@@ -832,7 +829,7 @@ export function TransactionEditDialog({
                           disabled={proofBusy !== null}
                           onClick={() => proofInputRef.current?.click()}
                         >
-                          Elegir archivo
+                          Choose file
                         </button>
 
                         {googleDriveConfigured() && (
@@ -842,7 +839,7 @@ export function TransactionEditDialog({
                             disabled={proofBusy !== null}
                             onClick={() => void pickFromDrive()}
                           >
-                            Desde Google Drive
+                            From Google Drive
                           </button>
                         )}
                       </div>
@@ -852,7 +849,7 @@ export function TransactionEditDialog({
                   {/* Only where there is no dropzone above saying the same
                       thing by being empty. */}
                   {proofs.length === 0 && !canAttachProof && (
-                    <p className="state-message">Sin comprobante.</p>
+                    <p className="state-message">No proof file attached.</p>
                   )}
 
                   {/* The zone is gone and the reason is not obvious: without
@@ -860,8 +857,8 @@ export function TransactionEditDialog({
                       the permission to attach. */}
                   {canAttachProof && attachments.length >= MAX_PROOFS && (
                     <p className="state-message">
-                      Este recibo ya tiene los {MAX_PROOFS} comprobantes que caben. Quita uno
-                      para poder agregar otro.
+                      This receipt already has the maximum of {MAX_PROOFS} proof files. Remove one
+                      to add another.
                     </p>
                   )}
 
@@ -873,7 +870,7 @@ export function TransactionEditDialog({
                           type="button"
                           className="proof-tile"
                           onClick={() => setViewingProof(file.id)}
-                          title={`Ver ${file.name}`}
+                          title={`View ${file.name}`}
                         >
                           <DocumentThumb file={file} />
                           <span className="proof-tile-name">{file.name}</span>
@@ -921,7 +918,7 @@ export function TransactionEditDialog({
                     void submit(true);
                   }}
                 >
-                  Sí, el cliente entregó de más — guardarlo así
+                  Yes, the customer overpaid — save anyway
                 </button>
               </div>
             )}
@@ -931,11 +928,11 @@ export function TransactionEditDialog({
         {/* The customer's whole history, so the change is judged in context
             rather than as a number on its own. */}
         <aside className="edit-history">
-          <p className="cp-section-title">Historial de {transaction.customerName}</p>
+          <p className="cp-section-title">History for {transaction.customerName}</p>
           <p className="field-hint">
-            {activeCount} transacci{activeCount === 1 ? "ón" : "ones"} en total
+            {activeCount} transaction{activeCount === 1 ? "" : "s"} total
             {voidedCount > 0 &&
-              `, sin contar ${voidedCount} anulada${voidedCount === 1 ? "" : "s"}`}
+              `, excluding ${voidedCount} voided transaction${voidedCount === 1 ? "" : "s"}`}
             .
           </p>
 
@@ -971,12 +968,12 @@ export function TransactionEditDialog({
         {/* "Cancelar" stops being true the moment a comprobante is filed: that
             file is on the server and this button will not take it back. */}
         <button type="button" className="btn-secondary" onClick={onClose}>
-          {proofsFiled ? "Cerrar" : "Cancelar"}
+          {proofsFiled ? "Close" : "Cancel"}
         </button>
 
         {proofWasTheWork ? (
           <button type="button" className="btn-primary modal-submit" onClick={onClose}>
-            Listo
+            Done
           </button>
         ) : (
           <button
@@ -985,7 +982,7 @@ export function TransactionEditDialog({
             disabled={!canSubmit}
             onClick={() => void submit(false)}
           >
-            {isSaving ? "Guardando…" : isNoteOnly ? "Guardar nota" : "Guardar corrección"}
+            {isSaving ? "Saving…" : isNoteOnly ? "Save note" : "Save correction"}
           </button>
         )}
       </div>
@@ -1013,24 +1010,24 @@ export function TransactionEditDialog({
 
       {pendingRemoval && (
         <ConfirmDialog
-          eyebrow="Quitar comprobante"
+          eyebrow="Remove proof file"
           title={pendingRemoval.name}
           description={
             pendingRemoval.sizeBytes === undefined
               ? undefined
               : readableSize(pendingRemoval.sizeBytes)
           }
-          confirmLabel="Quitar comprobante"
-          busyLabel="Quitando…"
+          confirmLabel="Remove proof file"
+          busyLabel="Removing…"
           onCancel={() => setPendingRemoval(null)}
           onConfirm={async () => {
             await removeProof(pendingRemoval.id);
             setPendingRemoval(null);
           }}
         >
-          Esto borra el archivo del servidor para siempre. El pago y el recibo no cambian —
-          solo se pierde la prueba que envió el cliente, y si ya no está en el chat no hay
-          otra copia.
+          This permanently deletes the file from the server. The payment and receipt won't change;
+          only the customer's proof file is removed, and if it is no longer in the chat, there is no
+          other copy.
         </ConfirmDialog>
       )}
     </Dialog>

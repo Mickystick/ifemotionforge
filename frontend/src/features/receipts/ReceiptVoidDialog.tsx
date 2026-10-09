@@ -46,50 +46,50 @@ export function ReceiptVoidDialog({ receipt, money, onClose, onVoided }: Receipt
       await voidReceipt(receipt.id, trimmed);
       onVoided();
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "No se pudo anular el recibo.");
+      setError(caught instanceof Error ? caught.message : "Could not void the receipt.");
       setSaving(false);
     }
   };
 
   return (
-    <Dialog ariaLabel={`Anular el recibo ${receipt.code}`} onClose={onClose}>
+    <Dialog ariaLabel={`Void receipt ${receipt.code}`} onClose={onClose}>
       <div className="modal-header">
         <div>
-          <p className="modal-eyebrow danger-eyebrow">Anular recibo</p>
+          <p className="modal-eyebrow danger-eyebrow">Void receipt</p>
           <h2>{receipt.code}</h2>
           <p className="modal-description">
             {receipt.customer.fullName} · {formatMoney(receipt.totalPaid, money)}
           </p>
         </div>
-        <button type="button" className="modal-close" onClick={onClose} aria-label="Cerrar">
+        <button type="button" className="modal-close" onClick={onClose} aria-label="Close">
           <IconClose />
         </button>
       </div>
 
       <div className="modal-form-grid">
         <p className="form-note full-width">
-          El recibo no se borra y su número nunca se reutiliza: queda visible como anulado. Lo que
-          cambia es que el dinero deja de contar, así que el saldo del contrato y todos los recibos
-          posteriores se recalculan solos.
+          The receipt is not deleted and its number is never reused; it remains visible as voided.
+          The money no longer counts, so the contract balance and all later receipts are
+          recalculated.
         </p>
 
         <div className="form-field full-width">
           <label htmlFor="void-reason">
-            Motivo <span className="required-mark">*</span>
+            Reason <span className="required-mark">*</span>
           </label>
           <textarea
             id="void-reason"
             rows={3}
             value={reason}
             onChange={(event) => setReason(event.target.value)}
-            placeholder="Ej. El cheque del cliente fue rechazado por el banco."
+            placeholder="e.g. The customer's check was rejected by the bank."
           />
           <span className="field-hint">
-            Se imprime en el recibo anulado y queda en el historial. Es lo que le explica al cliente
-            por qué su copia ya no vale.
+            Printed on the voided receipt and kept in the history. This explains to the customer why
+            their copy is no longer valid.
           </span>
           {trimmed.length > 0 && trimmed.length < MINIMUM_REASON && (
-            <span className="field-error">Escribe al menos {MINIMUM_REASON} caracteres.</span>
+            <span className="field-error">Enter at least {MINIMUM_REASON} characters.</span>
           )}
         </div>
 
@@ -98,7 +98,7 @@ export function ReceiptVoidDialog({ receipt, money, onClose, onVoided }: Receipt
 
       <div className="modal-actions">
         <button type="button" className="btn-secondary" onClick={onClose}>
-          Cancelar
+          Cancel
         </button>
         <button
           type="button"
@@ -106,7 +106,7 @@ export function ReceiptVoidDialog({ receipt, money, onClose, onVoided }: Receipt
           disabled={!canSubmit}
           onClick={() => void submit()}
         >
-          {isSaving ? "Anulando…" : "Anular recibo"}
+          {isSaving ? "Voiding…" : "Void receipt"}
         </button>
       </div>
     </Dialog>

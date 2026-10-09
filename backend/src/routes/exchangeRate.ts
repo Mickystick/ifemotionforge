@@ -60,14 +60,14 @@ export const exchangeRateRoutes: FastifyPluginAsync = async (app) => {
       if (!parsed.success) {
         return reply.code(400).send({
           error: "invalid_body",
-          message: "Escribe la tasa en lempiras por dólar.",
+          message: "Enter the exchange rate in lempiras per dollar.",
         });
       }
 
       if (!isPlausibleRate(parsed.data.rate)) {
         return reply.code(400).send({
           error: "implausible_rate",
-          message: "Esa tasa no parece correcta. Escribe cuántos lempiras cuesta un dólar.",
+          message: "That rate does not look right. Enter how many lempiras one dollar costs.",
         });
       }
 
@@ -184,7 +184,7 @@ export const exchangeRateRoutes: FastifyPluginAsync = async (app) => {
       if (!parsed.success) {
         return reply.code(400).send({
           error: "invalid_body",
-          message: "Escribe el ajuste como un porcentaje.",
+          message: "Enter the adjustment as a percentage.",
         });
       }
 
@@ -194,7 +194,7 @@ export const exchangeRateRoutes: FastifyPluginAsync = async (app) => {
         return reply.code(400).send({
           error: "implausible_adjustment",
           message:
-            "El ajuste no puede pasar del 2 %. Para una tasa muy distinta, escríbela a mano.",
+            "The adjustment cannot exceed 2%. For a significantly different rate, enter it manually.",
         });
       }
 

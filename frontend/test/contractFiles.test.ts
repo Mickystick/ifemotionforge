@@ -90,7 +90,7 @@ describe("screenContractFiles", () => {
     );
 
     assert.deepEqual(accepted, []);
-    assert.match(rejections[0] ?? "", /vacío/);
+    assert.match(rejections[0] ?? "", /empty/);
   });
 
   /* 30 MB is the server's ceiling, and a phone photographing twelve pages

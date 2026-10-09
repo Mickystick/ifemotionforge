@@ -17,9 +17,9 @@ import { clampDueDayInput, firstDueDate, parseIntOrNull, summarizeSchedule } fro
 const MINIMUM_REASON_LENGTH = 10;
 
 const SPLIT_OPTIONS: Array<{ value: SplitMode; title: string; detail: string }> = [
-  { value: "equal", title: "Partes iguales", detail: "El mismo precio para cada lote." },
-  { value: "area", title: "Según el área", detail: "En proporción a los metros de cada lote." },
-  { value: "manual", title: "A mano", detail: "Escribes el precio de cada lote." },
+  { value: "equal", title: "Equal shares", detail: "The same price for each lot." },
+  { value: "area", title: "By area", detail: "In proportion to each lot's area." },
+  { value: "manual", title: "Manual", detail: "Enter a price for each lot." },
 ];
 
 interface ContractAmendDialogProps {
@@ -41,7 +41,7 @@ function centsOf(text: string): number {
 
 /** "320", "338.58" — an area as it is read aloud, not as it is stored. */
 function formatArea(areaM2: number): string {
-  return areaM2.toLocaleString("es-HN", { maximumFractionDigits: 2 });
+  return areaM2.toLocaleString("en-US", { maximumFractionDigits: 2 });
 }
 
 /**
@@ -191,49 +191,49 @@ export function ContractAmendDialog({
     setError(null);
 
     if (chosen.length === 0) {
-      setError("Elige al menos un lote para la adenda.");
+      setError("Choose at least one lot for the amendment.");
       return;
     }
     if (effectiveOn === "") {
-      setError("Escribe la fecha en que se acordó.");
+      setError("Enter the date the agreement was made.");
       return;
     }
     if (effectiveOn > businessToday()) {
-      setError("La fecha de la adenda no puede ser futura: es el día en que se acordó.");
+      setError("The amendment date can't be in the future; it must be the date the agreement was made.");
       return;
     }
     if (effectiveOn < latestSigning) {
-      setError(`La adenda no puede ser anterior a la firma (${formatDate(latestSigning)}).`);
+      setError(`The amendment can't predate the signing date (${formatDate(latestSigning)}).`);
       return;
     }
     if (mode !== "manual" && centsOf(total) === 0) {
-      setError("Escribe el precio total del nuevo acuerdo.");
+      setError("Enter the new agreement's total price.");
       return;
     }
     if (plan.lines.some((line) => line.salePriceCents <= 0)) {
-      setError("Cada lote necesita un precio mayor que cero.");
+      setError("Each lot needs a price greater than zero.");
       return;
     }
     if (isFinanced) {
       if (validMonths === null) {
-        setError("Un acuerdo a crédito necesita el plazo en meses.");
+        setError("A financed agreement requires a term in months.");
         return;
       }
       if (validDay === null) {
-        setError("El día de pago debe estar entre 1 y 31.");
+        setError("Due day must be between 1 and 31.");
         return;
       }
       if (plan.lines.some((line) => line.downPaymentCents >= line.salePriceCents)) {
-        setError("La prima no puede cubrir todo el precio: eso sería una venta de contado.");
+        setError("The down payment can't cover the full price; that would be a cash sale.");
         return;
       }
       if (firstDueOn.trim() !== "" && firstDueOn < effectiveOn) {
-        setError("La primera cuota no puede vencer antes de la fecha del acuerdo.");
+        setError("The first installment can't be due before the agreement date.");
         return;
       }
     }
     if (reason.trim().length < MINIMUM_REASON_LENGTH) {
-      setError(`Explica el motivo con al menos ${MINIMUM_REASON_LENGTH} caracteres.`);
+      setError(`Please provide a reason with at least ${MINIMUM_REASON_LENGTH} characters.`);
       return;
     }
 
@@ -258,7 +258,7 @@ export function ContractAmendDialog({
         reason: reason.trim(),
       });
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "No se pudo registrar la adenda.");
+      setError(caught instanceof Error ? caught.message : "Unable to record the amendment.");
     } finally {
       setSaving(false);
     }
@@ -268,7 +268,7 @@ export function ContractAmendDialog({
 
   return (
     <Dialog
-      ariaLabel={`Adenda para ${customerName}`}
+      ariaLabel={`Amendment for ${customerName}`}
       size="wide"
       // Twenty figures agreed with a customer. The X and Cancelar are the way
       // out; a stray click on the backdrop is not.
@@ -278,17 +278,17 @@ export function ContractAmendDialog({
       <form onSubmit={handleSubmit}>
         <div className="modal-header">
           <div>
-            <p className="modal-eyebrow">Adenda · nuevo acuerdo</p>
+            <p className="modal-eyebrow">Amendment · new agreement</p>
             <h2>{customerName}</h2>
             <p className="modal-description">
               {contracts.length === 1
-                ? `Lote ${contracts[0]!.lot.code} · ${contracts[0]!.code}`
-                : `${contracts.length} lotes de una sola compra`}{" "}
-              · hoy {formatMoney(cents(oldTotal), money)}, pagado{" "}
+                ? `Lot ${contracts[0]!.lot.code} · ${contracts[0]!.code}`
+                : `${contracts.length} lots in one purchase`}{" "}
+              · current total {formatMoney(cents(oldTotal), money)}, paid{" "}
               {formatMoney(cents(paidBefore), money)}
             </p>
           </div>
-          <button type="button" className="modal-close" onClick={onCancel} aria-label="Cerrar">
+          <button type="button" className="modal-close" onClick={onCancel} aria-label="Close">
             <IconClose />
           </button>
         </div>
@@ -297,15 +297,15 @@ export function ContractAmendDialog({
           {/* Said before anything is typed: what this does to the contracts
               that exist, and what becomes of the money already paid. */}
           <p className="form-blocked full-width">
-            Una adenda no edita los contratos: los cierra como «Reemplazado», con sus pagos y
-            recibos tal como están, y abre contratos nuevos en los mismos lotes con lo que se
-            acuerde abajo. Lo ya pagado ({formatMoney(cents(paidBefore), money)}) queda como
-            ingreso: no se devuelve ni se abona al nuevo precio.
+            An amendment doesn't edit the contracts: it closes them as “Replaced,” keeping their
+            payments and receipts as they are, and opens new contracts for the same lots with the
+            terms below. The amount already paid ({formatMoney(cents(paidBefore), money)}) stays
+            as income; it isn't refunded or applied to the new price.
           </p>
 
           <div className="form-field">
             <label htmlFor="amend-date">
-              Fecha del acuerdo<span className="required-mark" aria-hidden="true"> *</span>
+              Agreement date<span className="required-mark" aria-hidden="true"> *</span>
             </label>
             <input
               id="amend-date"
@@ -315,46 +315,46 @@ export function ContractAmendDialog({
               onChange={(event) => setEffectiveOn(event.target.value)}
             />
             <span className="field-hint">
-              El día en que se acordó. Los contratos nuevos se firman con esta fecha, y los pagos
-              del contrato anterior tienen que ser de ese día o de antes.
+              The date the agreement was made. New contracts will use this signing date, and
+              payments on the previous contract must be dated on or before it.
             </span>
           </div>
 
           <div className="form-field">
-            <label htmlFor="amend-authorized">Autorizó</label>
+            <label htmlFor="amend-authorized">Authorized by</label>
             <input
               id="amend-authorized"
               type="text"
               maxLength={120}
               value={authorizedBy}
-              placeholder="Ej. Don Julio (dueño)"
+              placeholder="e.g. Mr. Julio (owner)"
               onChange={(event) => setAuthorizedBy(event.target.value)}
             />
-            <span className="field-hint">Quién aprobó el nuevo trato. Opcional.</span>
+            <span className="field-hint">Who approved the new agreement. Optional.</span>
           </div>
 
           <div className="form-field">
             <label htmlFor="amend-total">
-              Precio total nuevo<span className="required-mark" aria-hidden="true"> *</span>
+              New total price<span className="required-mark" aria-hidden="true"> *</span>
             </label>
             <MoneyInput
               id="amend-total"
               value={mode === "manual" ? toMoneyInput(cents(plan.totalCents)) : total}
               onChange={setTotal}
-              placeholder="Ej. 800,000"
+              placeholder="e.g. 800,000"
               readOnly={mode === "manual"}
             />
             <span className="field-hint">
               {mode === "manual"
-                ? "La suma de los precios que escribas en cada lote."
+                ? "The sum of the prices you enter for each lot."
                 : chosen.length === 1
-                  ? "El nuevo precio de este lote."
-                  : `El precio de los ${chosen.length} lotes juntos.`}
+                  ? "The new price for this lot."
+                  : `The combined price for all ${chosen.length} lots.`}
             </span>
           </div>
 
           <div className="form-field">
-            <label htmlFor="amend-sale-type">Forma de pago</label>
+            <label htmlFor="amend-sale-type">Payment type</label>
             <select
               id="amend-sale-type"
               value={saleType}
@@ -365,14 +365,14 @@ export function ContractAmendDialog({
             </select>
             <span className="field-hint">
               {isFinanced
-                ? "Prima y cuotas en las fechas de abajo."
-                : "Todo el nuevo precio de una vez, sin cuotas."}
+                ? "Down payment and installments on the dates below."
+                : "Pay the full new price at once, with no installments."}
             </span>
           </div>
 
           {chosen.length > 1 && (
             <fieldset className="form-field full-width settlement-choice">
-              <legend>Repartir el precio entre los lotes</legend>
+              <legend>Split the price between lots</legend>
               <div className="amend-split-choice">
                 {SPLIT_OPTIONS.map((option) => (
                   <label key={option.value} className="settlement-option">
@@ -396,23 +396,23 @@ export function ContractAmendDialog({
           {isFinanced && (
             <>
               <div className="form-field">
-                <label htmlFor="amend-down">Prima del nuevo acuerdo</label>
+                <label htmlFor="amend-down">Down payment for the new agreement</label>
                 <MoneyInput
                   id="amend-down"
                   value={downPayment}
                   onChange={setDownPayment}
-                  placeholder="Ej. 150,000"
+                  placeholder="e.g. 150,000"
                 />
                 <span className="field-hint">
-                  Lo que entrega al cerrar el trato — si ya mandó dinero para este acuerdo, va aquí
-                  y las cuotas se calculan sobre el resto. Esos pagos se registran después, como
-                  recibos normales, en los contratos nuevos.
+                  The amount paid when the agreement is signed. If the customer has already paid
+                  toward this agreement, enter it here; installments are calculated on the
+                  remainder. Those payments are recorded later as regular receipts on the new contracts.
                 </span>
               </div>
 
               <div className="form-field">
                 <label htmlFor="amend-term">
-                  Plazo en meses<span className="required-mark" aria-hidden="true"> *</span>
+                  Term in months<span className="required-mark" aria-hidden="true"> *</span>
                 </label>
                 <input
                   id="amend-term"
@@ -421,14 +421,14 @@ export function ContractAmendDialog({
                   min="1"
                   max="600"
                   value={termMonths}
-                  placeholder="Ej. 3"
+                  placeholder="e.g. 3"
                   onChange={(event) => setTermMonths(event.target.value)}
                 />
               </div>
 
               <div className="form-field">
                 <label htmlFor="amend-due-day">
-                  Día de pago<span className="required-mark" aria-hidden="true"> *</span>
+                  Due day<span className="required-mark" aria-hidden="true"> *</span>
                 </label>
                 <input
                   id="amend-due-day"
@@ -442,7 +442,7 @@ export function ContractAmendDialog({
               </div>
 
               <div className="form-field">
-                <label htmlFor="amend-first-due">Primera cuota</label>
+                <label htmlFor="amend-first-due">First installment</label>
                 <input
                   id="amend-first-due"
                   type="date"
@@ -452,24 +452,24 @@ export function ContractAmendDialog({
                 />
                 <span className="field-hint">
                   {firstDueOn.trim() === "" && derivedFirstDue
-                    ? `Opcional. Sin fecha, vence el ${formatDate(derivedFirstDue)}, un mes después del acuerdo.`
-                    : "Solo si se negoció aparte."}
+                    ? `Optional. If left blank, it's due ${formatDate(derivedFirstDue)}, one month after the agreement.`
+                    : "Only if negotiated separately."}
                 </span>
               </div>
             </>
           )}
 
           <div className="form-field full-width">
-            <span className="amend-table-title">Cómo queda cada lote</span>
+            <span className="amend-table-title">New terms for each lot</span>
             <div className="amend-table-scroll">
               <table className="amend-table">
                 <thead>
                   <tr>
-                    <th>Lote</th>
-                    <th>Ahora</th>
-                    <th className="col-money">Nuevo precio</th>
-                    {isFinanced && <th className="col-money">Prima</th>}
-                    <th>{isFinanced ? "Cuotas" : "Contrato nuevo"}</th>
+                    <th>Lot</th>
+                    <th>Current</th>
+                    <th className="col-money">New price</th>
+                    {isFinanced && <th className="col-money">Down payment</th>}
+                    <th>{isFinanced ? "Installments" : "New contract"}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -489,14 +489,14 @@ export function ContractAmendDialog({
 
                     return (
                       <tr key={contract.id} className={line ? undefined : "is-excluded"}>
-                        <td data-label="Lote">
+                        <td data-label="Lot">
                           {contracts.length > 1 ? (
                             <label className="amend-include">
                               <input
                                 type="checkbox"
                                 checked={included.has(contract.id)}
                                 onChange={() => toggleIncluded(contract.id)}
-                                aria-label={`Incluir el lote ${contract.lot.code}`}
+                                aria-label={`Include lot ${contract.lot.code}`}
                               />
                               <span className="code-badge">{contract.lot.code}</span>
                             </label>
@@ -505,17 +505,17 @@ export function ContractAmendDialog({
                           )}
                           <span className="cell-sub">{formatArea(contract.lot.areaM2)} m²</span>
                         </td>
-                        <td data-label="Ahora">
+                        <td data-label="Current">
                           <span className="cell-money">
                             {formatMoney(contract.terms.salePrice, money)}
                           </span>
                           <span className="cell-sub">
-                            {contract.code} · pagado {formatMoney(contract.paidToDate, money)}
+                          {contract.code} · paid {formatMoney(contract.paidToDate, money)}
                           </span>
                         </td>
-                        <td data-label="Nuevo precio" className="col-money">
+                        <td data-label="New price" className="col-money">
                           {!line ? (
-                            <span className="cell-sub">Sigue igual</span>
+                            <span className="cell-sub">Unchanged</span>
                           ) : mode === "manual" ? (
                             <MoneyInput
                               id={`amend-price-${contract.id}`}
@@ -523,7 +523,7 @@ export function ContractAmendDialog({
                               onChange={(value) =>
                                 setManualPrices((current) => ({ ...current, [contract.id]: value }))
                               }
-                              placeholder="Precio"
+                              placeholder="Price"
                             />
                           ) : (
                             <span className="cell-money">
@@ -533,7 +533,7 @@ export function ContractAmendDialog({
                           {line && <span className="cell-sub">{newCodes[index]}</span>}
                         </td>
                         {isFinanced && (
-                          <td data-label="Prima" className="col-money">
+                          <td data-label="Down payment" className="col-money">
                             {line && (
                               <span className="cell-money">
                                 {formatMoney(cents(line.downPaymentCents), money)}
@@ -541,9 +541,9 @@ export function ContractAmendDialog({
                             )}
                           </td>
                         )}
-                        <td data-label={isFinanced ? "Cuotas" : "Contrato nuevo"}>
+                        <td data-label={isFinanced ? "Installments" : "New contract"}>
                           {!line ? null : !isFinanced ? (
-                            <span className="cell-sub">{newCodes[index]} · de contado</span>
+                            <span className="cell-sub">{newCodes[index]} · cash</span>
                           ) : schedule && line.monthlyPaymentCents !== null ? (
                             <>
                               <span className="cell-money">
@@ -552,13 +552,13 @@ export function ContractAmendDialog({
                               </span>
                               <span className="cell-sub">
                                 {schedule.lastAmountCents !== line.monthlyPaymentCents
-                                  ? `la última ${formatMoney(cents(schedule.lastAmountCents), money)}, `
+                                  ? `last payment ${formatMoney(cents(schedule.lastAmountCents), money)}, `
                                   : ""}
-                                hasta {formatDate(schedule.lastDueOn)}
+                                through {formatDate(schedule.lastDueOn)}
                               </span>
                             </>
                           ) : (
-                            <span className="cell-sub">Falta el plazo</span>
+                            <span className="cell-sub">Term not set</span>
                           )}
                         </td>
                       </tr>
@@ -570,31 +570,31 @@ export function ContractAmendDialog({
 
             {chosen.length > 0 && plan.totalCents > 0 && (
               <p className="field-hint amend-total-line">
-                Nuevo total {formatMoney(cents(plan.totalCents), money)}
-                {isFinanced && downTotal > 0 && ` · prima ${formatMoney(cents(downTotal), money)}`}
+                New total {formatMoney(cents(plan.totalCents), money)}
+                {isFinanced && downTotal > 0 && ` · down payment ${formatMoney(cents(downTotal), money)}`}
                 {isFinanced &&
                   validMonths !== null &&
-                  ` · ${formatMoney(cents(financedTotal), money)} en ${validMonths} ${
-                    validMonths === 1 ? "cuota" : "cuotas"
-                  } de unos ${formatMoney(cents(monthlyTotal), money)} al mes`}
-                . Se cierran {oldCodes} y se abren {newCodes.join(", ")}.
+                  ` · ${formatMoney(cents(financedTotal), money)} over ${validMonths} ${
+                    validMonths === 1 ? "installment" : "installments"
+                  } at about ${formatMoney(cents(monthlyTotal), money)} per month`}
+                . {oldCodes} will close and {newCodes.join(", ")} will open.
               </p>
             )}
           </div>
 
           <div className="form-field full-width">
             <label htmlFor="amend-reason">
-              Motivo<span className="required-mark" aria-hidden="true"> *</span>
+              Reason<span className="required-mark" aria-hidden="true"> *</span>
             </label>
             <textarea
               id="amend-reason"
               rows={3}
               value={reason}
-              placeholder="Ej. Pagará los 3 lotes antes de fin de año; se acordó un precio total de L 800,000."
+              placeholder="e.g. Will pay for all 3 lots by year-end; agreed total price is L 800,000."
               onChange={(event) => setReason(event.target.value)}
             />
             <span className="field-hint">
-              Queda en los contratos nuevos y en los reemplazados, y en el Historial.
+              Saved on the new and replaced contracts, and in the history.
             </span>
           </div>
 
@@ -603,10 +603,10 @@ export function ContractAmendDialog({
 
         <div className="modal-actions">
           <button type="button" className="btn-secondary" onClick={onCancel} disabled={isSaving}>
-            Cancelar
+            Cancel
           </button>
           <button type="submit" className="btn-primary modal-submit" disabled={isSaving}>
-            <span>{isSaving ? "Registrando…" : "Registrar adenda"}</span>
+            <span>{isSaving ? "Saving…" : "Record amendment"}</span>
           </button>
         </div>
       </form>

@@ -110,7 +110,7 @@ export function allocateReceiptCode(isTaken: (code: string) => boolean): string 
     }
   }
 
-  throw new Error("No se pudo generar un número de recibo único.");
+  throw new Error("Could not generate a unique receipt number.");
 }
 
 /** What a printed receipt code looks like. Exported for the tests. */

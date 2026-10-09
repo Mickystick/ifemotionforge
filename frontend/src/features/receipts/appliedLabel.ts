@@ -55,5 +55,5 @@ export function appliedLabel(line: AppliedLabelLine): string | null {
   // "cuota 3 de 0" is worse than saying nothing.
   const total = line.installmentCount > 0 ? ` de ${line.installmentCount}` : "";
 
-  return `cuota ${principal.number}${total}`;
+  return `Installment ${principal.number}${total ? ` of ${line.installmentCount}` : ""}`;
 }

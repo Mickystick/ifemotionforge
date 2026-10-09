@@ -23,8 +23,7 @@ export const BUSINESS = {
   email: "edrosfamily@gmail.com",
 } as const;
 
-/** "Gracias por su pago y su confianza en Inversiones Manuel." */
-export const THANK_YOU = `Gracias por su pago y su confianza en ${BUSINESS.name}.`;
+export const THANK_YOU = `Thank you for your payment and for trusting ${BUSINESS.name}.`;
 
 /**
  * The footer's one-line contact strip, composed rather than stored whole so it
@@ -34,5 +33,5 @@ export const CONTACT_LINE = [
   BUSINESS.name,
   BUSINESS.location,
   `Tel: ${BUSINESS.phone}`,
-  `Correo: ${BUSINESS.email}`,
+  `Email: ${BUSINESS.email}`,
 ].join(" | ");

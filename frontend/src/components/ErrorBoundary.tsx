@@ -56,27 +56,27 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       return children;
     }
 
-    const where = area ? ` en ${area}` : "";
+    const where = area ? ` in ${area}` : "";
 
     return (
       <div className={variant === "page" ? "error-boundary error-boundary-page" : "error-boundary"}>
         <div className="card error-boundary-card">
-          <h2>Algo falló{where}</h2>
+          <h2>Something went wrong{where}</h2>
           <p className="state-message">
-            Se produjo un error inesperado y esta parte de la aplicación no se pudo mostrar. El
-            resto sigue funcionando; si el problema continúa, avisa a soporte.
+            An unexpected error prevented this part of the app from loading. The rest is still
+            working; if the problem continues, contact support.
           </p>
           <p className="error-boundary-detail">{error.message}</p>
           <div className="error-boundary-actions">
             <button type="button" className="btn-secondary" onClick={this.reset}>
-              Reintentar
+              Try again
             </button>
             <button
               type="button"
               className="btn-primary"
               onClick={() => window.location.reload()}
             >
-              Recargar la página
+              Reload page
             </button>
           </div>
         </div>

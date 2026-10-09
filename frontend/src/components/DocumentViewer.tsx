@@ -279,7 +279,7 @@ export function DocumentViewer({ files, startId, onClose, onRemove }: DocumentVi
             signed contract. It now lives at the foot of the viewer, diagonally
             opposite this button.
           */}
-          <button type="button" className="viewer-close" onClick={onClose} aria-label="Cerrar">
+          <button type="button" className="viewer-close" onClick={onClose} aria-label="Close">
             ×
           </button>
         </header>
@@ -290,7 +290,7 @@ export function DocumentViewer({ files, startId, onClose, onRemove }: DocumentVi
               type="button"
               className="viewer-step is-prev"
               onClick={() => step(-1)}
-              aria-label="Comprobante anterior"
+              aria-label="Previous proof file"
             >
               <IconChevronDown />
             </button>
@@ -323,7 +323,7 @@ export function DocumentViewer({ files, startId, onClose, onRemove }: DocumentVi
               onError={() => setBroken((was) => new Set(was).add(current.id))}
               onMouseDown={onImageMouseDown}
               onDoubleClick={toggleZoom}
-              title={zoom > MIN_ZOOM ? "Arrastra para moverte por el recibo" : "Doble clic para acercar"}
+              title={zoom > MIN_ZOOM ? "Drag to move around the receipt" : "Double-click to zoom in"}
             />
           )}
 
@@ -333,7 +333,7 @@ export function DocumentViewer({ files, startId, onClose, onRemove }: DocumentVi
                 type="button"
                 onClick={zoomOut}
                 disabled={zoom <= MIN_ZOOM}
-                aria-label="Alejar"
+                aria-label="Zoom out"
               >
                 <IconZoomOut />
               </button>
@@ -342,8 +342,8 @@ export function DocumentViewer({ files, startId, onClose, onRemove }: DocumentVi
                 className="viewer-zoom-value"
                 onClick={resetZoom}
                 disabled={zoom === MIN_ZOOM}
-                aria-label="Restablecer el zoom"
-                title="Restablecer el zoom"
+                aria-label="Reset zoom"
+                title="Reset zoom"
               >
                 {Math.round(zoom * 100)}%
               </button>
@@ -351,7 +351,7 @@ export function DocumentViewer({ files, startId, onClose, onRemove }: DocumentVi
                 type="button"
                 onClick={zoomIn}
                 disabled={zoom >= MAX_ZOOM}
-                aria-label="Acercar"
+                aria-label="Zoom in"
               >
                 <IconZoomIn />
               </button>
@@ -376,8 +376,8 @@ export function DocumentViewer({ files, startId, onClose, onRemove }: DocumentVi
               <span className="doc-thumb doc-thumb-badge">{formatBadge(current.contentType)}</span>
               <p>
                 {isFragileImage(current.contentType)
-                  ? "Este navegador no puede mostrar fotos HEIC de iPhone. El archivo está guardado y completo; ábrelo desde Safari, o pide la captura como JPG."
-                  : "Este archivo está guardado, pero el navegador no puede mostrarlo aquí."}
+                  ? "This browser can't display HEIC photos from iPhone. The file is safely stored; open it in Safari or ask for a JPG copy."
+                  : "This file is safely stored, but your browser can't display it here."}
               </p>
             </div>
           )}
@@ -387,7 +387,7 @@ export function DocumentViewer({ files, startId, onClose, onRemove }: DocumentVi
               type="button"
               className="viewer-step is-next"
               onClick={() => step(1)}
-              aria-label="Comprobante siguiente"
+              aria-label="Next payment proof"
             >
               <IconChevronDown />
             </button>
@@ -425,7 +425,7 @@ export function DocumentViewer({ files, startId, onClose, onRemove }: DocumentVi
               className="link-btn is-danger"
               onClick={() => onRemove(current)}
             >
-              Quitar este archivo
+              Remove this file
             </button>
           </div>
         )}

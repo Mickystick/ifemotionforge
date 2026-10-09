@@ -66,9 +66,9 @@ type Method = "cash" | "transfer" | "card";
 const MIXED = "mixed";
 
 const METHODS: Array<{ value: Method; label: string }> = [
-  { value: "cash", label: "Efectivo" },
-  { value: "transfer", label: "Transferencia" },
-  { value: "card", label: "Tarjeta" },
+  { value: "cash", label: "Cash" },
+  { value: "transfer", label: "Bank transfer" },
+  { value: "card", label: "Card" },
 ];
 
 /**
@@ -446,7 +446,7 @@ export function NewReceiptDialog({
     const typed = parseMoneyInput(amountText);
 
     if (Number.isNaN(typed) || typed <= 0) {
-      setError("Escribe el monto que entregó el cliente.");
+      setError("Enter the amount paid by the customer.");
       return;
     }
 
@@ -471,8 +471,8 @@ export function NewReceiptDialog({
         // is already paid off is how a customer ends up with a credit nobody
         // can explain.
         notes.push(
-          `Sobran ${formatMoney(cents(result.unallocatedCents), money)}: el cliente ya no debe tanto. ` +
-            "Decide a dónde va ese dinero antes de guardar.",
+          `There is ${formatMoney(cents(result.unallocatedCents), money)} left over because the customer owes less than this. ` +
+            "Choose where this money goes before saving.",
         );
       }
 
@@ -485,8 +485,8 @@ export function NewReceiptDialog({
         const codes = short.map((line) => line.lotCode).join(", ");
 
         notes.push(
-          `El monto no alcanza la cuota completa de ${codes}. Ajusta las líneas a mano o ` +
-            (short.length > 1 ? "esos lotes quedarán atrasados." : "ese lote quedará atrasado."),
+          `The amount does not cover the full installment for ${codes}. Adjust the lines manually or ` +
+            (short.length > 1 ? "those lots will become overdue." : "that lot will become overdue."),
         );
       }
 
@@ -494,7 +494,7 @@ export function NewReceiptDialog({
         setSplitNote(notes.join(" "));
       }
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "No se pudo repartir el monto.");
+      setError(caught instanceof Error ? caught.message : "Could not split the amount.");
     } finally {
       setSplitting(false);
     }
@@ -514,7 +514,7 @@ export function NewReceiptDialog({
       lines.map((line) => ({
         contractId: line.contractId,
         lotCode:
-          payable.find((contract) => contract.id === line.contractId)?.lot.code ?? "este lote",
+          payable.find((contract) => contract.id === line.contractId)?.lot.code ?? "this lot",
       })),
     [lines, payable],
   );
@@ -523,7 +523,7 @@ export function NewReceiptDialog({
     setError(null);
     setProofNotice(null);
     setSaving(true);
-    setSavingStep("Registrando el pago…");
+    setSavingStep("Recording payment…");
 
     const draft: ReceiptDraft = {
       customerId,
@@ -560,7 +560,7 @@ export function NewReceiptDialog({
         );
 
         for (const [index, proof] of proofs.entries()) {
-          setSavingStep(`Subiendo comprobante ${index + 1} de ${proofs.length}…`);
+          setSavingStep(`Uploading proof file ${index + 1} of ${proofs.length}…`);
 
           try {
             await uploadAttachment(
@@ -578,8 +578,8 @@ export function NewReceiptDialog({
         // the receipt itself.
         if (failures.length > 0) {
           setProofNotice(
-            `El pago quedó registrado como ${receipt.code}, pero no se pudo subir ` +
-              `${failures.join(", ")}. Puedes adjuntarlo de nuevo desde el recibo.`,
+            `Payment recorded as ${receipt.code}, but these files could not be uploaded: ` +
+              `${failures.join(", ")}. You can attach them again from the receipt.`,
           );
           setSaving(false);
           setSavingStep(null);
@@ -597,7 +597,7 @@ export function NewReceiptDialog({
       if (caught instanceof ApiError && caught.code === "overpayment") {
         setOverpaymentPrompt(caught.message);
       } else {
-        setError(caught instanceof Error ? caught.message : "No se pudo registrar el recibo.");
+        setError(caught instanceof Error ? caught.message : "Could not record the receipt.");
       }
       setSaving(false);
       setSavingStep(null);
@@ -714,7 +714,7 @@ export function NewReceiptDialog({
      * never had it.
      */
     <Dialog
-      ariaLabel="Registrar una transacción"
+      ariaLabel="Record a transaction"
       size={isMultiLot ? "wide" : "default"}
       /*
        * A receipt is typed at the window with the customer standing there. The
@@ -728,11 +728,11 @@ export function NewReceiptDialog({
     >
       <div className="modal-header">
         <div>
-          <p className="modal-eyebrow">Nueva transacción</p>
-          <h2>Registrar un pago</h2>
+          <p className="modal-eyebrow">New transaction</p>
+          <h2>Record a payment</h2>
           <p className="modal-description">
-            Un recibo por cliente. Si tiene varios lotes, se reparte abajo y cada uno conserva su
-            propio saldo.
+            One receipt per customer. If they have multiple lots, split the payment below; each lot
+            keeps its own balance.
           </p>
         </div>
         {/* The deliberate way out. Refused only while a file is still being
@@ -744,7 +744,7 @@ export function NewReceiptDialog({
           onClick={onClose}
           disabled={proofBusy !== null}
           title={proofBusy ?? undefined}
-          aria-label="Cerrar"
+          aria-label="Close"
         >
           <IconClose />
         </button>
@@ -755,8 +755,8 @@ export function NewReceiptDialog({
           <DraftNotice
             savedAt={formDraft.found.savedAt}
             missing={
-              "El comprobante que habías adjuntado hay que volver a elegirlo. " +
-              "Revisa también el monto contra el saldo de hoy."
+              "Choose the proof file you attached again. " +
+              "Also check the amount against today's balance."
             }
             onRestore={() => {
               const saved = formDraft.found!.values;
@@ -788,7 +788,7 @@ export function NewReceiptDialog({
             half-typed search can never sit over the customer being paid for. */}
         <div className="form-field full-width">
           <p className="picker-label">
-            Cliente <span className="required-mark">*</span>
+            Customer <span className="required-mark">*</span>
           </p>
           <CustomerPicker
             customers={customers}
@@ -806,18 +806,18 @@ export function NewReceiptDialog({
         */}
         <div className="form-field">
           <label htmlFor="receipt-amount">
-            Monto <span className="required-mark">*</span>
+            Amount <span className="required-mark">*</span>
           </label>
           <MoneyInput
             id="receipt-amount"
             value={amountText}
             onChange={setAmountText}
-            placeholder="Ej. 5,000"
+            placeholder="e.g. 5,000"
             invalid={invalidField === AMOUNT_FIELD}
           />
           {isMultiLot && (
             <span className="field-hint">
-              El total que entregó, para repartir abajo entre sus {payable.length} lotes.
+              The total amount paid, to split below across their {payable.length} lots.
             </span>
           )}
         </div>
@@ -835,7 +835,7 @@ export function NewReceiptDialog({
           receipt that needs one.
         */}
         <div className="form-field">
-          <label htmlFor="receipt-type">Tipo</label>
+          <label htmlFor="receipt-type">Type</label>
           <select
             id="receipt-type"
             value={sharedType ?? MIXED}
@@ -850,7 +850,7 @@ export function NewReceiptDialog({
                 the table, not something a payment can be filed under. */}
             {sharedType === null && (
               <option value={MIXED} disabled>
-                Varios
+                Multiple
               </option>
             )}
             {PAYMENT_TYPE_OPTIONS.map((entry) => (
@@ -865,14 +865,14 @@ export function NewReceiptDialog({
               lots the same fact sits on the row it belongs to. */}
           {soleLot && outstandingDownPayment(soleLot) > 0 && (
             <span className="field-hint">
-              Faltan {formatMoney(cents(outstandingDownPayment(soleLot)), money)} de la prima.
+              {formatMoney(cents(outstandingDownPayment(soleLot)), money)} remaining on the down payment.
             </span>
           )}
           {soleLot &&
             typeByContract[soleLot.id] !== undefined &&
             typeByContract[soleLot.id] !== suggestPaymentType(soleLot) && (
               <span className="field-hint">
-                Sugerido:{" "}
+                Suggested:{" "}
                 {
                   PAYMENT_TYPE_OPTIONS.find(
                     (entry) => entry.value === suggestPaymentType(soleLot),
@@ -885,15 +885,15 @@ export function NewReceiptDialog({
           {isMultiLot && (
             <span className="field-hint">
               {sharedType === null
-                ? `Los ${payable.length} lotes llevan tipos distintos. Elegir uno aquí los iguala.`
-                : `Aplica a los ${payable.length} lotes; abajo puedes cambiar uno.`}
+                ? `The ${payable.length} lots have different types. Choosing one here applies it to all.`
+                : `Applies to all ${payable.length} lots; you can change one below.`}
             </span>
           )}
         </div>
 
         <div className="form-field">
           <label htmlFor="receipt-date">
-            Fecha del pago <span className="required-mark">*</span>
+            Payment date <span className="required-mark">*</span>
           </label>
           <input
             id="receipt-date"
@@ -902,13 +902,13 @@ export function NewReceiptDialog({
             onChange={(event) => setPaidOn(event.target.value)}
           />
           <span className="field-hint">
-            El día que entró el dinero, no el día que lo registras. Una fecha anterior se acomoda
-            sola en su lugar del historial.
+            The day the money was received, not the day you record it. Earlier dates are placed
+            automatically in the right place in the history.
           </span>
         </div>
 
         <div className="form-field">
-          <label htmlFor="receipt-method">Forma de pago</label>
+          <label htmlFor="receipt-method">Payment method</label>
           <select
             id="receipt-method"
             value={method}
@@ -924,23 +924,23 @@ export function NewReceiptDialog({
 
         {method === "transfer" && (
           <div className="form-field full-width">
-            <label htmlFor="receipt-reference">Número de confirmación</label>
+            <label htmlFor="receipt-reference">Confirmation number</label>
             <input
               id="receipt-reference"
               type="text"
               value={reference}
               onChange={(event) => setReference(event.target.value)}
-              placeholder="Ej. BAC-889231"
+              placeholder="e.g. BAC-889231"
             />
             <span className="field-hint">
-              Lo que permite cuadrar este pago contra el estado de cuenta del banco meses después.
+              Helps reconcile this payment with the bank statement months later.
             </span>
           </div>
         )}
       </div>
 
       {customerId !== "" && payable.length === 0 && (
-        <p className="form-blocked">Este cliente no tiene contratos que admitan pagos.</p>
+        <p className="form-blocked">This customer has no contracts that can accept payments.</p>
       )}
 
       {payable.length > 0 && (
@@ -950,7 +950,7 @@ export function NewReceiptDialog({
               Several lots still need to say what the table is doing. */}
           {isMultiLot && (
             <>
-              <p className="cp-section-title">Repartir entre sus {payable.length} lotes</p>
+              <p className="cp-section-title">Split across their {payable.length} lots</p>
 
               {/* The fast path: the customer hands over one figure for three
                   lots and nobody wants to do the division at the window. */}
@@ -961,14 +961,14 @@ export function NewReceiptDialog({
                   disabled={isSplitting || amountText.trim() === ""}
                   onClick={() => void distribute()}
                 >
-                  {isSplitting ? "Repartiendo…" : "Repartir el monto entre los lotes"}
+                  {isSplitting ? "Splitting…" : "Split amount between lots"}
                 </button>
               </div>
 
               <p className="field-hint">
-                Partes iguales, al centavo. Solo cambia un lote si eso le dejaría pagando menos de
-                su próxima cuota o más de lo que debe; el resto se reparte igual entre los demás.
-                Puedes ajustar cualquier línea después.
+                Split evenly to the cent. Change a lot only if the split would leave it with less
+                than its next installment or more than it owes; the remainder is split equally
+                across the other lots. You can adjust any line afterward.
               </p>
             </>
           )}
@@ -980,15 +980,15 @@ export function NewReceiptDialog({
             <table className="split-table">
             <thead>
               <tr>
-                <th>Lote</th>
-                <th className="col-money">Saldo actual</th>
+                <th>Lot</th>
+                <th className="col-money">Current balance</th>
                 {/* Only when there is a division to see. One lot receives the
                     Monto typed above, in full, and a column repeating it would
                     be a second place for the same figure to live. The type
                     moves down here for the same reason it moves up there: with
                     several lots it is a per-lot answer, not one. */}
-                {isMultiLot && <th className="col-money col-receive">Recibe</th>}
-                {isMultiLot && <th className="col-type">Tipo</th>}
+                {isMultiLot && <th className="col-money col-receive">Amount</th>}
+                {isMultiLot && <th className="col-type">Type</th>}
               </tr>
             </thead>
             <tbody>
@@ -1008,9 +1008,9 @@ export function NewReceiptDialog({
                     </span>
                     {contract.health.nextDueOn && (
                       <span className="cell-sub">
-                        próxima {formatMoney(contract.health.nextInstallment, money)}
+                        next installment {formatMoney(contract.health.nextInstallment, money)}
                         {contract.health.nextDueCredit > 0 &&
-                          ` · adelanto ${formatMoney(contract.health.nextDueCredit, money)}`}
+                          ` · ${formatMoney(contract.health.nextDueCredit, money)} paid in advance`}
                       </span>
                     )}
                   </td>
@@ -1033,7 +1033,7 @@ export function NewReceiptDialog({
                   {isMultiLot && (
                     <td className="col-type">
                       <select
-                        aria-label={`Tipo de pago para ${contract.lot.code}`}
+                        aria-label={`Payment type for ${contract.lot.code}`}
                         value={typeFor(contract)}
                         onChange={(event) =>
                           setTypeByContract((current) => ({
@@ -1053,8 +1053,8 @@ export function NewReceiptDialog({
                           reason the column exists. */}
                       {outstandingDownPayment(contract) > 0 && (
                         <span className="cell-sub">
-                          faltan {formatMoney(cents(outstandingDownPayment(contract)), money)} de
-                          prima
+                          {formatMoney(cents(outstandingDownPayment(contract)), money)} remaining on
+                          down payment
                         </span>
                       )}
                     </td>
@@ -1085,13 +1085,13 @@ export function NewReceiptDialog({
           {total > 0 && (
             <>
               <p className={`receipt-running-total${balanceAfter < 0 ? " is-over" : ""}`}>
-                Saldo restante <strong>{formatMoney(cents(balanceAfter), money)}</strong>
+                Remaining balance <strong>{formatMoney(cents(balanceAfter), money)}</strong>
               </p>
 
               {balanceAfter < 0 && (
                 <p className="receipt-over-note">
-                  Está pagando más de lo que debe. El servidor lo va a preguntar antes de
-                  aceptarlo.
+                  The payment exceeds the amount owed. You'll be asked to confirm before it is
+                  accepted.
                 </p>
               )}
             </>
@@ -1101,7 +1101,7 @@ export function NewReceiptDialog({
 
       <div className="modal-form-grid">
         <div className="form-field full-width">
-          <label>Comprobante</label>
+          <label>Proof file</label>
           {/* Right above the field it is about, not down with the form's
               general errors — see the `proofNotice` state doc above. */}
           {proofNotice && <p className="form-error full-width">{proofNotice}</p>}
@@ -1117,20 +1117,20 @@ export function NewReceiptDialog({
         </div>
 
         <div className="form-field full-width">
-          <label htmlFor="receipt-note">Nota para el equipo (opcional)</label>
+          <label htmlFor="receipt-note">Team note (optional)</label>
           <textarea
             id="receipt-note"
             rows={2}
             maxLength={500}
             value={note}
             onChange={(event) => setNote(event.target.value)}
-            placeholder="Ej. Pagará el resto el viernes. Falta el comprobante."
+            placeholder="e.g. Will pay the rest on Friday. Proof is missing."
           />
           {/* Said here, where it is typed: this field used to be printed on the
               receipt, and somebody who remembers that would otherwise keep
               writing for the customer. */}
           <span className="field-hint">
-            La ven todos los usuarios en Recibos. No se imprime en el recibo ni se envía al cliente.
+            Visible to all users in Receipts. Not printed on the receipt or sent to the customer.
           </span>
         </div>
 
@@ -1155,7 +1155,7 @@ export function NewReceiptDialog({
                 void submit(true);
               }}
             >
-              Sí, el cliente entregó de más — registrarlo
+              Yes, the customer overpaid — record it anyway
             </button>
           </div>
         )}
@@ -1172,23 +1172,23 @@ export function NewReceiptDialog({
         <div className={hasReferenceMatch ? "form-warning" : "form-blocked"}>
           <strong>
             {hasReferenceMatch
-              ? "Ese número de confirmación ya está registrado."
-              : "Ya hay un recibo de este cliente por el mismo monto y la misma fecha."}
+              ? "That confirmation number has already been recorded."
+              : "A receipt for this customer with the same amount and date already exists."}
           </strong>
           <ul className="duplicate-matches">
             {duplicates.map((match) => (
               <li key={match.receiptId ?? `${match.paidOn}-${match.amountCents}`}>
-                {match.receiptCode ? `Recibo ${match.receiptCode}` : "Pago sin recibo"}
+                {match.receiptCode ? `Receipt ${match.receiptCode}` : "Payment without a receipt"}
                 {" · "}
                 {formatMoney(cents(match.amountCents), money)}
                 {" · "}
                 {match.paidOn}
                 {match.lotCodes.length > 0 && ` · ${match.lotCodes.join(", ")}`}
-                {match.cancelled && " · ANULADO"}
+                {match.cancelled && " · VOIDED"}
               </li>
             ))}
           </ul>
-          Revísalo antes de continuar. Si de verdad es un segundo pago, puedes registrarlo igual.
+          Review before continuing. If this is a second payment, you can still record it.
         </div>
       )}
 
@@ -1199,7 +1199,7 @@ export function NewReceiptDialog({
           onClick={onClose}
           disabled={isSaving || proofBusy !== null}
         >
-          Cancelar
+          Cancel
         </button>
         <button
           type="button"
@@ -1218,7 +1218,7 @@ export function NewReceiptDialog({
             void submit(false);
           }}
         >
-          {proofBusy ?? savingStep ?? "Registrar y emitir recibo"}
+          {proofBusy ?? savingStep ?? "Record payment and issue receipt"}
         </button>
       </div>
     </Dialog>

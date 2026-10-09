@@ -202,7 +202,7 @@ export function sendStoredFile(
   // which is exactly when a path handed to the filesystem must not be trusted.
   if (!isValidStorageKey(row.storageKey)) {
     reply.log.error({ fileId: row.id }, "Refusing to serve a malformed storage key");
-    return reply.code(500).send({ error: "bad_storage_key", message: "Archivo no disponible." });
+    return reply.code(500).send({ error: "bad_storage_key", message: "File unavailable." });
   }
 
   reply

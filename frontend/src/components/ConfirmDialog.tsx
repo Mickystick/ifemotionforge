@@ -63,7 +63,7 @@ export function ConfirmDialog({
     } catch (caught) {
       // Left open on failure, with the reason. Closing would look like it
       // worked, and the next thing the user does is check whether it did.
-      setError(caught instanceof Error ? caught.message : "No se pudo completar la acción.");
+      setError(caught instanceof Error ? caught.message : "Unable to complete the action.");
       setWorking(false);
     }
   };
@@ -76,7 +76,7 @@ export function ConfirmDialog({
           <h2>{title}</h2>
           {description && <p className="modal-description">{description}</p>}
         </div>
-        <button type="button" className="modal-close" onClick={onCancel} aria-label="Cerrar">
+        <button type="button" className="modal-close" onClick={onCancel} aria-label="Close">
           <IconClose />
         </button>
       </div>
@@ -88,7 +88,7 @@ export function ConfirmDialog({
 
       <div className="modal-actions">
         <button type="button" className="btn-secondary" onClick={onCancel} disabled={isWorking}>
-          Cancelar
+          Cancel
         </button>
         <button
           type="button"

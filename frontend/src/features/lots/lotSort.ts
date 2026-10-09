@@ -30,17 +30,17 @@ export const SORT_OPTIONS: Array<{
   ascLabel: string;
   descLabel: string;
 }> = [
-  { field: "code", label: "Lote", ascLabel: "A → Z", descLabel: "Z → A" },
-  { field: "project", label: "Proyecto", ascLabel: "A → Z", descLabel: "Z → A" },
-  { field: "area", label: "Área", ascLabel: "Menor a mayor", descLabel: "Mayor a menor" },
-  { field: "price", label: "Precio base", ascLabel: "Menor a mayor", descLabel: "Mayor a menor" },
+  { field: "code", label: "Lot", ascLabel: "A → Z", descLabel: "Z → A" },
+  { field: "project", label: "Project", ascLabel: "A → Z", descLabel: "Z → A" },
+  { field: "area", label: "Area", ascLabel: "Smallest first", descLabel: "Largest first" },
+  { field: "price", label: "Base price", ascLabel: "Lowest first", descLabel: "Highest first" },
   {
     field: "status",
-    label: "Estado",
-    ascLabel: "Disponibles primero",
-    descLabel: "Entregados primero",
+    label: "Status",
+    ascLabel: "Available first",
+    descLabel: "Sold or donated first",
   },
-  { field: "customer", label: "Cliente", ascLabel: "A → Z", descLabel: "Z → A" },
+  { field: "customer", label: "Customer", ascLabel: "A → Z", descLabel: "Z → A" },
 ];
 
 /**
@@ -75,7 +75,7 @@ export function compareLotCodes(a: string, b: string): number {
   const right = parseLotCode(b);
 
   if (left && right) {
-    return left.prefix.localeCompare(right.prefix, "es") || left.number - right.number;
+    return left.prefix.localeCompare(right.prefix, "en") || left.number - right.number;
   }
 
   if (left) {
@@ -85,7 +85,7 @@ export function compareLotCodes(a: string, b: string): number {
     return 1;
   }
 
-  return a.localeCompare(b, "es");
+  return a.localeCompare(b, "en");
 }
 
 /**
@@ -131,14 +131,14 @@ export function sortLots(
         return 0;
       }
 
-      const raw = nameA.localeCompare(nameB, "es");
+      const raw = nameA.localeCompare(nameB, "en");
       return rule.direction === "asc" ? raw : -raw;
     }
 
     const raw = ((): number => {
       switch (rule.field) {
         case "project":
-          return a.projectName.localeCompare(b.projectName, "es");
+          return a.projectName.localeCompare(b.projectName, "en");
         case "area":
           return a.areaM2 - b.areaM2;
         case "price":

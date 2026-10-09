@@ -34,18 +34,18 @@ const COPY: Record<
   { eyebrow: string; submit: string; busy: string; placeholder: string; moneyHint: string }
 > = {
   cancel: {
-    eyebrow: "Cancelar contrato",
-    submit: "Cancelar contrato",
-    busy: "Cancelando…",
-    placeholder: "Ej. El cliente desistió de la compra y se acordó devolver la prima.",
-    moneyHint: "¿Qué pasa con ese dinero?",
+    eyebrow: "Cancel contract",
+    submit: "Cancel contract",
+    busy: "Canceling…",
+    placeholder: "e.g. The customer changed their mind, and we agreed to refund the down payment.",
+    moneyHint: "What should happen to that money?",
   },
   default: {
-    eyebrow: "Declarar incumplido",
-    submit: "Marcar como incumplido",
-    busy: "Guardando…",
-    placeholder: "Ej. El cliente perdió el empleo y avisó que no podrá seguir pagando.",
-    moneyHint: "¿Qué pasa con lo que ya pagó? Lo habitual es que quede como ingreso.",
+    eyebrow: "Mark as defaulted",
+    submit: "Mark as defaulted",
+    busy: "Saving…",
+    placeholder: "e.g. The customer lost their job and said they can no longer make payments.",
+    moneyHint: "What should happen to the amount already paid? It's usually kept as income.",
   },
 };
 
@@ -57,19 +57,19 @@ const SETTLEMENT_OPTIONS: Array<{
 }> = [
   {
     value: "none",
-    title: "Queda como ingreso",
-    detail: "No se devuelve nada. Lo pagado se mantiene en las cuentas.",
+    title: "Keep as income",
+    detail: "Nothing is refunded. The amount paid stays in the accounts.",
   },
   {
     value: "held",
-    title: "Retenido temporalmente",
-    detail: "Sigue contando por ahora. Queda marcado para decidir después.",
+    title: "Hold temporarily",
+    detail: "It still counts for now and is marked for a decision later.",
   },
   {
     value: "refunded",
-    title: "Reembolsado al cliente",
+    title: "Refund to customer",
     detail:
-      "Se revierten los pagos ahora mismo: dejan de contar y el recibo que cubrían se anula.",
+      "Payments are reversed immediately: they stop counting, and the receipt they covered is voided.",
     needsRefundRight: true,
   },
 ];
@@ -95,12 +95,12 @@ export function ContractCancelDialog({
     setError(null);
 
     if (reason.trim().length < MINIMUM_REASON_LENGTH) {
-      setError(`Explica el motivo con al menos ${MINIMUM_REASON_LENGTH} caracteres.`);
+      setError(`Please provide a reason with at least ${MINIMUM_REASON_LENGTH} characters.`);
       return;
     }
 
     if (hasMoney && settlement === null) {
-      setError("Indica qué pasa con el dinero que el cliente ya pagó.");
+      setError("Choose what should happen to the amount the customer already paid.");
       return;
     }
 
@@ -109,7 +109,7 @@ export function ContractCancelDialog({
     try {
       await onConfirm(reason.trim(), hasMoney ? (settlement ?? undefined) : undefined);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "No se pudo completar la acción.");
+      setError(caught instanceof Error ? caught.message : "Unable to complete the action.");
     } finally {
       setSubmitting(false);
     }
@@ -123,11 +123,11 @@ export function ContractCancelDialog({
             <p className="modal-eyebrow danger-eyebrow">{copy.eyebrow}</p>
             <h2>{contract.code}</h2>
             <p className="modal-description">
-              El lote {contract.lot.code} vuelve a quedar disponible. El contrato y sus pagos se
-              conservan en el historial: nada se elimina.
+              Lot {contract.lot.code} will become available again. The contract and its payments
+              remain in the history; nothing is deleted.
             </p>
           </div>
-          <button type="button" className="modal-close" onClick={onCancel} aria-label="Cerrar">
+          <button type="button" className="modal-close" onClick={onCancel} aria-label="Close">
             <IconClose />
           </button>
         </div>
@@ -136,8 +136,8 @@ export function ContractCancelDialog({
           {hasMoney && (
             <fieldset className="form-field full-width settlement-choice">
               <legend>
-                {contract.customer.fullName} ya pagó {formatMoney(contract.paidToDate, money)} en
-                este contrato. {copy.moneyHint}
+                {contract.customer.fullName} has already paid {formatMoney(contract.paidToDate, money)}
+                toward this contract. {copy.moneyHint}
                 <span className="required-mark" aria-hidden="true"> *</span>
               </legend>
 
@@ -161,7 +161,7 @@ export function ContractCancelDialog({
                       <span className="settlement-title">{option.title}</span>
                       <span className="settlement-detail">
                         {option.detail}
-                        {disabled && " Tu usuario no puede revertir pagos."}
+                        {disabled && " Your account can't reverse payments."}
                       </span>
                     </span>
                   </label>
@@ -172,7 +172,7 @@ export function ContractCancelDialog({
 
           <div className="form-field full-width">
             <label htmlFor="cancel-reason">
-              Motivo<span className="required-mark" aria-hidden="true"> *</span>
+              Reason<span className="required-mark" aria-hidden="true"> *</span>
             </label>
             <textarea
               id="cancel-reason"
@@ -182,7 +182,7 @@ export function ContractCancelDialog({
               onChange={(event) => setReason(event.target.value)}
             />
             <span className="field-hint">
-              Queda guardado en el historial junto con tu nombre y la fecha.
+              This will be saved in the history with your name and the date.
             </span>
           </div>
 
@@ -191,7 +191,7 @@ export function ContractCancelDialog({
 
         <div className="modal-actions">
           <button type="button" className="btn-secondary" onClick={onCancel} disabled={isSubmitting}>
-            Volver
+            Back
           </button>
           <button type="submit" className="btn-danger" disabled={isSubmitting}>
             {isSubmitting ? copy.busy : copy.submit}

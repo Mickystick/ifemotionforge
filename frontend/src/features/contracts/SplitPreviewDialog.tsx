@@ -70,7 +70,7 @@ export function SplitPreviewDialog({ contracts, money, onClose }: SplitPreviewDi
         if (cancelled) {
           return;
         }
-        setError(caught instanceof Error ? caught.message : "No se pudo calcular el reparto.");
+        setError(caught instanceof Error ? caught.message : "Unable to calculate the split.");
         setLines([]);
       })
       .finally(() => {
@@ -87,33 +87,34 @@ export function SplitPreviewDialog({ contracts, money, onClose }: SplitPreviewDi
   const totalBalance = contracts.reduce((sum, contract) => sum + contract.balance, 0);
 
   return (
-    <Dialog ariaLabel={`Repartir un pago de ${customerName}`} onClose={onClose}>
+    <Dialog ariaLabel={`Split a payment for ${customerName}`} onClose={onClose}>
       <div className="modal-header">
         <div>
-          <p className="modal-eyebrow">Repartir un pago</p>
+          <p className="modal-eyebrow">Split payment</p>
           <h2>{customerName}</h2>
           <p className="modal-description">
-            {contracts.length} lotes en una sola compra · saldo total{" "}
+            {contracts.length} lots in one purchase · total balance{" "}
             {formatMoney(cents(totalBalance), money)}
           </p>
         </div>
-        <button type="button" className="modal-close" onClick={onClose} aria-label="Cerrar">
+        <button type="button" className="modal-close" onClick={onClose} aria-label="Close">
           <IconClose />
         </button>
       </div>
 
       <div className="modal-form-grid">
         <div className="form-field full-width">
-          <label htmlFor="split-amount">Monto del recibo</label>
+          <label htmlFor="split-amount">Receipt amount</label>
           <MoneyInput
             id="split-amount"
             value={amountText}
             onChange={setAmountText}
-            placeholder="Ej. 25,000"
+            placeholder="e.g. 25,000"
           />
           <span className="field-hint">
-            Partes iguales, al centavo. Solo cambia un lote si eso le dejaría pagando menos de
-            su próxima cuota o más de lo que debe; el resto se reparte igual entre los demás.
+            Equal shares, down to the cent. A lot's share changes only if it would leave that
+            customer paying less than their next installment or more than they owe; the rest is
+            split equally among the others.
           </span>
         </div>
 
@@ -125,9 +126,9 @@ export function SplitPreviewDialog({ contracts, money, onClose }: SplitPreviewDi
           <table className="split-table">
             <thead>
               <tr>
-                <th>Lote</th>
-                <th className="col-money">Le toca</th>
-                <th className="col-money">Saldo después</th>
+                <th>Lot</th>
+                <th className="col-money">Share</th>
+                <th className="col-money">Balance after</th>
               </tr>
             </thead>
             <tbody>
@@ -147,7 +148,7 @@ export function SplitPreviewDialog({ contracts, money, onClose }: SplitPreviewDi
                       {formatMoney(cents(line.balanceAfter), money)}
                     </span>
                     <span className="cell-sub">
-                      antes {formatMoney(cents(line.balanceBefore), money)}
+                      before {formatMoney(cents(line.balanceBefore), money)}
                     </span>
                   </td>
                 </tr>
@@ -160,8 +161,8 @@ export function SplitPreviewDialog({ contracts, money, onClose }: SplitPreviewDi
             // that is already paid off is how a customer ends up with a credit
             // nobody can explain.
             <p className="form-blocked">
-              Sobran {formatMoney(cents(unallocated), money)}: la compra ya no debe tanto. Hay que
-              decidir a dónde va ese dinero antes de registrar el pago.
+              {formatMoney(cents(unallocated), money)} remains: the purchase no longer owes that
+              much. Decide where that money goes before recording the payment.
             </p>
           )}
 
@@ -178,16 +179,16 @@ export function SplitPreviewDialog({ contracts, money, onClose }: SplitPreviewDi
 
             return (
               <p className="form-blocked">
-                El monto no alcanza la cuota completa de {codes}.{" "}
-                {short.length > 1 ? "Esos lotes quedarán atrasados" : "Ese lote quedará atrasado"}{" "}
-                si se registra así.
+                The amount isn't enough to cover the full installment for {codes}.{" "}
+                {short.length > 1 ? "Those lots will be overdue" : "That lot will be overdue"}{" "}
+                if recorded this way.
               </p>
             );
           })()}
         </div>
       )}
 
-      {isLoading && lines.length === 0 && <p className="state-message">Calculando…</p>}
+      {isLoading && lines.length === 0 && <p className="state-message">Calculating…</p>}
 
       <div className="modal-actions">
         {/* Registering the payment belongs to the transactions screen. Showing
@@ -195,10 +196,10 @@ export function SplitPreviewDialog({ contracts, money, onClose }: SplitPreviewDi
             do yet, so it says so instead — and it sits first, so the button
             stays where a button belongs. */}
         <span className="field-hint modal-foot-note">
-          Registrar el pago llega con la pantalla de transacciones.
+          Payment recording is available on the Transactions screen.
         </span>
         <button type="button" className="btn-secondary" onClick={onClose}>
-          Cerrar
+          Close
         </button>
       </div>
     </Dialog>

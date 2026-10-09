@@ -124,7 +124,7 @@ export function can(user: User, capability: Capability): boolean {
 /** What each role is called in the interface. */
 export const ROLE_LABELS: Record<Role, string> = {
   owner: "Supervisor",
-  staff: "Asociado",
+  staff: "Staff",
 };
 
 /**

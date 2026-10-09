@@ -47,7 +47,7 @@ export function MenuSurface({
           <div>
             <h2>{title}</h2>
           </div>
-          <button type="button" className="modal-close" onClick={onClose} aria-label="Cerrar">
+          <button type="button" className="modal-close" onClick={onClose} aria-label="Close">
             <IconClose />
           </button>
         </div>

@@ -117,7 +117,7 @@ export function MonthlyBars({
       `${valueLabel} ${formatMoney(column.valueCents, money)}`,
       column.targetCents === undefined
         ? null
-        : `${targetLabel ?? "esperado"} ${formatMoney(column.targetCents, money)}`,
+        : `${targetLabel ?? "expected"} ${formatMoney(column.targetCents, money)}`,
     ]
       .filter((part) => part !== null)
       .join(", ");
@@ -147,7 +147,7 @@ export function MonthlyBars({
               <span className="chart-readout-value">{formatMoney(reading.valueCents, money)}</span>
               {reading.targetCents !== undefined && (
                 <span className="chart-readout-target">
-                  de {formatMoney(reading.targetCents, money)}
+                  of {formatMoney(reading.targetCents, money)}
                 </span>
               )}
             </>
@@ -212,18 +212,18 @@ export function MonthlyBars({
           </ol>
         </div>
       ) : (
-        <p className="state-message">Todavía no hay movimientos en este período.</p>
+        <p className="state-message">There is no activity for this period yet.</p>
       )}
 
       {/* Not an extra: it is what makes every figure readable without a pointer,
           and the only way to read an exact amount off a chart drawn to scale. */}
       <details className="chart-table">
-        <summary>Ver los números</summary>
+        <summary>View the figures</summary>
         <table>
           <caption className="sr-only">{tableCaption}</caption>
           <thead>
             <tr>
-              <th>Mes</th>
+              <th>Month</th>
               <th className="col-money">{valueLabel}</th>
               {targetLabel && <th className="col-money">{targetLabel}</th>}
             </tr>

@@ -107,7 +107,7 @@ describe("contracts", async () => {
     const response = await create(ownerCookie, incomplete);
 
     assert.equal(response.statusCode, 400);
-    assert.match(response.json().message, /plazo/i);
+    assert.match(response.json().message, /term/i);
   });
 
   it("refuses a cash sale carrying a payment schedule", async () => {
@@ -118,7 +118,7 @@ describe("contracts", async () => {
     });
 
     assert.equal(response.statusCode, 400);
-    assert.match(response.json().message, /contado/i);
+    assert.match(response.json().message, /cash/i);
   });
 
   it("refuses a cash sale carrying a prima", async () => {
@@ -135,7 +135,7 @@ describe("contracts", async () => {
     });
 
     assert.equal(response.statusCode, 400);
-    assert.match(response.json().message, /prima/i);
+    assert.match(response.json().message, /down payment/i);
   });
 
   it("records a donation at zero and refuses one with a price", async () => {
@@ -148,7 +148,7 @@ describe("contracts", async () => {
     });
 
     assert.equal(withPrice.statusCode, 400);
-    assert.match(withPrice.json().message, /cero/i);
+    assert.match(withPrice.json().message, /zero/i);
 
     const donated = await create(ownerCookie, {
       ...financedSale(freshLot("N-06")),
@@ -180,7 +180,7 @@ describe("contracts", async () => {
     });
 
     assert.equal(response.statusCode, 400);
-    assert.match(response.json().message, /vencimiento/i);
+    assert.match(response.json().message, /expiration/i);
   });
 
   it("refuses a prima larger than the price", async () => {
@@ -190,7 +190,7 @@ describe("contracts", async () => {
     });
 
     assert.equal(response.statusCode, 400);
-    assert.match(response.json().message, /prima/i);
+    assert.match(response.json().message, /down payment/i);
   });
 
   it("refuses a date that is not a day", async () => {
@@ -335,7 +335,7 @@ describe("a purchase of several lots", async () => {
     });
 
     assert.equal(response.statusCode, 400);
-    assert.match(response.json().message, /un solo cliente/i);
+    assert.match(response.json().message, /one customer/i);
   });
 });
 
@@ -462,7 +462,7 @@ describe("editing and cancelling", async () => {
     });
 
     assert.equal(response.statusCode, 400);
-    assert.match(response.json().message, /pagado/i);
+    assert.match(response.json().message, /already paid/i);
   });
 
   it("demands a written motive before repricing a contract with payments on it", async () => {

@@ -71,7 +71,7 @@ export function ReceiptNote({ receipt, canWrite, onSave }: ReceiptNoteProps) {
       await onSave(next);
       setEditing(false);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "No se pudo guardar la nota.");
+      setError(caught instanceof Error ? caught.message : "Could not save the note.");
     } finally {
       setSaving(false);
     }
@@ -87,14 +87,14 @@ export function ReceiptNote({ receipt, canWrite, onSave }: ReceiptNoteProps) {
   return (
     <section
       className={`receipt-memo${receipt.note === null && !isEditing ? " is-empty" : ""}`}
-      aria-label="Nota del recibo"
+      aria-label="Receipt note"
     >
       <div className="receipt-memo-head">
-        <p className="receipt-memo-label">Nota del equipo</p>
+        <p className="receipt-memo-label">Team note</p>
 
         {canWrite && !isEditing && (
           <button type="button" className="btn-secondary is-small" onClick={startEditing}>
-            {receipt.note === null ? "Agregar nota" : "Editar"}
+            {receipt.note === null ? "Add note" : "Edit"}
           </button>
         )}
       </div>
@@ -106,14 +106,14 @@ export function ReceiptNote({ receipt, canWrite, onSave }: ReceiptNoteProps) {
             maxLength={MAX_NOTE_LENGTH}
             value={draft}
             autoFocus
-            aria-label="Nota del recibo"
-            placeholder="Ej. Pagará el resto el viernes. Falta el comprobante."
+            aria-label="Receipt note"
+            placeholder="e.g. Will pay the rest on Friday. Proof is missing."
             onChange={(event) => setDraft(event.target.value)}
             onKeyDown={handleKeyDown}
           />
 
           <p className="receipt-memo-hint">
-            La ven todos los usuarios. No se imprime en el recibo ni se envía al cliente.
+            Visible to all users. Not printed on the receipt or sent to the customer.
           </p>
 
           {error && <p className="form-error">{error}</p>}
@@ -125,10 +125,10 @@ export function ReceiptNote({ receipt, canWrite, onSave }: ReceiptNoteProps) {
               onClick={cancel}
               disabled={isSaving}
             >
-              Cancelar
+              Cancel
             </button>
             <button type="submit" className="btn-primary is-small" disabled={isSaving}>
-              {isSaving ? "Guardando…" : "Guardar"}
+              {isSaving ? "Saving…" : "Save"}
             </button>
           </div>
         </form>

@@ -62,7 +62,7 @@ export function SortMenu<Field extends string>({
 
   return (
     <>
-      <p className="menu-title desktop-only">Ordenar por</p>
+      <p className="menu-title desktop-only">Sort by</p>
       {options.map((option) => {
         const isCurrent = option.field === primary.field;
 
@@ -95,10 +95,10 @@ export function SortMenu<Field extends string>({
 
         return (
           <div key={level} className="sort-rule-row">
-            <span className="sort-rule-then">luego</span>
+            <span className="sort-rule-then">then</span>
             <select
               className="sort-rule-field"
-              aria-label="Ordenar también por"
+              aria-label="Also sort by"
               value={rule.field}
               onChange={(event) =>
                 onChange(setLevelField(rules, level, event.target.value as Field, defaultDirection))
@@ -114,7 +114,7 @@ export function SortMenu<Field extends string>({
               type="button"
               className="sort-rule-direction"
               onClick={() => onChange(toggleLevelDirection(rules, level))}
-              title="Invertir este orden"
+              title="Reverse this sort order"
             >
               {current ? (rule.direction === "asc" ? current.ascLabel : current.descLabel) : ""}
             </button>
@@ -122,8 +122,8 @@ export function SortMenu<Field extends string>({
               type="button"
               className="sort-rule-remove"
               onClick={() => onChange(removeLevel(rules, level))}
-              aria-label="Quitar este orden"
-              title="Quitar este orden"
+              aria-label="Remove this sort order"
+              title="Remove this sort order"
             >
               <IconClose />
             </button>
@@ -137,7 +137,7 @@ export function SortMenu<Field extends string>({
           className="sort-rule-add"
           onClick={() => onChange(addLevel(rules, options, defaultDirection))}
         >
-          + Agregar otro orden
+          + Add another sort order
         </button>
       )}
 

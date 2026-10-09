@@ -101,21 +101,21 @@ export function describeUndeliveredShare(
 ): string {
   const headline =
     outcome.status === "failed"
-      ? "No se pudo leer lo que compartiste."
+      ? "Could not read the item you shared."
       : outcome.status === "missing"
-        ? "Lo compartido llegó, pero ya no estaba guardado al abrir Lindero."
+        ? "The shared item arrived, but it was no longer saved when Lindero opened."
         : outcome.status === "unreadable"
-          ? "Lo compartido llegó, pero este teléfono no dejó leerlo."
-          : "Lo compartido llegó a Lindero sin la imagen.";
+          ? "The shared item arrived, but this phone could not read it."
+          : "The shared item reached Lindero without an image.";
 
   const details = [
-    received ? `recibido: ${received}` : null,
+    received ? `received: ${received}` : null,
     outcome.status === "unreadable" ? `error: ${outcome.detail}` : null,
   ].filter((part): part is string => part !== null);
 
   return (
-    `${headline} Adjunta el comprobante aquí abajo.` +
-    (details.length > 0 ? ` (Detalle: ${details.join(" — ")})` : "")
+    `${headline} Attach the proof file below.` +
+    (details.length > 0 ? ` (Details: ${details.join(" — ")})` : "")
   );
 }
 
@@ -171,7 +171,7 @@ function openDatabase(): Promise<IDBDatabase> {
  */
 export async function takeSharedPayload(id: string): Promise<TakenShare> {
   if (typeof indexedDB === "undefined") {
-    return { status: "unreadable", detail: "IndexedDB no disponible" };
+    return { status: "unreadable", detail: "IndexedDB unavailable" };
   }
 
   let database: IDBDatabase | null = null;
@@ -229,7 +229,7 @@ export async function takeSharedPayload(id: string): Promise<TakenShare> {
     return {
       status: "unreadable",
       // An aborted transaction can reject with `transaction.error` still null.
-      detail: error instanceof Error ? `${error.name}: ${error.message}` : String(error ?? "sin detalle"),
+      detail: error instanceof Error ? `${error.name}: ${error.message}` : String(error ?? "no details"),
     };
   } finally {
     database?.close();

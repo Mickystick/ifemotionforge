@@ -103,7 +103,7 @@ export async function receiptToPng(stage: HTMLElement, receiptCode: string): Pro
   const node = stage.querySelector<HTMLElement>(".receipt-paper");
 
   if (node === null) {
-    throw new Error("No hay un recibo que convertir en imagen.");
+    throw new Error("There is no receipt to convert to an image.");
   }
 
   const blob = await toBlob(node, {
@@ -121,10 +121,10 @@ export async function receiptToPng(stage: HTMLElement, receiptCode: string): Pro
   });
 
   if (blob === null) {
-    throw new Error("No se pudo generar la imagen del recibo.");
+    throw new Error("Could not generate the receipt image.");
   }
 
   // The filename is what the customer sees when they save it, and what somebody
   // in the office sees if it is forwarded back to them.
-  return new File([blob], `Recibo ${receiptCode}.png`, { type: "image/png" });
+  return new File([blob], `Receipt ${receiptCode}.png`, { type: "image/png" });
 }

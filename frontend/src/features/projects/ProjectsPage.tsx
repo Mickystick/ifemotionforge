@@ -60,14 +60,14 @@ export function ProjectsPage({
           className={showArchived ? "chip" : "chip active"}
           onClick={() => setShowArchived(false)}
         >
-          Activos ({active.length})
+          Active ({active.length})
         </button>
         <button
           type="button"
           className={showArchived ? "chip active" : "chip"}
           onClick={() => setShowArchived(true)}
         >
-          Archivados ({archived.length})
+          Archived ({archived.length})
         </button>
       </div>
 
@@ -75,8 +75,8 @@ export function ProjectsPage({
         <div className="card">
           <p className="state-message">
             {showArchived
-              ? "No hay proyectos archivados."
-              : "Todavía no hay proyectos. Crea el primero para poder registrar lotes."}
+              ? "No archived projects."
+              : "No projects yet. Create one to start recording lots."}
           </p>
         </div>
       )}
@@ -101,8 +101,8 @@ export function ProjectsPage({
                         <button
                           type="button"
                           className="icon-btn"
-                          title={`Editar ${project.name}`}
-                          aria-label={`Editar ${project.name}`}
+                          title={`Edit ${project.name}`}
+                          aria-label={`Edit ${project.name}`}
                           onClick={() => onEdit(project)}
                         >
                           <IconEdit />
@@ -112,8 +112,8 @@ export function ProjectsPage({
                         <button
                           type="button"
                           className="icon-btn"
-                          title={`Archivar ${project.name}`}
-                          aria-label={`Archivar ${project.name}`}
+                          title={`Archive ${project.name}`}
+                          aria-label={`Archive ${project.name}`}
                           onClick={() => onArchive(project)}
                         >
                           <IconArchive />
@@ -125,8 +125,8 @@ export function ProjectsPage({
                       <button
                         type="button"
                         className="icon-btn"
-                        title={`Restaurar ${project.name}`}
-                        aria-label={`Restaurar ${project.name}`}
+                        title={`Restore ${project.name}`}
+                        aria-label={`Restore ${project.name}`}
                         onClick={() => onRestore(project)}
                       >
                         <IconRestore />
@@ -136,13 +136,13 @@ export function ProjectsPage({
                 </div>
               </header>
 
-              {project.archivedAt !== null && <span className="stamp neutral">Archivado</span>}
+              {project.archivedAt !== null && <span className="stamp neutral">Archived</span>}
 
               <div className="project-stats">
                 <div className="project-stat">
                   <span className="project-stat-value">{project.lotCount}</span>
                   <span className="project-stat-label">
-                    Lote{project.lotCount === 1 ? "" : "s"}
+                    Lot{project.lotCount === 1 ? "" : "s"}
                   </span>
                 </div>
                 <div className="project-stat">
@@ -150,7 +150,7 @@ export function ProjectsPage({
                     {area.value}
                     <span className="unit">{area.symbol}</span>
                   </span>
-                  <span className="project-stat-label">Área total</span>
+                  <span className="project-stat-label">Total area</span>
                 </div>
                 <div className="project-stat">
                   <span className="project-stat-value">
@@ -171,12 +171,12 @@ export function ProjectsPage({
                   have none, and a permanent "0 donados" would take up a line
                   to say nothing. */}
               <div className="project-status-row">
-                <span className="stamp success">{project.availableCount} disponibles</span>
-                <span className="stamp warning">{project.reservedCount} reservados</span>
-                <span className="stamp clay">{project.financedCount} financiados</span>
-                <span className="stamp neutral">{project.soldCount} vendidos</span>
+                <span className="stamp success">{project.availableCount} available</span>
+                <span className="stamp warning">{project.reservedCount} reserved</span>
+                <span className="stamp clay">{project.financedCount} financed</span>
+                <span className="stamp neutral">{project.soldCount} sold</span>
                 {project.donatedCount > 0 && (
-                  <span className="stamp neutral">{project.donatedCount} donados</span>
+                  <span className="stamp neutral">{project.donatedCount} donated</span>
                 )}
               </div>
 
@@ -185,7 +185,7 @@ export function ProjectsPage({
               {project.areaUnit !== "m2" && (
                 <footer className="project-card-foot">
                   <span className="field-hint">
-                    Áreas en {area.symbol} · guardadas siempre en m²
+                    Areas in {area.symbol} · always stored in m²
                   </span>
                 </footer>
               )}

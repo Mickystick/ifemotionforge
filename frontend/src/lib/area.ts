@@ -20,7 +20,7 @@ export type AreaUnit = (typeof AREA_UNITS)[number];
 interface AreaUnitInfo {
   /** Short form shown in tables, e.g. "mz". */
   symbol: string;
-  /** Full Spanish name for labels and dropdowns. */
+  /** Full name for labels and dropdowns. */
   label: string;
   /** How many square metres one of this unit is. */
   squareMetres: number;
@@ -38,16 +38,16 @@ const VARA_METRES = 0.8359;
 const VARA2_M2 = VARA_METRES * VARA_METRES;
 
 export const AREA_UNIT_INFO: Record<AreaUnit, AreaUnitInfo> = {
-  m2: { symbol: "m²", label: "Metros cuadrados (m²)", squareMetres: 1, decimals: 2 },
-  vara2: { symbol: "v²", label: "Varas cuadradas (v²)", squareMetres: VARA2_M2, decimals: 2 },
+  m2: { symbol: "m²", label: "Square meters (m²)", squareMetres: 1, decimals: 2 },
+  vara2: { symbol: "v²", label: "Square varas (v²)", squareMetres: VARA2_M2, decimals: 2 },
   manzana: {
     symbol: "mz",
     label: "Manzanas (mz)",
     squareMetres: VARA2_M2 * 10_000,
     decimals: 4,
   },
-  hectarea: { symbol: "ha", label: "Hectáreas (ha)", squareMetres: 10_000, decimals: 4 },
-  km2: { symbol: "km²", label: "Kilómetros cuadrados (km²)", squareMetres: 1_000_000, decimals: 6 },
+  hectarea: { symbol: "ha", label: "Hectares (ha)", squareMetres: 10_000, decimals: 4 },
+  km2: { symbol: "km²", label: "Square kilometers (km²)", squareMetres: 1_000_000, decimals: 6 },
 };
 
 export function isAreaUnit(value: string): value is AreaUnit {
@@ -75,7 +75,7 @@ function areaFormat(decimals: number): Intl.NumberFormat {
   let format = areaFormats.get(decimals);
 
   if (!format) {
-    format = new Intl.NumberFormat("es-HN", {
+    format = new Intl.NumberFormat("en-US", {
       minimumFractionDigits: 0,
       maximumFractionDigits: decimals,
     });

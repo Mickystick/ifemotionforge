@@ -30,7 +30,7 @@ export function useContracts(enabled: boolean, onSessionExpired: () => void) {
         return;
       }
 
-      const message = caught instanceof Error ? caught.message : "No se pudo cargar los contratos.";
+      const message = caught instanceof Error ? caught.message : "Could not load contracts.";
 
       /*
        * A failed REFRESH leaves what is on screen alone.

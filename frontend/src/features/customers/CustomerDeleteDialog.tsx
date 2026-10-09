@@ -48,7 +48,7 @@ export function CustomerDeleteDialog({
     setError(null);
 
     if (reason.trim().length < MINIMUM_REASON_LENGTH) {
-      setError(`Explica el motivo con al menos ${MINIMUM_REASON_LENGTH} caracteres.`);
+      setError(`Please provide a reason with at least ${MINIMUM_REASON_LENGTH} characters.`);
       return;
     }
 
@@ -57,22 +57,22 @@ export function CustomerDeleteDialog({
     try {
       await onConfirm(reason.trim());
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "No se pudo eliminar el cliente.");
+      setError(caught instanceof Error ? caught.message : "Unable to delete the customer.");
     } finally {
       setDeleting(false);
     }
   };
 
   return (
-    <Dialog ariaLabel={`Eliminar a ${customer.fullName}`} onClose={onCancel}>
+    <Dialog ariaLabel={`Delete ${customer.fullName}`} onClose={onCancel}>
       <form onSubmit={handleSubmit}>
         <div className="modal-header">
           <div>
-            <p className="modal-eyebrow danger-eyebrow">Eliminar cliente</p>
+            <p className="modal-eyebrow danger-eyebrow">Delete customer</p>
             <h2>{customer.fullName}</h2>
             <p className="modal-description">{customerLine(customer)}</p>
           </div>
-          <button type="button" className="modal-close" onClick={onCancel} aria-label="Cerrar">
+          <button type="button" className="modal-close" onClick={onCancel} aria-label="Close">
             <IconClose />
           </button>
         </div>
@@ -80,35 +80,33 @@ export function CustomerDeleteDialog({
         <div className="modal-form-grid">
           {isBlocked ? (
             <p className="form-blocked full-width">
-              {customer.fullName} tiene {activeContracts.length} contrato
-              {activeContracts.length === 1 ? "" : "s"} vigente
+              {customer.fullName} has {activeContracts.length} active contract
               {activeContracts.length === 1 ? "" : "s"} (
-              {activeContracts.map((contract) => contract.contractCode).join(", ")}). Cancela
-              el contrato primero: borrar al cliente dejaría {activeContracts.length === 1
-                ? "ese lote"
-                : "esos lotes"}{" "}
-              en manos de nadie.
+              {activeContracts.map((contract) => contract.contractCode).join(", ")}). Cancel
+              the contract first; deleting the customer would leave{" "}
+              {activeContracts.length === 1 ? "that lot" : "those lots"}{" "}
+              without an owner.
             </p>
           ) : (
             <>
               <p className="form-warning full-width">
-                Esto borra el registro de {customer.fullName} para siempre. No es archivar: no
-                se puede restaurar. Solo queda la línea del historial que escribas aquí.
+                This permanently deletes {customer.fullName}'s record. This is not archiving:
+                it can't be undone. Only the history entry you write here will remain.
               </p>
 
               <div className="form-field full-width">
                 <label htmlFor="customer-delete-reason">
-                  Motivo<span className="required-mark" aria-hidden="true"> *</span>
+                  Reason<span className="required-mark" aria-hidden="true"> *</span>
                 </label>
                 <textarea
                   id="customer-delete-reason"
                   rows={3}
                   value={reason}
-                  placeholder="Ej. Capturado dos veces el 12 de agosto; este registro está vacío."
+                  placeholder="e.g. Entered twice on August 12; this record is empty."
                   onChange={(event) => setReason(event.target.value)}
                 />
                 <span className="field-hint">
-                  Queda guardado en el historial junto con tu nombre y la fecha.
+                  This will be saved in the history with your name and the date.
                 </span>
               </div>
             </>
@@ -119,10 +117,10 @@ export function CustomerDeleteDialog({
 
         <div className="modal-actions">
           <button type="button" className="btn-secondary" onClick={onCancel} disabled={isDeleting}>
-            Cancelar
+            Cancel
           </button>
           <button type="submit" className="btn-danger" disabled={isBlocked || isDeleting}>
-            {isDeleting ? "Eliminando…" : "Eliminar cliente"}
+            {isDeleting ? "Deleting…" : "Delete customer"}
           </button>
         </div>
       </form>

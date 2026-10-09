@@ -44,34 +44,34 @@ describe("receiptBlocker", () => {
     const blocker = receiptBlocker({ ...ready, customerId: "", payable: [], lineCount: 0 });
 
     assert.equal(blocker?.focus, CUSTOMER_FIELD);
-    assert.match(blocker!.message, /cliente/i);
+    assert.match(blocker!.message, /customer/i);
   });
 
   it("names the missing monto, and points at the field that takes it", () => {
     const blocker = receiptBlocker({ ...ready, lineCount: 0, amountText: "" });
 
     assert.equal(blocker?.focus, AMOUNT_FIELD);
-    assert.match(blocker!.message, /monto/i);
+    assert.match(blocker!.message, /payment amount/i);
   });
 
   it("says a typed zero is not an amount, rather than repeating 'falta el monto'", () => {
     const blocker = receiptBlocker({ ...ready, lineCount: 0, amountText: "0" });
 
-    assert.match(blocker!.message, /mayor que cero/i);
+    assert.match(blocker!.message, /greater than zero/i);
     assert.equal(blocker?.focus, AMOUNT_FIELD);
   });
 
   it("treats whitespace as nothing typed at all", () => {
     const blocker = receiptBlocker({ ...ready, lineCount: 0, amountText: "   " });
 
-    assert.match(blocker!.message, /Falta el monto/i);
+    assert.match(blocker!.message, /enter the payment amount/i);
   });
 
   it("tells a customer with no payable contracts apart from one with no monto", () => {
     const blocker = receiptBlocker({ ...ready, payable: [], lineCount: 0 });
 
     assert.equal(blocker?.focus, CUSTOMER_FIELD);
-    assert.match(blocker!.message, /no tiene contratos/i);
+    assert.match(blocker!.message, /no contracts/i);
   });
 
   describe("several lots", () => {
@@ -94,7 +94,7 @@ describe("receiptBlocker", () => {
         amountText: "25,000",
       });
 
-      assert.match(blocker!.message, /repartir/i);
+      assert.match(blocker!.message, /has not been split/i);
       assert.equal(blocker?.focus, amountFieldId("c1"));
     });
 
@@ -108,7 +108,7 @@ describe("receiptBlocker", () => {
         amountText: "0",
       });
 
-      assert.match(blocker!.message, /mayor que cero/i);
+      assert.match(blocker!.message, /greater than zero/i);
       assert.equal(blocker?.focus, AMOUNT_FIELD);
     });
 
@@ -134,7 +134,7 @@ describe("receiptBlocker", () => {
         amountByContract: { c3: "0" },
       });
 
-      assert.match(blocker!.message, /ningún lote/i);
+      assert.match(blocker!.message, /No amount is assigned to any lot/i);
       assert.equal(blocker?.focus, amountFieldId("c1"));
     });
   });

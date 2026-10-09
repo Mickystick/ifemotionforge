@@ -41,14 +41,14 @@ const authPlugin: FastifyPluginAsync<AuthPluginOptions> = async (app, options) =
 
   app.decorate("requireUser", async (request: FastifyRequest, reply: FastifyReply) => {
     if (!request.user) {
-      await reply.code(401).send({ error: "unauthenticated", message: "Inicia sesión." });
+      await reply.code(401).send({ error: "unauthenticated", message: "Please sign in." });
     }
   });
 
   app.decorate("requireCapability", (capability: Capability) => {
     return async (request: FastifyRequest, reply: FastifyReply) => {
       if (!request.user) {
-        await reply.code(401).send({ error: "unauthenticated", message: "Inicia sesión." });
+        await reply.code(401).send({ error: "unauthenticated", message: "Please sign in." });
         return;
       }
 
@@ -62,7 +62,7 @@ const authPlugin: FastifyPluginAsync<AuthPluginOptions> = async (app, options) =
         );
         await reply.code(403).send({
           error: "forbidden",
-          message: "Tu usuario no tiene permiso para esta acción.",
+          message: "Your account does not have permission to perform this action.",
         });
       }
     };

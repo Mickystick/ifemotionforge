@@ -153,7 +153,7 @@ function identificationClash(
     return null;
   }
 
-  return `La identidad ${identification} ya está registrada a nombre de ${clash.fullName}.`;
+  return `ID ${identification} is already registered to ${clash.fullName}.`;
 }
 
 export const customerRoutes: FastifyPluginAsync = async (app) => {
@@ -204,7 +204,7 @@ export const customerRoutes: FastifyPluginAsync = async (app) => {
       if (!parsed.success) {
         return reply.code(400).send({
           error: "invalid_body",
-          message: "Revisa los datos del cliente.",
+          message: "Check the customer details.",
           issues: parsed.error.issues.map((issue) => issue.message),
         });
       }
@@ -216,9 +216,9 @@ export const customerRoutes: FastifyPluginAsync = async (app) => {
         return reply.code(400).send({
           error: "invalid_phone",
           message:
-            "El teléfono no parece un número válido. Escribe los 8 dígitos hondureños " +
-            "(9982-4471) o el número completo con su código de país (+1 305 555 0123), " +
-            "o déjalo en blanco si el cliente no tiene uno registrado.",
+            "This phone number does not look valid. Enter the 8-digit Honduran number " +
+            "(9982-4471) or the full number with its country code (+1 305 555 0123), " +
+            "or leave it blank if the customer does not have a number on file.",
         });
       }
 
@@ -265,7 +265,7 @@ export const customerRoutes: FastifyPluginAsync = async (app) => {
       if (!parsed.success) {
         return reply.code(400).send({
           error: "invalid_body",
-          message: "Revisa los datos del cliente.",
+          message: "Check the customer details.",
           issues: parsed.error.issues.map((issue) => issue.message),
         });
       }
@@ -277,7 +277,7 @@ export const customerRoutes: FastifyPluginAsync = async (app) => {
         .get();
 
       if (!existing) {
-        return reply.code(404).send({ error: "not_found", message: "Cliente no encontrado." });
+        return reply.code(404).send({ error: "not_found", message: "Customer not found." });
       }
 
       const typedPhone = parsed.data.phone?.trim() ?? "";
@@ -287,9 +287,9 @@ export const customerRoutes: FastifyPluginAsync = async (app) => {
         return reply.code(400).send({
           error: "invalid_phone",
           message:
-            "El teléfono no parece un número válido. Escribe los 8 dígitos hondureños " +
-            "(9982-4471) o el número completo con su código de país (+1 305 555 0123), " +
-            "o déjalo en blanco si el cliente no tiene uno registrado.",
+            "This phone number does not look valid. Enter the 8-digit Honduran number " +
+            "(9982-4471) or the full number with its country code (+1 305 555 0123), " +
+            "or leave it blank if the customer does not have a number on file.",
         });
       }
 
@@ -382,7 +382,7 @@ export const customerRoutes: FastifyPluginAsync = async (app) => {
       if (!parsed.success) {
         return reply.code(400).send({
           error: "invalid_body",
-          message: "Explica el motivo con al menos 10 caracteres.",
+          message: "Please explain the reason in at least 10 characters.",
         });
       }
 
@@ -393,7 +393,7 @@ export const customerRoutes: FastifyPluginAsync = async (app) => {
         .get();
 
       if (!existing) {
-        return reply.code(404).send({ error: "not_found", message: "Cliente no encontrado." });
+        return reply.code(404).send({ error: "not_found", message: "Customer not found." });
       }
 
       // Every contract this person has ever been on, not just the live ones.
@@ -411,10 +411,10 @@ export const customerRoutes: FastifyPluginAsync = async (app) => {
         return reply.code(409).send({
           error: "customer_has_active_contracts",
           message:
-            `No se puede eliminar a ${existing.fullName}: todavía tiene ` +
-            `${active.length} contrato${active.length === 1 ? "" : "s"} vigente` +
-            `${active.length === 1 ? "" : "s"} (${active.map((contract) => contract.code).join(", ")}). ` +
-            "Cancela el contrato primero.",
+            `Cannot delete ${existing.fullName}: they still have ` +
+            `${active.length} active contract${active.length === 1 ? "" : "s"} ` +
+            `(${active.map((contract) => contract.code).join(", ")}). ` +
+            "Cancel the contract first.",
           contractCodes: active.map((contract) => contract.code),
         });
       }
@@ -423,10 +423,10 @@ export const customerRoutes: FastifyPluginAsync = async (app) => {
         return reply.code(409).send({
           error: "customer_has_history",
           message:
-            `No se puede eliminar a ${existing.fullName}: tiene ` +
-            `${held.length} contrato${held.length === 1 ? "" : "s"} en su historial ` +
+            `Cannot delete ${existing.fullName}: they have ` +
+            `${held.length} contract${held.length === 1 ? "" : "s"} in their history ` +
             `(${held.map((contract) => contract.code).join(", ")}). ` +
-            "Borrar al cliente dejaría esos pagos sin dueño.",
+            "Deleting this customer would leave those payments without an owner.",
           contractCodes: held.map((contract) => contract.code),
         });
       }

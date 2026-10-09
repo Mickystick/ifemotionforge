@@ -51,13 +51,13 @@ function DocumentMark({ contract }: { contract: Contract }) {
       className="contract-doc-mark"
       title={
         contract.documentCount === 1
-          ? "El contrato firmado está guardado"
-          : `${contract.documentCount} documentos guardados`
+          ? "Signed contract saved"
+          : `${contract.documentCount} documents saved`
       }
       aria-label={
         contract.documentCount === 1
-          ? "Tiene el contrato firmado guardado"
-          : `Tiene ${contract.documentCount} documentos guardados`
+          ? "Signed contract saved"
+          : `${contract.documentCount} documents saved`
       }
     >
       <IconPaperclip />
@@ -233,21 +233,21 @@ export function ContractsPage({
           <table className="contracts-table">
             <thead>
               <tr>
-                <th>Contrato</th>
-                <th>Cliente</th>
-                <th>Lote</th>
+                <th>Contract</th>
+                <th>Customer</th>
+                <th>Lot</th>
                 {/* Price and prima share a column: the prima is a PART of the
                     price, not a peer of it, and giving it a column of its own
                     pushed the payment health off a 1440px screen. */}
-                <th className="col-money">Precio · prima</th>
-                <th className="col-money">Saldo</th>
-                <th className="col-money">Mensual</th>
-                <th>Estado</th>
+                <th className="col-money">Price · down payment</th>
+                <th className="col-money">Balance</th>
+                <th className="col-money">Monthly</th>
+                <th>Status</th>
                 {/* No visible heading: three 28px icons under the word
                     "Contacto" would be a column captioned wider than itself.
                     The name is given to screen readers instead. */}
                 <th className="col-contact">
-                  <span className="sr-only">Contacto</span>
+                  <span className="sr-only">Contact</span>
                 </th>
               </tr>
             </thead>
@@ -279,11 +279,11 @@ export function ContractsPage({
                             <span className="holder-text">
                               <span className="holder-name">{group.customerName}</span>
                               <span className="holder-contract">
-                                {group.contracts.length} contratos
+                                {group.contracts.length} contracts
                                 {/* One signature and one receipt, versus lots
                                     bought years apart by the same person. The
                                     split only makes sense for the first. */}
-                                {group.isOnePurchase ? " · una sola compra" : ""}
+                                {group.isOnePurchase ? " · single purchase" : ""}
                               </span>
                             </span>
                           </button>
@@ -297,7 +297,7 @@ export function ContractsPage({
                                 onSplitPayment(group.contracts);
                               }}
                             >
-                              Repartir pago
+                              Split payment
                             </button>
                           )}
 
@@ -318,7 +318,7 @@ export function ContractsPage({
                                   onAmendPurchase(group.contracts);
                                 }}
                               >
-                                Adenda
+                                Amend purchase
                               </button>
                             )}
                         </td>
@@ -330,7 +330,7 @@ export function ContractsPage({
                               the one place the number still showed. */}
                           {group.totalDownPayment > 0 && (
                             <span className="cell-sub">
-                              prima {formatMoney(group.totalDownPayment, money)}
+                              down payment {formatMoney(group.totalDownPayment, money)}
                             </span>
                           )}
                         </td>
@@ -380,7 +380,7 @@ export function ContractsPage({
                                   event.stopPropagation();
                                   onOpenContract(contract);
                                 }}
-                                title={`Ver el contrato ${contract.code}`}
+                                title={`View contract ${contract.code}`}
                               >
                                 <span className="code-badge">{contract.code}</span>
                                 {contract.documentCount > 0 && <DocumentMark contract={contract} />}
@@ -457,11 +457,11 @@ export function ContractsPage({
                                       : "cell-sub"
                                   }
                                 >
-                                  prima {formatMoney(contract.terms.downPayment, money)}
+                                  down payment {formatMoney(contract.terms.downPayment, money)}
                                   {contract.downPaymentPaid < contract.terms.downPayment &&
                                     (contract.downPaymentPaid === 0
-                                      ? " · sin cobrar"
-                                      : ` · faltan ${formatMoney(
+                                      ? " · unpaid"
+                                      : ` · remaining ${formatMoney(
                                           subtractMoney(
                                             contract.terms.downPayment,
                                             contract.downPaymentPaid,
@@ -480,7 +480,7 @@ export function ContractsPage({
                               ) : (
                                 <>
                                   {moneyCell(contract.terms.monthlyPayment)}
-                                  <span className="cell-sub">día {contract.terms.dueDay}</span>
+                                  <span className="cell-sub">day {contract.terms.dueDay}</span>
                                 </>
                               )}
                             </td>
@@ -489,7 +489,7 @@ export function ContractsPage({
                               {detail !== "" && <span className="cell-sub">{detail}</span>}
                               {contract.health.nextDueOn && detail === "" && (
                                 <span className="cell-sub">
-                                  vence {formatDate(contract.health.nextDueOn)}
+                                  due {formatDate(contract.health.nextDueOn)}
                                 </span>
                               )}
                             </td>
@@ -508,20 +508,20 @@ export function ContractsPage({
                 <tr>
                   <td colSpan={COLUMN_COUNT} className="table-empty">
                     {contracts.length === 0 ? (
-                      "Todavía no hay contratos registrados."
+                      "No contracts have been recorded yet."
                     ) : (
                       <>
                         <p>
                           {search.trim() === ""
-                            ? "Ningún contrato coincide con los filtros."
-                            : `Ningún contrato coincide con «${search.trim()}».`}
+                            ? "No contracts match the filters."
+                            : `No contracts match “${search.trim()}”.`}
                         </p>
                         {/* An empty table is where a forgotten filter finally
                             shows itself — and this screen opens with one on, so
                             the way out has to be offered right here. */}
                       {isNarrowed && (
                         <button type="button" className="link-btn" onClick={clearEverything}>
-                          Limpiar la búsqueda y los filtros
+                          Clear search and filters
                         </button>
                       )}
                     </>
@@ -547,7 +547,7 @@ export function ContractsPage({
                   <div className="holder-text">
                     <span className="holder-name">{group.customerName}</span>
                     <span className="holder-contract">
-                      {group.contracts.length} contratos · saldo{" "}
+                      {group.contracts.length} contracts · balance{" "}
                       {formatMoney(group.totalBalance, money)}
                     </span>
                   </div>
@@ -596,14 +596,14 @@ export function ContractsPage({
                     {isGrouped && <p className="contract-card-lot">{contract.lot.projectName}</p>}
 
                     <div className="contract-card-balance">
-                      <span>Saldo</span>
+                      <span>Balance</span>
                       <strong>{formatMoney(contract.balance, money)}</strong>
                     </div>
 
                     <p className="contract-card-foot">
                       {contract.terms.monthlyPayment === null
                         ? SALE_TYPE_LABELS[contract.saleType]
-                        : `${formatMoney(contract.terms.monthlyPayment, money)} · día ${
+                        : `${formatMoney(contract.terms.monthlyPayment, money)} · day ${
                             contract.terms.dueDay
                           }`}
                       {detail !== "" ? ` · ${detail}` : ""}
@@ -633,8 +633,8 @@ export function ContractsPage({
           {visible.length === 0 && (
             <p className="state-message">
               {contracts.length === 0
-                ? "Todavía no hay contratos registrados."
-                : "Ningún contrato coincide con los filtros."}
+                ? "No contracts have been recorded yet."
+                : "No contracts match the filters."}
             </p>
           )}
         </div>

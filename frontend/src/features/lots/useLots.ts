@@ -32,7 +32,7 @@ export function useLots(enabled: boolean, onSessionExpired: () => void) {
         return;
       }
 
-      const message = caught instanceof Error ? caught.message : "No se pudo cargar el inventario.";
+      const message = caught instanceof Error ? caught.message : "Could not load the inventory.";
 
       /*
        * A failed REFRESH leaves what is on screen alone.
